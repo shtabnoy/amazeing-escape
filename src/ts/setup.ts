@@ -30,22 +30,22 @@ function drawOnCanvas(mazeObject: any, ctx: CanvasRenderingContext2D) {
       const room = mazeObject[row * WIDTH + col + 1]
       ctx.beginPath()
       ctx.moveTo(room.x1, room.y1)
-      if (room.n) {
+      if (room.up) {
         ctx.moveTo(room.x2, room.y1)
       } else {
         ctx.lineTo(room.x2, room.y1)
       }
-      if (room.e) {
+      if (room.right) {
         ctx.moveTo(room.x2, room.y2)
       } else {
         ctx.lineTo(room.x2, room.y2)
       }
-      if (room.s) {
+      if (room.down) {
         ctx.moveTo(room.x1, room.y2)
       } else {
         ctx.lineTo(room.x1, room.y2)
       }
-      if (room.w) {
+      if (room.left) {
         ctx.moveTo(room.x1, room.y1)
       } else {
         ctx.lineTo(room.x1, room.y1)
@@ -66,10 +66,10 @@ function drawCharacter(ctx: CanvasRenderingContext2D, x: number, y: number) {
 function prepareForDrawing(g: Graph) {
   const mazeObject: {
     [key: string]: {
-      w: number | null
-      e: number | null
-      n: number | null
-      s: number | null
+      left: number | null
+      right: number | null
+      up: number | null
+      down: number | null
       x1: number
       y1: number
       x2: number
@@ -78,10 +78,10 @@ function prepareForDrawing(g: Graph) {
   } = {}
   Object.keys(g.AdjList).forEach((v1, index) => {
     mazeObject[v1] = {
-      w: null,
-      e: null,
-      n: null,
-      s: null,
+      left: null,
+      right: null,
+      up: null,
+      down: null,
       x1: 0,
       y1: 0,
       x2: 0,
@@ -95,16 +95,16 @@ function prepareForDrawing(g: Graph) {
     mazeObject[v1].y2 = (Math.floor(index / HEIGHT) + 1) * rw + offset
     Object.keys(g.AdjList[v1]).forEach(v2 => {
       if (Number(v1) - Number(v2) === 1) {
-        mazeObject[v1].w = Number(v2)
+        mazeObject[v1].left = Number(v2)
       }
       if (Number(v1) - Number(v2) === -1) {
-        mazeObject[v1].e = Number(v2)
+        mazeObject[v1].right = Number(v2)
       }
       if (Number(v1) - Number(v2) === WIDTH) {
-        mazeObject[v1].n = Number(v2)
+        mazeObject[v1].up = Number(v2)
       }
       if (Number(v1) - Number(v2) === -WIDTH) {
-        mazeObject[v1].s = Number(v2)
+        mazeObject[v1].down = Number(v2)
       }
     })
   })
@@ -165,7 +165,7 @@ function makeGraph(w: number, h: number) {
 
 document.addEventListener('DOMContentLoaded', () => {
   const graph = makeGraph(WIDTH, HEIGHT)
-  const mazeObj = prepareForDrawing(graph)
+  const maze = prepareForDrawing(graph)
 
   const canvas = document.getElementById('canvas') as HTMLCanvasElement
   // const cw = window.innerWidth
@@ -190,114 +190,72 @@ document.addEventListener('DOMContentLoaded', () => {
     x: 30,
     y: 30,
   }
-  let INCREMENT = 10
-  let inc = 1
-  let counter = 0
-  let currentRoom = 1
-  drawOnCanvas(mazeObj, ctx)
+  const STEP_PER_FRAME = 2
+  let room = 1
+  drawOnCanvas(maze, ctx)
   drawCharacter(ctx, coords.x, coords.y)
 
-  const moveRight = () => {
-    if (
-      !mazeObj[currentRoom].e &&
-      coords.x + inc + CIRCLE_R > mazeObj[currentRoom].x2
-    ) {
-      console.log('RIGHT WALL')
-    } else {
-      ctx.clearRect(0, 0, cw, ch)
-      if (coords.x + inc + CIRCLE_R > mazeObj[currentRoom].x2) {
-        currentRoom = mazeObj[currentRoom].e
-      }
-      coords.x += inc
-      drawOnCanvas(mazeObj, ctx)
-      drawCharacter(ctx, coords.x, coords.y)
-      counter++
-      if (counter < INCREMENT) {
-        requestAnimationFrame(moveRight)
-      } else {
-        counter = 0
-      }
+  const move = (dir: 'right' | 'left' | 'up' | 'down') => {
+    let inRoom = true
+    let canGo = false
+    switch (dir) {
+      case 'left':
+        inRoom = coords.x - STEP_PER_FRAME - CIRCLE_R >= maze[room].x1
+        canGo = inRoom || Boolean(maze[room].left)
+        if (canGo) coords.x -= STEP_PER_FRAME
+        break
+      case 'right':
+        inRoom = coords.x + STEP_PER_FRAME + CIRCLE_R <= maze[room].x2
+        canGo = inRoom || Boolean(maze[room].right)
+        if (canGo) coords.x += STEP_PER_FRAME
+        break
+      case 'up':
+        inRoom = coords.y - STEP_PER_FRAME - CIRCLE_R >= maze[room].y1
+        canGo = inRoom || Boolean(maze[room].up)
+        if (canGo) coords.y -= STEP_PER_FRAME
+        break
+      case 'down':
+        inRoom = coords.y + STEP_PER_FRAME + CIRCLE_R <= maze[room].y2
+        canGo = inRoom || Boolean(maze[room].down)
+        if (canGo) coords.y += STEP_PER_FRAME
+        break
+      default:
+        break
     }
-  }
-  const moveLeft = () => {
-    if (
-      !mazeObj[currentRoom].w &&
-      coords.x - inc - CIRCLE_R < mazeObj[currentRoom].x1
-    ) {
-      console.log('LEFT WALL')
-    } else {
+    if (canGo) {
       ctx.clearRect(0, 0, cw, ch)
-      if (coords.x - inc - CIRCLE_R < mazeObj[currentRoom].x1) {
-        currentRoom = mazeObj[currentRoom].w
-      }
-      coords.x -= inc
-      drawOnCanvas(mazeObj, ctx)
+      if (!inRoom) room = maze[room][dir]
+      drawOnCanvas(maze, ctx)
       drawCharacter(ctx, coords.x, coords.y)
-      counter++
-      if (counter < INCREMENT) {
-        requestAnimationFrame(moveLeft)
-      } else {
-        counter = 0
-      }
-    }
-  }
-  const moveUp = () => {
-    if (
-      !mazeObj[currentRoom].n &&
-      coords.y - inc - CIRCLE_R < mazeObj[currentRoom].y1
-    ) {
-      console.log('TOP WALL')
-    } else {
-      ctx.clearRect(0, 0, cw, ch)
-      if (coords.y - inc - CIRCLE_R < mazeObj[currentRoom].y1) {
-        currentRoom = mazeObj[currentRoom].n
-      }
-      coords.y -= inc
-      drawOnCanvas(mazeObj, ctx)
-      drawCharacter(ctx, coords.x, coords.y)
-      counter++
-      if (counter < INCREMENT) {
-        requestAnimationFrame(moveUp)
-      } else {
-        counter = 0
-      }
-    }
-  }
-  const moveDown = () => {
-    if (
-      !mazeObj[currentRoom].s &&
-      coords.y + inc + CIRCLE_R > mazeObj[currentRoom].y2
-    ) {
-      console.log('BOTTOM WALL')
-    } else {
-      ctx.clearRect(0, 0, cw, ch)
-      if (coords.y + inc + CIRCLE_R > mazeObj[currentRoom].y2) {
-        currentRoom = mazeObj[currentRoom].s
-      }
-      coords.y += inc
-      drawOnCanvas(mazeObj, ctx)
-      drawCharacter(ctx, coords.x, coords.y)
-      counter++
-      if (counter < INCREMENT) {
-        requestAnimationFrame(moveDown)
-      } else {
-        counter = 0
-      }
     }
   }
 
+  const keys: {
+    [key: string]: boolean
+  } = {}
+
+  const update = () => {
+    if (keys[39]) {
+      move('right')
+    }
+    if (keys[37]) {
+      move('left')
+    }
+    if (keys[40]) {
+      move('down')
+    }
+    if (keys[38]) {
+      move('up')
+    }
+    requestAnimationFrame(update)
+  }
+
+  requestAnimationFrame(update)
+
   document.addEventListener('keydown', e => {
-    if (e.which === 39) {
-      requestAnimationFrame(moveRight)
-    }
-    if (e.which === 37) {
-      requestAnimationFrame(moveLeft)
-    }
-    if (e.which === 40) {
-      requestAnimationFrame(moveDown)
-    }
-    if (e.which === 38) {
-      requestAnimationFrame(moveUp)
-    }
+    keys[e.keyCode] = true
+  })
+  document.addEventListener('keyup', e => {
+    keys[e.keyCode] = false
   })
 })
