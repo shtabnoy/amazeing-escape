@@ -1,58 +1,47 @@
 import Graph from './Graph'
 import mst from './MST'
 
+interface Maze {
+  [key: string]: {
+    left: number | null
+    right: number | null
+    up: number | null
+    down: number | null
+    x1: number
+    y1: number
+    x2: number
+    y2: number
+  }
+}
+
 interface Point {
   x: number
   y: number
 }
 
-interface Wall {}
-
-interface Room {
-  x1: number
-  y1: number
-  x2: number
-  y2: number
-  n: Room | Wall
-  e: Room | Wall
-  s: Room | Wall
-  w: Room | Wall
+interface Wall {
+  a: Point
+  b: Point
 }
+
+interface Walls {
+  [key: string]: Wall
+}
+
+const walls: Walls = {}
 
 const WIDTH = 5
 const HEIGHT = 5
 const CIRCLE_R = 5
 
-function drawOnCanvas(mazeObject: any, ctx: CanvasRenderingContext2D) {
-  // TODO: just iterate over Object.keys(mazeObject)
-  for (let row = 0; row < WIDTH; row++) {
-    for (let col = 0; col < HEIGHT; col++) {
-      const room = mazeObject[row * WIDTH + col + 1]
-      ctx.beginPath()
-      ctx.moveTo(room.x1, room.y1)
-      if (room.up) {
-        ctx.moveTo(room.x2, room.y1)
-      } else {
-        ctx.lineTo(room.x2, room.y1)
-      }
-      if (room.right) {
-        ctx.moveTo(room.x2, room.y2)
-      } else {
-        ctx.lineTo(room.x2, room.y2)
-      }
-      if (room.down) {
-        ctx.moveTo(room.x1, room.y2)
-      } else {
-        ctx.lineTo(room.x1, room.y2)
-      }
-      if (room.left) {
-        ctx.moveTo(room.x1, room.y1)
-      } else {
-        ctx.lineTo(room.x1, room.y1)
-      }
-      ctx.stroke()
-    }
-  }
+function drawOnCanvas(ctx: CanvasRenderingContext2D) {
+  Object.values(walls).forEach(wall => {
+    ctx.beginPath()
+    ctx.moveTo(wall.a.x, wall.a.y)
+    ctx.lineTo(wall.b.x, wall.b.y)
+    ctx.stroke()
+    ctx.closePath()
+  })
 }
 
 function drawCharacter(ctx: CanvasRenderingContext2D, x: number, y: number) {
@@ -64,18 +53,7 @@ function drawCharacter(ctx: CanvasRenderingContext2D, x: number, y: number) {
 }
 
 function prepareForDrawing(g: Graph) {
-  const mazeObject: {
-    [key: string]: {
-      left: number | null
-      right: number | null
-      up: number | null
-      down: number | null
-      x1: number
-      y1: number
-      x2: number
-      y2: number
-    }
-  } = {}
+  const mazeObject: Maze = {}
   Object.keys(g.AdjList).forEach((v1, index) => {
     mazeObject[v1] = {
       left: null,
@@ -89,22 +67,63 @@ function prepareForDrawing(g: Graph) {
     }
     const rw = 50
     const offset = 10
+    let topLeft = {
+      x: (index % WIDTH) * rw + offset,
+      y: Math.floor(index / HEIGHT) * rw + offset,
+    }
+    let topRight = {
+      x: ((index % WIDTH) + 1) * rw + offset,
+      y: Math.floor(index / HEIGHT) * rw + offset,
+    }
+    let bottomLeft = {
+      x: (index % WIDTH) * rw + offset,
+      y: (Math.floor(index / HEIGHT) + 1) * rw + offset,
+    }
+    let bottomRight = {
+      x: ((index % WIDTH) + 1) * rw + offset,
+      y: (Math.floor(index / HEIGHT) + 1) * rw + offset,
+    }
     mazeObject[v1].x1 = (index % WIDTH) * rw + offset
     mazeObject[v1].x2 = ((index % WIDTH) + 1) * rw + offset
     mazeObject[v1].y1 = Math.floor(index / HEIGHT) * rw + offset
     mazeObject[v1].y2 = (Math.floor(index / HEIGHT) + 1) * rw + offset
+
+    walls[`${topLeft.x}${topLeft.y}${bottomLeft.x}${bottomLeft.y}`] = {
+      a: topLeft,
+      b: bottomLeft,
+    }
+    walls[`${topLeft.x}${topLeft.y}${topRight.x}${topRight.y}`] = {
+      a: topLeft,
+      b: topRight,
+    }
+    walls[`${topRight.x}${topRight.y}${bottomRight.x}${bottomRight.y}`] = {
+      a: topRight,
+      b: bottomRight,
+    }
+    walls[`${bottomLeft.x}${bottomLeft.y}${bottomRight.x}${bottomRight.y}`] = {
+      a: bottomLeft,
+      b: bottomRight,
+    }
     Object.keys(g.AdjList[v1]).forEach(v2 => {
       if (Number(v1) - Number(v2) === 1) {
         mazeObject[v1].left = Number(v2)
-      }
-      if (Number(v1) - Number(v2) === -1) {
-        mazeObject[v1].right = Number(v2)
+        delete walls[`${topLeft.x}${topLeft.y}${bottomLeft.x}${bottomLeft.y}`]
       }
       if (Number(v1) - Number(v2) === WIDTH) {
         mazeObject[v1].up = Number(v2)
+        delete walls[`${topLeft.x}${topLeft.y}${topRight.x}${topRight.y}`]
+      }
+      if (Number(v1) - Number(v2) === -1) {
+        mazeObject[v1].right = Number(v2)
+        delete walls[
+          `${topRight.x}${topRight.y}${bottomRight.x}${bottomRight.y}`
+        ]
       }
       if (Number(v1) - Number(v2) === -WIDTH) {
         mazeObject[v1].down = Number(v2)
+        delete walls[
+          `${bottomLeft.x}${bottomLeft.y}${bottomRight.x}${bottomRight.y}`
+        ]
       }
     })
   })
@@ -119,7 +138,6 @@ function makeGraph(w: number, h: number) {
   })
   for (let row = 0; row < w; row++) {
     for (let col = 0; col < h; col++) {
-      // TODO: Allow number graph vertices
       const v = row * w + col + 1
 
       if (row == 0 && col == 0) {
@@ -159,8 +177,19 @@ function makeGraph(w: number, h: number) {
     }
   }
   mst(g1, g2)
-  // console.log(g2)
   return g2
+}
+
+const rerender = (
+  ctx: CanvasRenderingContext2D,
+  maze: Maze,
+  cw: number,
+  ch: number,
+  coords: Point
+) => {
+  ctx.clearRect(0, 0, cw, ch)
+  drawOnCanvas(ctx)
+  drawCharacter(ctx, coords.x, coords.y)
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -190,44 +219,70 @@ document.addEventListener('DOMContentLoaded', () => {
     x: 30,
     y: 30,
   }
-  const STEP_PER_FRAME = 2
-  let room = 1
-  drawOnCanvas(maze, ctx)
+  const STEP = 2
+  drawOnCanvas(ctx)
   drawCharacter(ctx, coords.x, coords.y)
 
-  const move = (dir: 'right' | 'left' | 'up' | 'down') => {
-    let inRoom = true
-    let canGo = false
+  const move = (dir: 'left' | 'right' | 'up' | 'down') => {
+    let collided = false
     switch (dir) {
       case 'left':
-        inRoom = coords.x - STEP_PER_FRAME - CIRCLE_R >= maze[room].x1
-        canGo = inRoom || Boolean(maze[room].left)
-        if (canGo) coords.x -= STEP_PER_FRAME
+        Object.values(walls).forEach(wall => {
+          if (
+            coords.x - STEP >= wall.b.x &&
+            coords.x - STEP - CIRCLE_R <= wall.b.x &&
+            coords.y + CIRCLE_R >= wall.a.y &&
+            coords.y - CIRCLE_R <= wall.b.y
+          ) {
+            collided = true
+          }
+        })
+        if (!collided) coords.x -= STEP
         break
       case 'right':
-        inRoom = coords.x + STEP_PER_FRAME + CIRCLE_R <= maze[room].x2
-        canGo = inRoom || Boolean(maze[room].right)
-        if (canGo) coords.x += STEP_PER_FRAME
+        Object.values(walls).forEach(wall => {
+          if (
+            coords.x + STEP <= wall.a.x &&
+            coords.x + STEP + CIRCLE_R >= wall.a.x &&
+            coords.y + CIRCLE_R >= wall.a.y &&
+            coords.y - CIRCLE_R <= wall.b.y
+          ) {
+            collided = true
+          }
+        })
+        if (!collided) coords.x += STEP
         break
       case 'up':
-        inRoom = coords.y - STEP_PER_FRAME - CIRCLE_R >= maze[room].y1
-        canGo = inRoom || Boolean(maze[room].up)
-        if (canGo) coords.y -= STEP_PER_FRAME
+        Object.values(walls).forEach(wall => {
+          if (
+            coords.y - STEP >= wall.b.y &&
+            coords.y - STEP - CIRCLE_R <= wall.b.y &&
+            coords.x + CIRCLE_R >= wall.a.x &&
+            coords.x - CIRCLE_R <= wall.b.x
+          ) {
+            collided = true
+          }
+        })
+        if (!collided) coords.y -= STEP
         break
       case 'down':
-        inRoom = coords.y + STEP_PER_FRAME + CIRCLE_R <= maze[room].y2
-        canGo = inRoom || Boolean(maze[room].down)
-        if (canGo) coords.y += STEP_PER_FRAME
+        Object.values(walls).forEach(wall => {
+          if (
+            coords.y + STEP <= wall.a.y &&
+            coords.y + STEP + CIRCLE_R >= wall.a.y &&
+            coords.x + CIRCLE_R >= wall.a.x &&
+            coords.x - CIRCLE_R <= wall.b.x
+          ) {
+            collided = true
+          }
+        })
+        if (!collided) coords.y += STEP
         break
       default:
         break
     }
-    if (canGo) {
-      ctx.clearRect(0, 0, cw, ch)
-      if (!inRoom) room = maze[room][dir]
-      drawOnCanvas(maze, ctx)
-      drawCharacter(ctx, coords.x, coords.y)
-    }
+    rerender(ctx, maze, cw, ch, coords)
+    collided = false
   }
 
   const keys: {
