@@ -1,36 +1,28 @@
-import Graph from './Graph'
-import mst from './MST'
+import { createMazeGraph, createWalls } from './utils'
+import { Point, Keys, Walls } from './types'
 
-interface Point {
-  x: number
-  y: number
-}
-
-interface Wall {
-  a: Point
-  b: Point
-}
-
-interface Walls {
-  [key: string]: Wall
-}
-
-interface Keys {
-  [key: string]: boolean
-}
-
-const walls: Walls = {}
 const WIDTH = 5
 const HEIGHT = 5
-const CIRCLE_R = 5
+// const CIRCLE_R = 5
 const STEP = 2
 const CW = 600 // window.innerWidth
 const CH = 600 // window.innerHeight
+const CELL_W = 50
+const OFFSET = 10
 const coords: Point = {
   x: 30,
   y: 30,
 }
 const keys: Keys = {}
+const img = new Image()
+img.src = 'src/assets/boy_walking_1.png'
+const CHAR_REAL_W = 200
+const CHAR_REAL_H = 337
+const CHAR_W = CHAR_REAL_W / 10
+const CHAR_H = CHAR_REAL_H / 10
+const CHAR_HW = CHAR_W / 2
+const CHAR_HH = CHAR_H / 2
+let walls: Walls = {}
 
 const drawWalls = (ctx: CanvasRenderingContext2D) => {
   Object.values(walls).forEach(wall => {
@@ -43,119 +35,22 @@ const drawWalls = (ctx: CanvasRenderingContext2D) => {
 }
 
 const drawCharacter = (ctx: CanvasRenderingContext2D) => {
-  ctx.beginPath()
-  ctx.arc(coords.x, coords.y, CIRCLE_R, 0, 2 * Math.PI)
-  ctx.stroke()
-  ctx.fill()
-  ctx.closePath()
-}
-
-const prepareForDrawing = (g: Graph) => {
-  Object.keys(g.AdjList).forEach((v1, index) => {
-    const rw = 50
-    const offset = 10
-    let topLeft = {
-      x: (index % WIDTH) * rw + offset,
-      y: Math.floor(index / HEIGHT) * rw + offset,
-    }
-    let topRight = {
-      x: ((index % WIDTH) + 1) * rw + offset,
-      y: Math.floor(index / HEIGHT) * rw + offset,
-    }
-    let bottomLeft = {
-      x: (index % WIDTH) * rw + offset,
-      y: (Math.floor(index / HEIGHT) + 1) * rw + offset,
-    }
-    let bottomRight = {
-      x: ((index % WIDTH) + 1) * rw + offset,
-      y: (Math.floor(index / HEIGHT) + 1) * rw + offset,
-    }
-
-    walls[`${topLeft.x}${topLeft.y}${bottomLeft.x}${bottomLeft.y}`] = {
-      a: topLeft,
-      b: bottomLeft,
-    }
-    walls[`${topLeft.x}${topLeft.y}${topRight.x}${topRight.y}`] = {
-      a: topLeft,
-      b: topRight,
-    }
-    walls[`${topRight.x}${topRight.y}${bottomRight.x}${bottomRight.y}`] = {
-      a: topRight,
-      b: bottomRight,
-    }
-    walls[`${bottomLeft.x}${bottomLeft.y}${bottomRight.x}${bottomRight.y}`] = {
-      a: bottomLeft,
-      b: bottomRight,
-    }
-    Object.keys(g.AdjList[v1]).forEach(v2 => {
-      if (Number(v1) - Number(v2) === 1) {
-        delete walls[`${topLeft.x}${topLeft.y}${bottomLeft.x}${bottomLeft.y}`]
-      }
-      if (Number(v1) - Number(v2) === WIDTH) {
-        delete walls[`${topLeft.x}${topLeft.y}${topRight.x}${topRight.y}`]
-      }
-      if (Number(v1) - Number(v2) === -1) {
-        delete walls[
-          `${topRight.x}${topRight.y}${bottomRight.x}${bottomRight.y}`
-        ]
-      }
-      if (Number(v1) - Number(v2) === -WIDTH) {
-        delete walls[
-          `${bottomLeft.x}${bottomLeft.y}${bottomRight.x}${bottomRight.y}`
-        ]
-      }
-    })
-  })
-}
-
-const makeGraph = (w: number, h: number) => {
-  const g1 = new Graph()
-  const g2 = new Graph()
-  Object.keys(Array.from(Array(w * h))).forEach((n, index) => {
-    g1.addVertex((index + 1).toString())
-  })
-  for (let row = 0; row < w; row++) {
-    for (let col = 0; col < h; col++) {
-      const v = row * w + col + 1
-
-      if (row == 0 && col == 0) {
-        g1.addEdge(v.toString(), (v + 1).toString(), Math.random()) // to the right
-        g1.addEdge(v.toString(), (v + w).toString(), Math.random()) // to the bottom
-      } else if (row == 0 && col == h - 1) {
-        g1.addEdge(v.toString(), (v - 1).toString(), Math.random()) // to the left
-        g1.addEdge(v.toString(), (v + w).toString(), Math.random()) // to the bottom
-      } else if (row == w - 1 && col == 0) {
-        g1.addEdge(v.toString(), (v + 1).toString(), Math.random()) // to the right
-        g1.addEdge(v.toString(), (v - w).toString(), Math.random()) // to the top
-      } else if (row == w - 1 && col == h - 1) {
-        g1.addEdge(v.toString(), (v - 1).toString(), Math.random()) // to the left
-        g1.addEdge(v.toString(), (v - w).toString(), Math.random()) // to the top
-      } else if (row == 0) {
-        g1.addEdge(v.toString(), (v - 1).toString(), Math.random()) // to the left
-        g1.addEdge(v.toString(), (v + 1).toString(), Math.random()) // to the right
-        g1.addEdge(v.toString(), (v + w).toString(), Math.random()) // to the bottom
-      } else if (row == w - 1) {
-        g1.addEdge(v.toString(), (v - 1).toString(), Math.random()) // to the left
-        g1.addEdge(v.toString(), (v + 1).toString(), Math.random()) // to the right
-        g1.addEdge(v.toString(), (v - w).toString(), Math.random()) // to the top
-      } else if (col == 0) {
-        g1.addEdge(v.toString(), (v - w).toString(), Math.random()) // to the top
-        g1.addEdge(v.toString(), (v + w).toString(), Math.random()) // to the bottom
-        g1.addEdge(v.toString(), (v + 1).toString(), Math.random()) // to the right
-      } else if (col == h - 1) {
-        g1.addEdge(v.toString(), (v - w).toString(), Math.random()) // to the top
-        g1.addEdge(v.toString(), (v + w).toString(), Math.random()) // to the bottom
-        g1.addEdge(v.toString(), (v - 1).toString(), Math.random()) // to the left
-      } else {
-        g1.addEdge(v.toString(), (v - w).toString(), Math.random()) // to the top
-        g1.addEdge(v.toString(), (v + w).toString(), Math.random()) // to the bottom
-        g1.addEdge(v.toString(), (v - 1).toString(), Math.random()) // to the left
-        g1.addEdge(v.toString(), (v + 1).toString(), Math.random()) // to the right
-      }
-    }
-  }
-  mst(g1, g2)
-  return g2
+  // ctx.beginPath()
+  // ctx.arc(coords.x, coords.y, CIRCLE_R, 0, 2 * Math.PI)
+  // ctx.stroke()
+  // ctx.fill()
+  // ctx.closePath()
+  ctx.drawImage(
+    img,
+    0,
+    0,
+    CHAR_REAL_W,
+    CHAR_REAL_H,
+    coords.x - CHAR_HW,
+    coords.y - CHAR_HH,
+    CHAR_W,
+    CHAR_H
+  )
 }
 
 const rerender = (ctx: CanvasRenderingContext2D) => {
@@ -174,9 +69,9 @@ const move = (
       Object.values(walls).forEach(wall => {
         if (
           coords.x - STEP >= wall.b.x &&
-          coords.x - STEP - CIRCLE_R <= wall.b.x &&
-          coords.y + CIRCLE_R >= wall.a.y &&
-          coords.y - CIRCLE_R <= wall.b.y
+          coords.x - STEP - CHAR_HW <= wall.b.x &&
+          coords.y + CHAR_HH >= wall.a.y &&
+          coords.y - CHAR_HH <= wall.b.y
         ) {
           collided = true
         }
@@ -187,9 +82,9 @@ const move = (
       Object.values(walls).forEach(wall => {
         if (
           coords.x + STEP <= wall.a.x &&
-          coords.x + STEP + CIRCLE_R >= wall.a.x &&
-          coords.y + CIRCLE_R >= wall.a.y &&
-          coords.y - CIRCLE_R <= wall.b.y
+          coords.x + STEP + CHAR_HW >= wall.a.x &&
+          coords.y + CHAR_HH >= wall.a.y &&
+          coords.y - CHAR_HH <= wall.b.y
         ) {
           collided = true
         }
@@ -200,9 +95,9 @@ const move = (
       Object.values(walls).forEach(wall => {
         if (
           coords.y - STEP >= wall.b.y &&
-          coords.y - STEP - CIRCLE_R <= wall.b.y &&
-          coords.x + CIRCLE_R >= wall.a.x &&
-          coords.x - CIRCLE_R <= wall.b.x
+          coords.y - STEP - CHAR_HH <= wall.b.y &&
+          coords.x + CHAR_HW >= wall.a.x &&
+          coords.x - CHAR_HW <= wall.b.x
         ) {
           collided = true
         }
@@ -213,9 +108,9 @@ const move = (
       Object.values(walls).forEach(wall => {
         if (
           coords.y + STEP <= wall.a.y &&
-          coords.y + STEP + CIRCLE_R >= wall.a.y &&
-          coords.x + CIRCLE_R >= wall.a.x &&
-          coords.x - CIRCLE_R <= wall.b.x
+          coords.y + STEP + CHAR_HH >= wall.a.y &&
+          coords.x + CHAR_HW >= wall.a.x &&
+          coords.x - CHAR_HW <= wall.b.x
         ) {
           collided = true
         }
@@ -253,11 +148,12 @@ document.addEventListener('keyup', e => {
 })
 
 document.addEventListener('DOMContentLoaded', () => {
-  const graph = makeGraph(WIDTH, HEIGHT)
+  /**
+   * Setup canvas
+   */
   const canvas = document.getElementById('canvas') as HTMLCanvasElement
   const ctx = canvas.getContext('2d')
   const ratio = window.devicePixelRatio
-
   // retina adjustments
   canvas.width = CW * 2
   canvas.height = CH * 2
@@ -268,7 +164,20 @@ document.addEventListener('DOMContentLoaded', () => {
   ctx.lineCap = 'square'
   ctx.scale(ratio, ratio)
 
-  prepareForDrawing(graph)
+  /**
+   * Create maze and walls
+   */
+  const mazeGraph = createMazeGraph(WIDTH, HEIGHT)
+  walls = createWalls(mazeGraph, {
+    width: WIDTH,
+    height: HEIGHT,
+    cellWidth: CELL_W,
+    offset: OFFSET,
+  })
+
+  /**
+   * Rendering
+   */
   drawWalls(ctx)
   drawCharacter(ctx)
   requestAnimationFrame(() => update(ctx))
