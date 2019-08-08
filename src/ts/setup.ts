@@ -15,13 +15,20 @@ const coords: Point = {
 }
 const keys: Keys = {}
 const img = new Image()
-img.src = 'src/assets/boy_walking_1.png'
-const CHAR_REAL_W = 200
-const CHAR_REAL_H = 337
-const CHAR_W = CHAR_REAL_W / 10
-const CHAR_H = CHAR_REAL_H / 10
+img.src = 'src/assets/sprites.png'
+// const CHAR_REAL_W = 200
+// const CHAR_REAL_H = 337
+// const CHAR_W = CHAR_REAL_W / 10
+// const CHAR_H = CHAR_REAL_H / 10
+// const CHAR_HW = CHAR_W / 2
+// const CHAR_HH = CHAR_H / 2
+const CHAR_REAL_W = 32
+const CHAR_REAL_H = 32
+const CHAR_W = CHAR_REAL_W
+const CHAR_H = CHAR_REAL_H
 const CHAR_HW = CHAR_W / 2
 const CHAR_HH = CHAR_H / 2
+let charYOffset = 0
 let walls: Walls = {}
 
 const drawWalls = (ctx: CanvasRenderingContext2D) => {
@@ -42,8 +49,8 @@ const drawCharacter = (ctx: CanvasRenderingContext2D) => {
   // ctx.closePath()
   ctx.drawImage(
     img,
-    0,
-    0,
+    2,
+    charYOffset,
     CHAR_REAL_W,
     CHAR_REAL_H,
     coords.x - CHAR_HW,
@@ -53,7 +60,7 @@ const drawCharacter = (ctx: CanvasRenderingContext2D) => {
   )
 }
 
-const rerender = (ctx: CanvasRenderingContext2D) => {
+const render = (ctx: CanvasRenderingContext2D) => {
   ctx.clearRect(0, 0, CW, CH)
   drawWalls(ctx)
   drawCharacter(ctx)
@@ -66,6 +73,7 @@ const move = (
   let collided = false
   switch (dir) {
     case 'left':
+      charYOffset = 32
       Object.values(walls).forEach(wall => {
         if (
           coords.x - STEP >= wall.b.x &&
@@ -79,6 +87,7 @@ const move = (
       if (!collided) coords.x -= STEP
       break
     case 'right':
+      charYOffset = 64
       Object.values(walls).forEach(wall => {
         if (
           coords.x + STEP <= wall.a.x &&
@@ -92,6 +101,7 @@ const move = (
       if (!collided) coords.x += STEP
       break
     case 'up':
+      charYOffset = 96
       Object.values(walls).forEach(wall => {
         if (
           coords.y - STEP >= wall.b.y &&
@@ -105,6 +115,7 @@ const move = (
       if (!collided) coords.y -= STEP
       break
     case 'down':
+      charYOffset = 0
       Object.values(walls).forEach(wall => {
         if (
           coords.y + STEP <= wall.a.y &&
@@ -120,7 +131,7 @@ const move = (
     default:
       break
   }
-  rerender(ctx)
+  render(ctx)
   collided = false
 }
 
@@ -178,7 +189,6 @@ document.addEventListener('DOMContentLoaded', () => {
   /**
    * Rendering
    */
-  drawWalls(ctx)
-  drawCharacter(ctx)
+  render(ctx)
   requestAnimationFrame(() => update(ctx))
 })
