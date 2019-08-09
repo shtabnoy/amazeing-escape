@@ -21,8 +21,12 @@ const CHAR_W = 56
 const CHAR_H = 64
 const CHAR_HW = CHAR_W / 2
 const CHAR_HH = CHAR_H / 2
+const NUMBER_OF_FRAMES = 3
+const FPS_INTERVAL = 1000 / 10
+let frame = 0
 let charYOffset = 0
 let walls: Walls = {}
+let now, then: number, elapsed
 
 const drawWalls = (ctx: CanvasRenderingContext2D) => {
   Object.values(walls).forEach(wall => {
@@ -37,7 +41,7 @@ const drawWalls = (ctx: CanvasRenderingContext2D) => {
 const drawCharacter = (ctx: CanvasRenderingContext2D) => {
   ctx.drawImage(
     img,
-    4,
+    4 + frame * 32,
     charYOffset,
     SPRITE_WIDTH,
     SPRITE_HEIGHT,
@@ -120,10 +124,26 @@ const move = (
       break
   }
   render(ctx)
+  updateSpriteFrames()
   collided = false
 }
 
+const updateSpriteFrames = () => {
+  now = Date.now()
+  elapsed = now - then
+  if (elapsed > FPS_INTERVAL) {
+    // adjust fpsInterval not being a multiple of RAF's interval (16.7ms)
+    then = now - (elapsed % FPS_INTERVAL)
+    if (frame < NUMBER_OF_FRAMES - 1) {
+      frame += 1
+    } else {
+      frame = 0
+    }
+  }
+}
+
 const update = (ctx: CanvasRenderingContext2D) => {
+  // moving character
   if (keys[39]) {
     move(ctx, 'right')
   }
@@ -136,6 +156,7 @@ const update = (ctx: CanvasRenderingContext2D) => {
   if (keys[38]) {
     move(ctx, 'up')
   }
+
   requestAnimationFrame(() => update(ctx))
 }
 
@@ -178,5 +199,6 @@ document.addEventListener('DOMContentLoaded', () => {
    * Rendering
    */
   render(ctx)
+  then = Date.now()
   requestAnimationFrame(() => update(ctx))
 })
