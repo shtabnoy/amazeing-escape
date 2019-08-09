@@ -3,29 +3,22 @@ import { Point, Keys, Walls } from './types'
 
 const WIDTH = 5
 const HEIGHT = 5
-// const CIRCLE_R = 5
 const STEP = 2
-const CW = 600 // window.innerWidth
-const CH = 600 // window.innerHeight
-const CELL_W = 50
+const CW = window.innerWidth - 10
+const CH = window.innerHeight - 10
+const CELL_W = 150
 const OFFSET = 10
 const coords: Point = {
-  x: 30,
-  y: 30,
+  x: 50,
+  y: 50,
 }
 const keys: Keys = {}
 const img = new Image()
 img.src = 'src/assets/sprites.png'
-// const CHAR_REAL_W = 200
-// const CHAR_REAL_H = 337
-// const CHAR_W = CHAR_REAL_W / 10
-// const CHAR_H = CHAR_REAL_H / 10
-// const CHAR_HW = CHAR_W / 2
-// const CHAR_HH = CHAR_H / 2
-const CHAR_REAL_W = 32
-const CHAR_REAL_H = 32
-const CHAR_W = CHAR_REAL_W
-const CHAR_H = CHAR_REAL_H
+const SPRITE_WIDTH = 24
+const SPRITE_HEIGHT = 32
+const CHAR_W = 56
+const CHAR_H = 64
 const CHAR_HW = CHAR_W / 2
 const CHAR_HH = CHAR_H / 2
 let charYOffset = 0
@@ -42,17 +35,12 @@ const drawWalls = (ctx: CanvasRenderingContext2D) => {
 }
 
 const drawCharacter = (ctx: CanvasRenderingContext2D) => {
-  // ctx.beginPath()
-  // ctx.arc(coords.x, coords.y, CIRCLE_R, 0, 2 * Math.PI)
-  // ctx.stroke()
-  // ctx.fill()
-  // ctx.closePath()
   ctx.drawImage(
     img,
-    2,
+    4,
     charYOffset,
-    CHAR_REAL_W,
-    CHAR_REAL_H,
+    SPRITE_WIDTH,
+    SPRITE_HEIGHT,
     coords.x - CHAR_HW,
     coords.y - CHAR_HH,
     CHAR_W,
@@ -73,7 +61,7 @@ const move = (
   let collided = false
   switch (dir) {
     case 'left':
-      charYOffset = 32
+      charYOffset = 32 + 1 // sprites adjustment
       Object.values(walls).forEach(wall => {
         if (
           coords.x - STEP >= wall.b.x &&
@@ -87,7 +75,7 @@ const move = (
       if (!collided) coords.x -= STEP
       break
     case 'right':
-      charYOffset = 64
+      charYOffset = 64 + 1 // sprites adjustment
       Object.values(walls).forEach(wall => {
         if (
           coords.x + STEP <= wall.a.x &&
@@ -101,7 +89,7 @@ const move = (
       if (!collided) coords.x += STEP
       break
     case 'up':
-      charYOffset = 96
+      charYOffset = 96 + 1 // sprites adjustment
       Object.values(walls).forEach(wall => {
         if (
           coords.y - STEP >= wall.b.y &&
