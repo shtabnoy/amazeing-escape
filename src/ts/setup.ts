@@ -19,8 +19,6 @@ const SPRITE_WIDTH = 24
 const SPRITE_HEIGHT = 32
 const CHAR_W = 56
 const CHAR_H = 64
-const CHAR_HW = CHAR_W / 2
-const CHAR_HH = CHAR_H / 2
 const NUMBER_OF_FRAMES = 3
 const FPS_INTERVAL = 1000 / 10
 let frame = 0
@@ -45,15 +43,14 @@ const drawCharacter = (ctx: CanvasRenderingContext2D) => {
     charYOffset,
     SPRITE_WIDTH,
     SPRITE_HEIGHT,
-    coords.x - CHAR_HW,
-    coords.y - CHAR_HH,
+    coords.x,
+    coords.y,
     CHAR_W,
     CHAR_H
   )
 }
 
 const render = (ctx: CanvasRenderingContext2D) => {
-  ctx.clearRect(0, 0, CW, CH)
   drawWalls(ctx)
   drawCharacter(ctx)
 }
@@ -63,16 +60,17 @@ const move = (
   dir: 'left' | 'right' | 'up' | 'down'
 ) => {
   let collided = false
-  ctx.clearRect(coords.x - CHAR_HW, coords.y - CHAR_HH, CHAR_W, CHAR_H)
+  ctx.clearRect(coords.x, coords.y, CHAR_W, CHAR_H)
+  // ctx.clearRect(coords.x - CHAR_HW, coords.y - CHAR_HH, CHAR_W, CHAR_H)
   switch (dir) {
     case 'left':
       charYOffset = 32 + 1 // sprites adjustment
       Object.values(walls).forEach(wall => {
         if (
-          coords.x - STEP >= wall.b.x &&
-          coords.x - STEP - CHAR_HW <= wall.b.x &&
-          coords.y + CHAR_HH >= wall.a.y &&
-          coords.y - CHAR_HH <= wall.b.y
+          coords.x - STEP + CHAR_W >= wall.b.x &&
+          coords.x - STEP <= wall.b.x &&
+          coords.y + CHAR_H >= wall.a.y &&
+          coords.y <= wall.b.y
         ) {
           collided = true
         }
@@ -84,9 +82,9 @@ const move = (
       Object.values(walls).forEach(wall => {
         if (
           coords.x + STEP <= wall.a.x &&
-          coords.x + STEP + CHAR_HW >= wall.a.x &&
-          coords.y + CHAR_HH >= wall.a.y &&
-          coords.y - CHAR_HH <= wall.b.y
+          coords.x + STEP + CHAR_W >= wall.a.x &&
+          coords.y + CHAR_H >= wall.a.y &&
+          coords.y <= wall.b.y
         ) {
           collided = true
         }
@@ -97,10 +95,10 @@ const move = (
       charYOffset = 96 + 1 // sprites adjustment
       Object.values(walls).forEach(wall => {
         if (
-          coords.y - STEP >= wall.b.y &&
-          coords.y - STEP - CHAR_HH <= wall.b.y &&
-          coords.x + CHAR_HW >= wall.a.x &&
-          coords.x - CHAR_HW <= wall.b.x
+          coords.y - STEP + CHAR_H >= wall.b.y &&
+          coords.y - STEP <= wall.b.y &&
+          coords.x + CHAR_W >= wall.a.x &&
+          coords.x <= wall.b.x
         ) {
           collided = true
         }
@@ -112,9 +110,9 @@ const move = (
       Object.values(walls).forEach(wall => {
         if (
           coords.y + STEP <= wall.a.y &&
-          coords.y + STEP + CHAR_HH >= wall.a.y &&
-          coords.x + CHAR_HW >= wall.a.x &&
-          coords.x - CHAR_HW <= wall.b.x
+          coords.y + STEP + CHAR_H >= wall.a.y &&
+          coords.x + CHAR_W >= wall.a.x &&
+          coords.x <= wall.b.x
         ) {
           collided = true
         }
