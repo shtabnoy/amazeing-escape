@@ -63,6 +63,7 @@ const move = (
   dir: 'left' | 'right' | 'up' | 'down'
 ) => {
   let collided = false
+  ctx.clearRect(coords.x - CHAR_HW, coords.y - CHAR_HH, CHAR_W, CHAR_H)
   switch (dir) {
     case 'left':
       charYOffset = 32 + 1 // sprites adjustment
@@ -123,7 +124,7 @@ const move = (
     default:
       break
   }
-  render(ctx)
+  drawCharacter(ctx)
   updateSpriteFrames()
   collided = false
 }
