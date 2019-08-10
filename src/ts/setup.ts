@@ -1,13 +1,14 @@
 import { createMazeGraph, createWalls } from './utils'
 import { Point, Keys, Walls } from './types'
 
-const WIDTH = 5
-const HEIGHT = 5
-const STEP = 2
+const WIDTH = 10
+const HEIGHT = 10
+const STEP = 4
 const CW = window.innerWidth - 10
 const CH = window.innerHeight - 10
-const CELL_W = 150
+const CELL_W = 200
 const OFFSET = 10
+const CAMERA_BORDER = 100
 const coords: Point = {
   x: 50,
   y: 50,
@@ -17,8 +18,8 @@ const img = new Image()
 img.src = 'src/assets/sprites.png'
 const SPRITE_WIDTH = 24
 const SPRITE_HEIGHT = 32
-const CHAR_W = 56
-const CHAR_H = 64
+const CHARACTER_WIDTH = 56
+const CHARACTER_HEIGHT = 64
 const NUMBER_OF_FRAMES = 3
 const FPS_INTERVAL = 1000 / 10
 let frame = 0
@@ -45,8 +46,8 @@ const drawCharacter = (ctx: CanvasRenderingContext2D) => {
     SPRITE_HEIGHT,
     coords.x,
     coords.y,
-    CHAR_W,
-    CHAR_H
+    CHARACTER_WIDTH,
+    CHARACTER_HEIGHT
   )
 }
 
@@ -60,68 +61,91 @@ const move = (
   dir: 'left' | 'right' | 'up' | 'down'
 ) => {
   let collided = false
-  ctx.clearRect(coords.x, coords.y, CHAR_W, CHAR_H)
-  // ctx.clearRect(coords.x - CHAR_HW, coords.y - CHAR_HH, CHAR_W, CHAR_H)
+  ctx.clearRect(0, 0, CW * 2, CH * 2) // TODO: ???
+  // divide by two since there were adjustments for retina
+  let translatedX = ctx.getTransform().e / 2
+  let translatedY = ctx.getTransform().f / 2
   switch (dir) {
     case 'left':
       charYOffset = 32 + 1 // sprites adjustment
       Object.values(walls).forEach(wall => {
         if (
-          coords.x - STEP + CHAR_W >= wall.b.x &&
+          coords.x - STEP + CHARACTER_WIDTH >= wall.b.x &&
           coords.x - STEP <= wall.b.x &&
-          coords.y + CHAR_H >= wall.a.y &&
+          coords.y + CHARACTER_HEIGHT >= wall.a.y &&
           coords.y <= wall.b.y
         ) {
           collided = true
         }
       })
-      if (!collided) coords.x -= STEP
+      if (!collided) {
+        coords.x -= STEP
+        if (coords.x < CAMERA_BORDER - translatedX) {
+          ctx.translate(STEP, 0)
+        }
+      }
       break
     case 'right':
       charYOffset = 64 + 1 // sprites adjustment
       Object.values(walls).forEach(wall => {
         if (
           coords.x + STEP <= wall.a.x &&
-          coords.x + STEP + CHAR_W >= wall.a.x &&
-          coords.y + CHAR_H >= wall.a.y &&
+          coords.x + STEP + CHARACTER_WIDTH >= wall.a.x &&
+          coords.y + CHARACTER_HEIGHT >= wall.a.y &&
           coords.y <= wall.b.y
         ) {
           collided = true
         }
       })
-      if (!collided) coords.x += STEP
+      if (!collided) {
+        coords.x += STEP
+        if (coords.x + CHARACTER_WIDTH > CW - translatedX - CAMERA_BORDER) {
+          ctx.translate(-STEP, 0)
+        }
+      }
       break
     case 'up':
       charYOffset = 96 + 1 // sprites adjustment
       Object.values(walls).forEach(wall => {
         if (
-          coords.y - STEP + CHAR_H >= wall.b.y &&
+          coords.y - STEP + CHARACTER_HEIGHT >= wall.b.y &&
           coords.y - STEP <= wall.b.y &&
-          coords.x + CHAR_W >= wall.a.x &&
+          coords.x + CHARACTER_WIDTH >= wall.a.x &&
           coords.x <= wall.b.x
         ) {
           collided = true
         }
       })
-      if (!collided) coords.y -= STEP
+      if (!collided) {
+        coords.y -= STEP
+        if (coords.y < CAMERA_BORDER - translatedY) {
+          ctx.translate(0, STEP)
+        }
+      }
       break
     case 'down':
       charYOffset = 0
       Object.values(walls).forEach(wall => {
         if (
           coords.y + STEP <= wall.a.y &&
-          coords.y + STEP + CHAR_H >= wall.a.y &&
-          coords.x + CHAR_W >= wall.a.x &&
+          coords.y + STEP + CHARACTER_HEIGHT >= wall.a.y &&
+          coords.x + CHARACTER_WIDTH >= wall.a.x &&
           coords.x <= wall.b.x
         ) {
           collided = true
         }
       })
-      if (!collided) coords.y += STEP
+      if (!collided) {
+        coords.y += STEP
+        if (coords.y + CHARACTER_HEIGHT > CH - translatedY - CAMERA_BORDER) {
+          ctx.translate(0, -STEP)
+        }
+      }
       break
     default:
       break
   }
+  drawWalls(ctx)
   drawCharacter(ctx)
   updateSpriteFrames()
   collided = false
