@@ -1,14 +1,14 @@
 import { createMazeGraph, createWalls } from './utils'
 import { Point, Keys, Walls } from './types'
 
-const ROOMS_HORIZONTAL = 10
-const ROOMS_VERTICAL = 10
+const ROOMS_HORIZONTAL = 6
+const ROOMS_VERTICAL = 6
 const STEP = 4
 const OFFSET_X = 10
 const OFFSET_Y = 100
 const CW = window.innerWidth - 10
 const CH = window.innerHeight - 10
-const CELL_W = 200
+const CELL_W = 300
 const CAMERA_BORDER_X = OFFSET_X + 100
 const CAMERA_BORDER_Y = OFFSET_Y + 100
 const coords: Point = {
@@ -69,10 +69,16 @@ const move = (
   dir: 'left' | 'right' | 'up' | 'down'
 ) => {
   let collided = false
-  ctx.clearRect(0, 0, CW * 2, CH * 2) // TODO: ???
   // divide by two since there were adjustments for retina
   let translatedX = ctx.getTransform().e / 2
   let translatedY = ctx.getTransform().f / 2
+  // TODO: Think why it's working
+  ctx.clearRect(
+    0 - translatedX < 0 ? -1 : 0 - translatedX,
+    0 - translatedY < 0 ? -1 : 0 - translatedY,
+    CW - translatedX + OFFSET_X,
+    CH - translatedY + OFFSET_Y
+  )
   switch (dir) {
     case 'left':
       charYOffset = 32 + 1 // sprites adjustment
