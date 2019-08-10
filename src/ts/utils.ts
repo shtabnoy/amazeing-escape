@@ -91,30 +91,29 @@ interface CreateWallsConfig {
   width: number
   height: number
   cellWidth: number
-  offset: number
 }
 
 export const createWalls = (
   g: Graph,
-  { width, height, cellWidth, offset }: CreateWallsConfig
+  { width, height, cellWidth }: CreateWallsConfig
 ): Walls => {
   const walls: Walls = {}
   Object.keys(g.AdjList).forEach((v1, index) => {
     let topLeft = {
-      x: (index % width) * cellWidth + offset,
-      y: Math.floor(index / height) * cellWidth + offset,
+      x: (index % width) * cellWidth,
+      y: Math.floor(index / height) * cellWidth,
     }
     let topRight = {
-      x: ((index % width) + 1) * cellWidth + offset,
-      y: Math.floor(index / height) * cellWidth + offset,
+      x: ((index % width) + 1) * cellWidth,
+      y: Math.floor(index / height) * cellWidth,
     }
     let bottomLeft = {
-      x: (index % width) * cellWidth + offset,
-      y: (Math.floor(index / height) + 1) * cellWidth + offset,
+      x: (index % width) * cellWidth,
+      y: (Math.floor(index / height) + 1) * cellWidth,
     }
     let bottomRight = {
-      x: ((index % width) + 1) * cellWidth + offset,
-      y: (Math.floor(index / height) + 1) * cellWidth + offset,
+      x: ((index % width) + 1) * cellWidth,
+      y: (Math.floor(index / height) + 1) * cellWidth,
     }
 
     walls[`${topLeft.x}${topLeft.y}${bottomLeft.x}${bottomLeft.y}`] = {

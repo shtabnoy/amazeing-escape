@@ -1,31 +1,35 @@
 import { createMazeGraph, createWalls } from './utils'
 import { Point, Keys, Walls } from './types'
 
-const WIDTH = 10
-const HEIGHT = 10
+const ROOMS_HORIZONTAL = 10
+const ROOMS_VERTICAL = 10
 const STEP = 4
+const OFFSET_X = 10
+const OFFSET_Y = 100
 const CW = window.innerWidth - 10
 const CH = window.innerHeight - 10
 const CELL_W = 200
-const OFFSET = 10
-const CAMERA_BORDER = 100
+const CAMERA_BORDER_X = OFFSET_X + 100
+const CAMERA_BORDER_Y = OFFSET_Y + 100
 const coords: Point = {
-  x: 50,
-  y: 50,
+  x: 100,
+  y: 100,
 }
 const keys: Keys = {}
-const img = new Image()
-img.src = 'src/assets/sprites.png'
 const SPRITE_WIDTH = 24
 const SPRITE_HEIGHT = 32
 const CHARACTER_WIDTH = 56
 const CHARACTER_HEIGHT = 64
 const NUMBER_OF_FRAMES = 3
 const FPS_INTERVAL = 1000 / 10
+
 let frame = 0
 let charYOffset = 0
 let walls: Walls = {}
-let now, then: number, elapsed
+let now: number, then: number, elapsed: number
+
+const img = new Image()
+img.src = 'src/assets/sprites.png'
 
 const drawWalls = (ctx: CanvasRenderingContext2D) => {
   Object.values(walls).forEach(wall => {
@@ -52,6 +56,10 @@ const drawCharacter = (ctx: CanvasRenderingContext2D) => {
 }
 
 const render = (ctx: CanvasRenderingContext2D) => {
+  // ctx.save()
+  // ctx.fillStyle = '#9b54de'
+  // ctx.fillRect(0, 0, window.innerWidth + OFFSET, OFFSET)
+  // ctx.restore()
   drawWalls(ctx)
   drawCharacter(ctx)
 }
@@ -80,7 +88,7 @@ const move = (
       })
       if (!collided) {
         coords.x -= STEP
-        if (coords.x < CAMERA_BORDER - translatedX) {
+        if (coords.x < CAMERA_BORDER_X - translatedX) {
           ctx.translate(STEP, 0)
         }
       }
@@ -99,7 +107,7 @@ const move = (
       })
       if (!collided) {
         coords.x += STEP
-        if (coords.x + CHARACTER_WIDTH > CW - translatedX - CAMERA_BORDER) {
+        if (coords.x + CHARACTER_WIDTH > CW - translatedX - CAMERA_BORDER_X) {
           ctx.translate(-STEP, 0)
         }
       }
@@ -118,7 +126,7 @@ const move = (
       })
       if (!collided) {
         coords.y -= STEP
-        if (coords.y < CAMERA_BORDER - translatedY) {
+        if (coords.y < CAMERA_BORDER_Y - translatedY) {
           ctx.translate(0, STEP)
         }
       }
@@ -137,7 +145,7 @@ const move = (
       })
       if (!collided) {
         coords.y += STEP
-        if (coords.y + CHARACTER_HEIGHT > CH - translatedY - CAMERA_BORDER) {
+        if (coords.y + CHARACTER_HEIGHT > CH - translatedY - CAMERA_BORDER_Y) {
           ctx.translate(0, -STEP)
         }
       }
@@ -206,16 +214,17 @@ document.addEventListener('DOMContentLoaded', () => {
   ctx.lineWidth = 2
   ctx.lineCap = 'square'
   ctx.scale(ratio, ratio)
+  // Add a game info line to the top
+  ctx.translate(OFFSET_X, OFFSET_Y)
 
   /**
    * Create maze and walls
    */
-  const mazeGraph = createMazeGraph(WIDTH, HEIGHT)
+  const mazeGraph = createMazeGraph(ROOMS_HORIZONTAL, ROOMS_VERTICAL)
   walls = createWalls(mazeGraph, {
-    width: WIDTH,
-    height: HEIGHT,
+    width: ROOMS_HORIZONTAL,
+    height: ROOMS_VERTICAL,
     cellWidth: CELL_W,
-    offset: OFFSET,
   })
 
   /**
