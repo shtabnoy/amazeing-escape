@@ -1,8 +1,8 @@
 import { createMazeGraph, createWalls } from './utils'
 import { Point, Keys, Walls } from './types'
 
-const ROOMS_HORIZONTAL = 6
-const ROOMS_VERTICAL = 6
+const ROOMS_HORIZONTAL = 5
+const ROOMS_VERTICAL = 5
 const STEP = 4
 const OFFSET_X = 10
 const OFFSET_Y = 100
@@ -31,13 +31,26 @@ let now: number, then: number, elapsed: number
 const img = new Image()
 img.src = 'src/assets/sprites.png'
 
+const wallImage = new Image()
+wallImage.src = 'src/assets/wall_sp.png'
+
 const drawWalls = (ctx: CanvasRenderingContext2D) => {
   Object.values(walls).forEach(wall => {
-    ctx.beginPath()
-    ctx.moveTo(wall.a.x, wall.a.y)
-    ctx.lineTo(wall.b.x, wall.b.y)
-    ctx.stroke()
-    ctx.closePath()
+    for (let i = 0; i < wall.b.x - wall.a.x; i += 50) {
+      for (let j = 0; j < wall.b.y - wall.a.y; j += 50) {
+        ctx.drawImage(
+          wallImage,
+          0,
+          0,
+          52,
+          52,
+          wall.a.x + i,
+          wall.a.y + j,
+          50,
+          50
+        )
+      }
+    }
   })
 }
 
@@ -220,6 +233,8 @@ document.addEventListener('DOMContentLoaded', () => {
   ctx.lineWidth = 2
   ctx.lineCap = 'square'
   ctx.scale(ratio, ratio)
+  // ctx.rotate((45 * Math.PI) / 180)
+  // ctx.translate(700, 0)
   // Add a game info line to the top
   ctx.translate(OFFSET_X, OFFSET_Y)
 
@@ -231,6 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
     width: ROOMS_HORIZONTAL,
     height: ROOMS_VERTICAL,
     cellWidth: CELL_W,
+    depth: 50,
   })
 
   /**

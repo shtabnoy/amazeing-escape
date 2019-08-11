@@ -91,11 +91,12 @@ interface CreateWallsConfig {
   width: number
   height: number
   cellWidth: number
+  depth?: number
 }
 
 export const createWalls = (
   g: Graph,
-  { width, height, cellWidth }: CreateWallsConfig
+  { width, height, cellWidth, depth = 0 }: CreateWallsConfig
 ): Walls => {
   const walls: Walls = {}
   Object.keys(g.AdjList).forEach((v1, index) => {
@@ -118,19 +119,19 @@ export const createWalls = (
 
     walls[`${topLeft.x}${topLeft.y}${bottomLeft.x}${bottomLeft.y}`] = {
       a: topLeft,
-      b: bottomLeft,
+      b: { ...bottomLeft, x: bottomLeft.x + depth },
     }
     walls[`${topLeft.x}${topLeft.y}${topRight.x}${topRight.y}`] = {
       a: topLeft,
-      b: topRight,
+      b: { ...topRight, y: topRight.y + depth },
     }
     walls[`${topRight.x}${topRight.y}${bottomRight.x}${bottomRight.y}`] = {
       a: topRight,
-      b: bottomRight,
+      b: { ...bottomRight, x: bottomRight.x + depth },
     }
     walls[`${bottomLeft.x}${bottomLeft.y}${bottomRight.x}${bottomRight.y}`] = {
       a: bottomLeft,
-      b: bottomRight,
+      b: { ...bottomRight, y: bottomRight.y + depth },
     }
     Object.keys(g.AdjList[v1]).forEach(v2 => {
       if (Number(v1) - Number(v2) === 1) {
