@@ -1,14 +1,14 @@
 import { createMazeGraph, createWalls } from './utils'
 import { Point, Keys, Walls } from './types'
 
-const ROOMS_HORIZONTAL = 5
-const ROOMS_VERTICAL = 5
+const ROOMS_HORIZONTAL = 6
+const ROOMS_VERTICAL = 6
 const STEP = 4
-const OFFSET_X = 10
-const OFFSET_Y = 100
-const CW = window.innerWidth - 10
-const CH = window.innerHeight - 10
-const CELL_W = 300
+const OFFSET_X = 0
+const OFFSET_Y = 0
+const CW = window.innerWidth
+const CH = window.innerHeight
+const CELL_W = 250
 const CAMERA_BORDER_X = OFFSET_X + 100
 const CAMERA_BORDER_Y = OFFSET_Y + 100
 const coords: Point = {
@@ -22,6 +22,9 @@ const CHARACTER_WIDTH = 56
 const CHARACTER_HEIGHT = 64
 const NUMBER_OF_FRAMES = 3
 const FPS_INTERVAL = 1000 / 10
+const WALL_DEPTH = 50
+const RIGHT_BORDER = ROOMS_HORIZONTAL * CELL_W + WALL_DEPTH - CW
+const BOTTOM_BORDER = ROOMS_VERTICAL * CELL_W + WALL_DEPTH - CH
 
 let frame = 0
 let charYOffset = 0
@@ -30,9 +33,10 @@ let now: number, then: number, elapsed: number
 
 const img = new Image()
 img.src = 'src/assets/sprites.png'
-
 const wallImage = new Image()
 wallImage.src = 'src/assets/wall_sp.png'
+const groundTile = new Image()
+groundTile.src = 'src/assets/ground1.png'
 
 const drawWalls = (ctx: CanvasRenderingContext2D) => {
   Object.values(walls).forEach(wall => {
@@ -42,16 +46,30 @@ const drawWalls = (ctx: CanvasRenderingContext2D) => {
           wallImage,
           0,
           0,
-          52,
-          52,
+          WALL_DEPTH + 2,
+          WALL_DEPTH + 2,
           wall.a.x + i,
           wall.a.y + j,
-          50,
-          50
+          WALL_DEPTH,
+          WALL_DEPTH
         )
       }
     }
   })
+}
+
+const drawGround = (ctx: CanvasRenderingContext2D) => {
+  let translatedX = ctx.getTransform().e / 2
+  let translatedY = ctx.getTransform().f / 2
+  ctx.save()
+  ctx.fillStyle = ctx.createPattern(groundTile, 'repeat')
+  ctx.fillRect(
+    0 - translatedX < 0 ? -1 : 0 - translatedX,
+    0 - translatedY < 0 ? -1 : 0 - translatedY,
+    CW - translatedX + OFFSET_X,
+    CH - translatedY + OFFSET_Y
+  )
+  ctx.restore()
 }
 
 const drawCharacter = (ctx: CanvasRenderingContext2D) => {
@@ -69,10 +87,6 @@ const drawCharacter = (ctx: CanvasRenderingContext2D) => {
 }
 
 const render = (ctx: CanvasRenderingContext2D) => {
-  // ctx.save()
-  // ctx.fillStyle = '#9b54de'
-  // ctx.fillRect(0, 0, window.innerWidth + OFFSET, OFFSET)
-  // ctx.restore()
   drawWalls(ctx)
   drawCharacter(ctx)
 }
@@ -108,7 +122,7 @@ const move = (
       if (!collided) {
         coords.x -= STEP
         if (coords.x < CAMERA_BORDER_X - translatedX) {
-          ctx.translate(STEP, 0)
+          ctx.translate(translatedX < 0 ? STEP : 0, 0)
         }
       }
       break
@@ -127,7 +141,7 @@ const move = (
       if (!collided) {
         coords.x += STEP
         if (coords.x + CHARACTER_WIDTH > CW - translatedX - CAMERA_BORDER_X) {
-          ctx.translate(-STEP, 0)
+          ctx.translate(translatedX < -RIGHT_BORDER + 2 ? 0 : -STEP, 0) // TODO: strange 2px adjustment
         }
       }
       break
@@ -146,7 +160,7 @@ const move = (
       if (!collided) {
         coords.y -= STEP
         if (coords.y < CAMERA_BORDER_Y - translatedY) {
-          ctx.translate(0, STEP)
+          ctx.translate(0, translatedY < 0 ? STEP : 0)
         }
       }
       break
@@ -165,13 +179,14 @@ const move = (
       if (!collided) {
         coords.y += STEP
         if (coords.y + CHARACTER_HEIGHT > CH - translatedY - CAMERA_BORDER_Y) {
-          ctx.translate(0, -STEP)
+          ctx.translate(0, translatedY < -BOTTOM_BORDER + 2 ? 0 : -STEP) // TODO: strange 2px adjustment
         }
       }
       break
     default:
       break
   }
+  drawGround(ctx)
   drawWalls(ctx)
   drawCharacter(ctx)
   updateSpriteFrames()
@@ -246,7 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
     width: ROOMS_HORIZONTAL,
     height: ROOMS_VERTICAL,
     cellWidth: CELL_W,
-    depth: 50,
+    depth: WALL_DEPTH,
   })
 
   /**
