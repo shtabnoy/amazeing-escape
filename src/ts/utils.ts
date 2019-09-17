@@ -1,5 +1,6 @@
 import Graph from './Graph'
 import { Walls } from './types'
+import NewGraph, { Edge } from './NewGraph'
 
 export const mst = (source: Graph, dest: Graph) => {
   const vStart = Object.keys(source.AdjList)[0]
@@ -35,6 +36,49 @@ export const mst = (source: Graph, dest: Graph) => {
       if (source.AdjList[v].degree === 0) source.removeVertex(v)
     }
   }
+}
+
+export const mstNew = (source: NewGraph) => {
+  const result = new NewGraph()
+  let v = Object.keys(source.vertices)[0]
+  let heap: Edge[] = source.getVertexEdges(v)
+  let min: Edge = {
+    src: '',
+    dest: '',
+    weight: Infinity,
+  }
+  while (heap.length > 0) {
+    for (let edge of heap) {
+      min = edge.weight < min.weight ? edge : min
+    }
+    result.addEdge(min.src, min.dest, min.weight)
+    v = min.dest
+    heap = heap.concat(source.getVertexEdges(v))
+    heap = heap.filter(
+      (edge: Edge) =>
+        !(
+          (edge.src === min.src && edge.dest === min.dest) ||
+          (edge.src === min.dest && edge.dest === min.src)
+        )
+    )
+    const srcs = result.edges.map(e => e.src)
+    const dests = result.edges.map(e => e.dest)
+    heap = heap.filter(
+      (edge: Edge) =>
+        !(
+          (srcs.includes(edge.src) && srcs.includes(edge.dest)) ||
+          (srcs.includes(edge.src) && dests.includes(edge.dest)) ||
+          (dests.includes(edge.src) && srcs.includes(edge.dest)) ||
+          (dests.includes(edge.src) && dests.includes(edge.dest))
+        )
+    )
+    min = {
+      src: '',
+      dest: '',
+      weight: Infinity,
+    }
+  }
+  return result
 }
 
 export const createMazeGraph = (w: number, h: number) => {

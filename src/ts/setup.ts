@@ -1,5 +1,6 @@
-import { createMazeGraph, createWalls } from './utils'
+import { createMazeGraph, createWalls, mstNew } from './utils'
 import { Point, Keys, Walls } from './types'
+import NewGraph from './NewGraph'
 
 const ROOMS_HORIZONTAL = 6
 const ROOMS_VERTICAL = 6
@@ -232,6 +233,12 @@ document.addEventListener('keyup', e => {
   keys[e.keyCode] = false
 })
 
+const randInt = (min: number, max: number) => {
+  min = Math.ceil(min)
+  max = Math.floor(max)
+  return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   /**
    * Setup canvas
@@ -253,21 +260,51 @@ document.addEventListener('DOMContentLoaded', () => {
   // Add a game info line to the top
   ctx.translate(OFFSET_X, OFFSET_Y)
 
+  const g = new NewGraph()
+  // g.addEdge('a', 'b', randInt(0, 10))
+  // g.addEdge('a', 'd', randInt(0, 10))
+  // g.addEdge('b', 'c', randInt(0, 10))
+  // g.addEdge('b', 'e', randInt(0, 10))
+  // g.addEdge('c', 'f', randInt(0, 10))
+  // g.addEdge('d', 'e', randInt(0, 10))
+  // g.addEdge('d', 'g', randInt(0, 10))
+  // g.addEdge('e', 'f', randInt(0, 10))
+  // g.addEdge('e', 'h', randInt(0, 10))
+  // g.addEdge('f', 'i', randInt(0, 10))
+  // g.addEdge('g', 'h', randInt(0, 10))
+  // g.addEdge('h', 'i', randInt(0, 10))
+  g.addEdge('a', 'b', 5)
+  g.addEdge('a', 'd', 2)
+  g.addEdge('b', 'c', 5)
+  g.addEdge('b', 'e', 1)
+  g.addEdge('c', 'f', 7)
+  g.addEdge('d', 'e', 3)
+  g.addEdge('d', 'g', 6)
+  g.addEdge('e', 'f', 7)
+  g.addEdge('e', 'h', 3)
+  g.addEdge('f', 'i', 3)
+  g.addEdge('g', 'h', 6)
+  g.addEdge('h', 'i', 7)
+  // console.log(g.edges)
+  const result = mstNew(g)
+  // console.log(result.edges)
+  // console.log(g.getVertexEdges('e'))
+
   /**
    * Create maze and walls
    */
-  const mazeGraph = createMazeGraph(ROOMS_HORIZONTAL, ROOMS_VERTICAL)
-  walls = createWalls(mazeGraph, {
-    width: ROOMS_HORIZONTAL,
-    height: ROOMS_VERTICAL,
-    cellWidth: CELL_W,
-    depth: WALL_DEPTH,
-  })
+  // const mazeGraph = createMazeGraph(ROOMS_HORIZONTAL, ROOMS_VERTICAL)
+  // walls = createWalls(mazeGraph, {
+  //   width: ROOMS_HORIZONTAL,
+  //   height: ROOMS_VERTICAL,
+  //   cellWidth: CELL_W,
+  //   depth: WALL_DEPTH,
+  // })
 
   /**
    * Rendering
    */
-  render(ctx)
-  then = Date.now()
-  requestAnimationFrame(() => update(ctx))
+  // render(ctx)
+  // then = Date.now()
+  // requestAnimationFrame(() => update(ctx))
 })
