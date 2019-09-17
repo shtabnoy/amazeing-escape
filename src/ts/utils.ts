@@ -53,7 +53,9 @@ export const mstNew = (source: NewGraph) => {
     }
     result.addEdge(min.src, min.dest, min.weight)
     v = min.dest
+    // Add edges coming out from new vertex 'v'
     heap = heap.concat(source.getVertexEdges(v))
+    // Remove min edge
     heap = heap.filter(
       (edge: Edge) =>
         !(
@@ -63,14 +65,9 @@ export const mstNew = (source: NewGraph) => {
     )
     const srcs = result.edges.map(e => e.src)
     const dests = result.edges.map(e => e.dest)
+    // Remove loops
     heap = heap.filter(
-      (edge: Edge) =>
-        !(
-          (srcs.includes(edge.src) && srcs.includes(edge.dest)) ||
-          (srcs.includes(edge.src) && dests.includes(edge.dest)) ||
-          (dests.includes(edge.src) && srcs.includes(edge.dest)) ||
-          (dests.includes(edge.src) && dests.includes(edge.dest))
-        )
+      (edge: Edge) => !(srcs.includes(edge.dest) || dests.includes(edge.dest))
     )
     min = {
       src: '',
