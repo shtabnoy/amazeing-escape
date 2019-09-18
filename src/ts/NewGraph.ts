@@ -5,21 +5,21 @@ export interface Edge {
 }
 
 export default class NewGraph {
-  vertices: any
+  vertices: string[]
   edges: Edge[]
 
   constructor() {
-    this.vertices = {}
+    this.vertices = []
     this.edges = []
   }
 
   addVertex(v: string) {
-    this.vertices[v] = v
+    this.vertices.push(v)
   }
 
   addEdge(src: string, dest: string, weight: number) {
-    if (!this.vertices[src]) this.addVertex(src)
-    if (!this.vertices[dest]) this.addVertex(dest)
+    if (!this.vertices.find(v => v === src)) this.addVertex(src)
+    if (!this.vertices.find(v => v === dest)) this.addVertex(src)
     this.edges.push({
       src: src,
       dest: dest,

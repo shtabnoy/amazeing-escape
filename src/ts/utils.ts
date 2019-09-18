@@ -40,7 +40,7 @@ export const mst = (source: Graph, dest: Graph) => {
 
 export const mstNew = (source: NewGraph) => {
   const result = new NewGraph()
-  let v = Object.keys(source.vertices)[0]
+  let v = source.vertices[0]
   let heap: Edge[] = source.getVertexEdges(v)
   let min: Edge = {
     src: '',
