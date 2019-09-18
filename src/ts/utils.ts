@@ -1,6 +1,6 @@
 import Graph from './Graph'
 import { Walls } from './types'
-import NewGraph, { Edge } from './NewGraph'
+import NewGraph, { Edge, Direction } from './NewGraph'
 
 export const mst = (source: Graph, dest: Graph) => {
   const vStart = Object.keys(source.AdjList)[0]
@@ -46,12 +46,14 @@ export const mstNew = (source: NewGraph) => {
     src: '',
     dest: '',
     weight: Infinity,
+    dir: undefined,
   }
   while (heap.length > 0) {
     for (let edge of heap) {
       min = edge.weight < min.weight ? edge : min
     }
-    result.addEdge(min.src, min.dest, min.weight)
+    // TODO: Pass just an object { src, dest, weight, dir } to create an edge
+    result.addEdge(min.src, min.dest, min.weight, min.dir)
     v = min.dest
     // Add edges coming out from new vertex 'v'
     heap = heap.concat(source.getVertexEdges(v))
@@ -73,6 +75,7 @@ export const mstNew = (source: NewGraph) => {
       src: '',
       dest: '',
       weight: Infinity,
+      dir: undefined,
     }
   }
   return result
@@ -145,11 +148,11 @@ export const createMazeGraphNew = (w: number, h: number): NewGraph => {
   for (let i = 0; i < total; i++) {
     // every vertex except right column
     if (i % w != w - 1) {
-      g.addEdge(`${i}`, `${i + 1}`, rnd()) // to the right
+      g.addEdge(`${i}`, `${i + 1}`, rnd(), Direction.right) // to the right
     }
     // every vertex except bottom row
     if (i < total - w) {
-      g.addEdge(`${i}`, `${i + w}`, rnd()) // to the bottom
+      g.addEdge(`${i}`, `${i + w}`, rnd(), Direction.down) // to the bottom
     }
   }
   return g
@@ -222,3 +225,8 @@ export const createWalls = (
   })
   return walls
 }
+
+export const createWallsNew = (
+  g: Graph,
+  { width, height, cellWidth, depth = 0 }: CreateWallsConfig
+) => {}

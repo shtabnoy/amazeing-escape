@@ -1,7 +1,15 @@
+export enum Direction {
+  up,
+  down,
+  left,
+  right,
+}
+
 export interface Edge {
   src: string
   dest: string
   weight: number
+  dir?: Direction
 }
 
 export default class NewGraph {
@@ -17,13 +25,14 @@ export default class NewGraph {
     this.vertices.push(v)
   }
 
-  addEdge(src: string, dest: string, weight: number) {
+  addEdge(src: string, dest: string, weight: number, dir?: Direction) {
     if (!this.vertices.find(v => v === src)) this.addVertex(src)
     if (!this.vertices.find(v => v === dest)) this.addVertex(src)
     this.edges.push({
-      src: src,
-      dest: dest,
-      weight: weight,
+      src,
+      dest,
+      weight,
+      dir,
     })
   }
 

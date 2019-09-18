@@ -275,8 +275,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // g.addEdge('h', 'i', randInt(0, 10))
   const g = createMazeGraphNew(4, 4)
   console.log(g.edges)
-  // const result = mstNew(g)
-  // console.log(result.edges)
+  const result = mstNew(g)
+  console.log(result.edges)
 
   /**
    * Create maze and walls
