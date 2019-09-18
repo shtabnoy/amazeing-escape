@@ -1,4 +1,10 @@
-import { createMazeGraph, createWalls, mstNew } from './utils'
+import {
+  createMazeGraph,
+  createWalls,
+  mstNew,
+  randInt,
+  createMazeGraphNew,
+} from './utils'
 import { Point, Keys, Walls } from './types'
 import NewGraph from './NewGraph'
 
@@ -233,12 +239,6 @@ document.addEventListener('keyup', e => {
   keys[e.keyCode] = false
 })
 
-const randInt = (min: number, max: number) => {
-  min = Math.ceil(min)
-  max = Math.floor(max)
-  return Math.floor(Math.random() * (max - min + 1)) + min
-}
-
 document.addEventListener('DOMContentLoaded', () => {
   /**
    * Setup canvas
@@ -260,22 +260,23 @@ document.addEventListener('DOMContentLoaded', () => {
   // Add a game info line to the top
   ctx.translate(OFFSET_X, OFFSET_Y)
 
-  const g = new NewGraph()
-  g.addEdge('a', 'b', randInt(0, 10))
-  g.addEdge('a', 'd', randInt(0, 10))
-  g.addEdge('b', 'c', randInt(0, 10))
-  g.addEdge('b', 'e', randInt(0, 10))
-  g.addEdge('c', 'f', randInt(0, 10))
-  g.addEdge('d', 'e', randInt(0, 10))
-  g.addEdge('d', 'g', randInt(0, 10))
-  g.addEdge('e', 'f', randInt(0, 10))
-  g.addEdge('e', 'h', randInt(0, 10))
-  g.addEdge('f', 'i', randInt(0, 10))
-  g.addEdge('g', 'h', randInt(0, 10))
-  g.addEdge('h', 'i', randInt(0, 10))
+  // const g = new NewGraph()
+  // g.addEdge('a', 'b', randInt(0, 10))
+  // g.addEdge('a', 'd', randInt(0, 10))
+  // g.addEdge('b', 'c', randInt(0, 10))
+  // g.addEdge('b', 'e', randInt(0, 10))
+  // g.addEdge('c', 'f', randInt(0, 10))
+  // g.addEdge('d', 'e', randInt(0, 10))
+  // g.addEdge('d', 'g', randInt(0, 10))
+  // g.addEdge('e', 'f', randInt(0, 10))
+  // g.addEdge('e', 'h', randInt(0, 10))
+  // g.addEdge('f', 'i', randInt(0, 10))
+  // g.addEdge('g', 'h', randInt(0, 10))
+  // g.addEdge('h', 'i', randInt(0, 10))
+  const g = createMazeGraphNew(4, 4)
   console.log(g.edges)
-  const result = mstNew(g)
-  console.log(result.edges)
+  // const result = mstNew(g)
+  // console.log(result.edges)
 
   /**
    * Create maze and walls

@@ -128,6 +128,33 @@ export const createMazeGraph = (w: number, h: number) => {
   return g2
 }
 
+export const randInt = (min: number, max: number) => {
+  min = Math.ceil(min)
+  max = Math.floor(max)
+  return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+const rnd = () => Math.random() // Just a shorter way to call Math.random()
+
+export const createMazeGraphNew = (w: number, h: number): NewGraph => {
+  const g = new NewGraph()
+  if (w < 2 || h < 2) return g
+
+  const total = w * h
+  // A vertex name will be an index (0 to total)
+  for (let i = 0; i < total; i++) {
+    // every vertex except right column
+    if (i % w != w - 1) {
+      g.addEdge(`${i}`, `${i + 1}`, rnd()) // to the right
+    }
+    // every vertex except bottom row
+    if (i < total - w) {
+      g.addEdge(`${i}`, `${i + w}`, rnd()) // to the bottom
+    }
+  }
+  return g
+}
+
 interface CreateWallsConfig {
   width: number
   height: number
