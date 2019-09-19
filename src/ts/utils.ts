@@ -1,5 +1,5 @@
 import Graph from './Graph'
-import { Walls } from './types'
+import { Walls, Wall } from './types'
 import NewGraph, { Edge, Direction } from './NewGraph'
 
 export const mst = (source: Graph, dest: Graph) => {
@@ -143,18 +143,30 @@ export const createMazeGraphNew = (w: number, h: number): NewGraph => {
   const g = new NewGraph()
   if (w < 2 || h < 2) return g
 
-  const total = w * h
-  // A vertex name will be an index (0 to total)
-  for (let i = 0; i < total; i++) {
-    // every vertex except right column
-    if (i % w != w - 1) {
-      g.addEdge(`${i}`, `${i + 1}`, rnd(), Direction.right) // to the right
-    }
-    // every vertex except bottom row
-    if (i < total - w) {
-      g.addEdge(`${i}`, `${i + w}`, rnd(), Direction.down) // to the bottom
+  // const total = w * h
+  // // A vertex name will be an index (0 to total)
+  // for (let i = 0; i < total; i++) {
+  //   // every vertex except right column
+  //   if (i % w != w - 1) {
+  //     g.addEdge(`${i}`, `${i + 1}`, rnd(), Direction.right) // to the right
+  //   }
+  //   // every vertex except bottom row
+  //   if (i < total - w) {
+  //     g.addEdge(`${i}`, `${i + w}`, rnd(), Direction.down) // to the bottom
+  //   }
+  // }
+  for (let i = 0; i < w; i++) {
+    for (let j = 0; j < h; j++) {
+      if (i != w - 1) g.addEdge(`${i},${j}`, `${i + 1},${j}`, rnd())
+      if (j < h - 1) g.addEdge(`${i},${j}`, `${i},${j + 1}`, rnd())
     }
   }
+  // for (let i = 0; i < h; i++) {
+  //   for (let j = 0; j < w; j++) {
+  //     if (j != w - 1) g.addEdge(`${i},${j}`, `${i},${j + 1}`, rnd())
+  //     if (i < h - 1) g.addEdge(`${i},${j}`, `${i + 1},${j}`, rnd())
+  //   }
+  // }
   return g
 }
 
@@ -226,7 +238,21 @@ export const createWalls = (
   return walls
 }
 
+const dir = (edge: Edge): Direction => {
+  const [x1, y1] = edge.src.split(',')
+  const [x2, y2] = edge.dest.split(',')
+  if (Number(x2) - Number(x1) > 0) return Direction.right
+  if (Number(x2) - Number(x1) < 0) return Direction.left
+  if (Number(y2) - Number(y1) > 0) return Direction.down
+  if (Number(y2) - Number(y1) < 0) return Direction.up
+}
+
 export const createWallsNew = (
-  g: Graph,
-  { width, height, cellWidth, depth = 0 }: CreateWallsConfig
-) => {}
+  g: NewGraph
+  // { width, height, cellWidth, depth = 0 }: CreateWallsConfig
+) => {
+  const walls: Wall[] = []
+  g.edges.forEach((edge: Edge) => {
+    console.log(dir(edge))
+  })
+}

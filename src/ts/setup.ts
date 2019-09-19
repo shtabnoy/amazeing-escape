@@ -4,6 +4,7 @@ import {
   mstNew,
   randInt,
   createMazeGraphNew,
+  createWallsNew,
 } from './utils'
 import { Point, Keys, Walls } from './types'
 import NewGraph from './NewGraph'
@@ -277,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log(g.edges)
   const result = mstNew(g)
   console.log(result.edges)
-
+  createWallsNew(result)
   /**
    * Create maze and walls
    */
