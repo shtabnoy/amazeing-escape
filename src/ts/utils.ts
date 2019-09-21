@@ -1,11 +1,11 @@
 import { Wall } from './types'
-import NewGraph, { Edge, Direction } from './NewGraph'
+import NewGraph, { Edge, Direction, Vertex } from './NewGraph'
 
 export const mstNew = (source: NewGraph): NewGraph => {
   const result = new NewGraph()
   let v = source.vertices[0]
   // let heap: Edge[] = source.getVertexEdges(v)
-  let heap: Edge[] = v.edges
+  let heap: Edge[] = Object.values(v.edges)
   let min: Edge = {
     src: '',
     dest: '',
@@ -20,7 +20,7 @@ export const mstNew = (source: NewGraph): NewGraph => {
     v = source.getVertex(min.dest)
     // Add edges coming out from new vertex 'v'
     // heap = heap.concat(source.getVertexEdges(v))
-    heap = heap.concat(v.edges)
+    heap = heap.concat(Object.values(v.edges))
     // Remove min edge
     heap = heap.filter(
       (edge: Edge) =>
@@ -39,7 +39,6 @@ export const mstNew = (source: NewGraph): NewGraph => {
       src: '',
       dest: '',
       weight: Infinity,
-      dir: undefined,
     }
   }
   return result
@@ -135,21 +134,44 @@ interface CreateWallsConfig {
 //   return walls
 // }
 
-const dir = (edge: Edge): Direction => {
-  const [x1, y1] = edge.src.split(',')
-  const [x2, y2] = edge.dest.split(',')
-  if (Number(x2) - Number(x1) > 0) return Direction.right
-  if (Number(x2) - Number(x1) < 0) return Direction.left
-  if (Number(y2) - Number(y1) > 0) return Direction.down
-  if (Number(y2) - Number(y1) < 0) return Direction.up
-}
-
 export const createWallsNew = (
-  g: NewGraph
+  g: NewGraph,
+  cellWidth: number
   // { width, height, cellWidth, depth = 0 }: CreateWallsConfig
 ) => {
   const walls: Wall[] = []
-  g.edges.forEach((edge: Edge) => {
-    console.log(dir(edge))
+  g.vertices.forEach((vertex: Vertex) => {
+    // console.log(vertex.edges)
+    // let wall = {}
+    let [vx, vy] = vertex.name.split(',')
+    // vertex.edges.forEach((edge: Edge) => {
+    //   if (edge.dir === Direction.up) {
+
+    //   }
+    // })
+    if (!vertex.edges[Direction.up]) {
+      walls.push({
+        a: { x: 0, y: 0 },
+        b: { x: 0, y: 0 },
+      })
+    }
+    if (!vertex.edges[Direction.down]) {
+      walls.push({
+        a: { x: 0, y: 0 },
+        b: { x: 0, y: 0 },
+      })
+    }
+    if (!vertex.edges[Direction.left]) {
+      walls.push({
+        a: { x: 0, y: 0 },
+        b: { x: 0, y: 0 },
+      })
+    }
+    if (!vertex.edges[Direction.right]) {
+      walls.push({
+        a: { x: 0, y: 0 },
+        b: { x: 0, y: 0 },
+      })
+    }
   })
 }

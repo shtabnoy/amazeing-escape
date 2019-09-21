@@ -1,20 +1,25 @@
 export enum Direction {
-  up, // 0
+  right, // 3
   down, // 1
   left, // 2
-  right, // 3
+  up, // 0
 }
 
 export interface Edge {
   src: string
   dest: string
   weight: number
-  dir?: Direction
+  // dir?: Direction
 }
 
 export interface Vertex {
   name: string
-  edges: Edge[]
+  edges: {
+    [Direction.up]?: Edge
+    [Direction.down]?: Edge
+    [Direction.left]?: Edge
+    [Direction.right]?: Edge
+  }
 }
 
 export default class NewGraph {
@@ -51,61 +56,49 @@ export default class NewGraph {
       weight,
     })
     const srcVertex = this.vertices.find((v: Vertex) => v.name === src)
+    let edgeToAdd = {
+      src,
+      dest,
+      weight,
+    }
+    let dir = this.getDir(src, dest)
     if (srcVertex) {
-      srcVertex.edges.push({
-        src,
-        dest,
-        weight,
-        dir: this.getDir(src, dest),
-      })
+      srcVertex.edges[dir] = edgeToAdd
     } else {
       this.addVertex({
         name: src,
-        edges: [
-          {
-            src,
-            dest,
-            weight,
-            dir: this.getDir(src, dest),
-          },
-        ],
+        edges: { [dir]: edgeToAdd },
       })
     }
     const destVertex = this.vertices.find((v: Vertex) => v.name === dest)
+    edgeToAdd = {
+      src: dest,
+      dest: src,
+      weight,
+    }
+    dir = this.getDir(dest, src)
     if (destVertex) {
-      destVertex.edges.push({
-        src: dest,
-        dest: src,
-        weight,
-        dir: this.getDir(dest, src),
-      })
+      destVertex.edges[dir] = edgeToAdd
     } else {
       this.addVertex({
         name: dest,
-        edges: [
-          {
-            src: dest,
-            dest: src,
-            weight,
-            dir: this.getDir(dest, src),
-          },
-        ],
+        edges: { [dir]: edgeToAdd },
       })
     }
   }
 
-  getVertexEdges(v: string): Edge[] {
-    const srcs = this.edges.filter((edge: Edge) => edge.src === v)
-    let dests = this.edges.filter((edge: Edge) => edge.dest === v)
-    // reverse src and dest if v is dest
-    dests = dests.map((edge: Edge) => {
-      let newEdge = { ...edge }
-      let src = newEdge.src
-      let dest = newEdge.dest
-      newEdge.dest = src
-      newEdge.src = dest
-      return newEdge
-    })
-    return srcs.concat(dests)
-  }
+  // getVertexEdges(v: string): Edge[] {
+  //   const srcs = this.edges.filter((edge: Edge) => edge.src === v)
+  //   let dests = this.edges.filter((edge: Edge) => edge.dest === v)
+  //   // reverse src and dest if v is dest
+  //   dests = dests.map((edge: Edge) => {
+  //     let newEdge = { ...edge }
+  //     let src = newEdge.src
+  //     let dest = newEdge.dest
+  //     newEdge.dest = src
+  //     newEdge.src = dest
+  //     return newEdge
+  //   })
+  //   return srcs.concat(dests)
+  // }
 }
