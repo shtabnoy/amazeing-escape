@@ -1,8 +1,8 @@
 export enum Direction {
-  up,
-  down,
-  left,
-  right,
+  up, // 0
+  down, // 1
+  left, // 2
+  right, // 3
 }
 
 export interface Edge {
@@ -12,8 +12,13 @@ export interface Edge {
   dir?: Direction
 }
 
+export interface Vertex {
+  name: string
+  edges: Edge[]
+}
+
 export default class NewGraph {
-  vertices: string[]
+  vertices: Vertex[]
   edges: Edge[]
 
   constructor() {
@@ -21,19 +26,72 @@ export default class NewGraph {
     this.edges = []
   }
 
-  addVertex(v: string) {
+  addVertex(v: Vertex) {
     this.vertices.push(v)
   }
 
-  addEdge(src: string, dest: string, weight: number, dir?: Direction) {
-    if (!this.vertices.find(v => v === src)) this.addVertex(src)
-    if (!this.vertices.find(v => v === dest)) this.addVertex(src)
+  getVertex(name: string) {
+    return this.vertices.find((v: Vertex) => v.name === name)
+  }
+
+  getDir(src: string, dest: string): Direction {
+    const [x1, y1] = src.split(',')
+    const [x2, y2] = dest.split(',')
+    if (Number(x2) - Number(x1) > 0) return Direction.right
+    if (Number(x2) - Number(x1) < 0) return Direction.left
+    if (Number(y2) - Number(y1) > 0) return Direction.down
+    if (Number(y2) - Number(y1) < 0) return Direction.up
+  }
+
+  // TODO: split addEdge and addVertex
+  addEdge(src: string, dest: string, weight: number) {
     this.edges.push({
       src,
       dest,
       weight,
-      dir,
     })
+    const srcVertex = this.vertices.find((v: Vertex) => v.name === src)
+    if (srcVertex) {
+      srcVertex.edges.push({
+        src,
+        dest,
+        weight,
+        dir: this.getDir(src, dest),
+      })
+    } else {
+      this.addVertex({
+        name: src,
+        edges: [
+          {
+            src,
+            dest,
+            weight,
+            dir: this.getDir(src, dest),
+          },
+        ],
+      })
+    }
+    const destVertex = this.vertices.find((v: Vertex) => v.name === dest)
+    if (destVertex) {
+      destVertex.edges.push({
+        src: dest,
+        dest: src,
+        weight,
+        dir: this.getDir(dest, src),
+      })
+    } else {
+      this.addVertex({
+        name: dest,
+        edges: [
+          {
+            src: dest,
+            dest: src,
+            weight,
+            dir: this.getDir(dest, src),
+          },
+        ],
+      })
+    }
   }
 
   getVertexEdges(v: string): Edge[] {

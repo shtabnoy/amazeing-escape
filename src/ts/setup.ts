@@ -1,6 +1,6 @@
 import {
-  createMazeGraph,
-  createWalls,
+  // createMazeGraph,
+  // createWalls,
   mstNew,
   randInt,
   createMazeGraphNew,
@@ -261,24 +261,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Add a game info line to the top
   ctx.translate(OFFSET_X, OFFSET_Y)
 
-  // const g = new NewGraph()
-  // g.addEdge('a', 'b', randInt(0, 10))
-  // g.addEdge('a', 'd', randInt(0, 10))
-  // g.addEdge('b', 'c', randInt(0, 10))
-  // g.addEdge('b', 'e', randInt(0, 10))
-  // g.addEdge('c', 'f', randInt(0, 10))
-  // g.addEdge('d', 'e', randInt(0, 10))
-  // g.addEdge('d', 'g', randInt(0, 10))
-  // g.addEdge('e', 'f', randInt(0, 10))
-  // g.addEdge('e', 'h', randInt(0, 10))
-  // g.addEdge('f', 'i', randInt(0, 10))
-  // g.addEdge('g', 'h', randInt(0, 10))
-  // g.addEdge('h', 'i', randInt(0, 10))
   const g = createMazeGraphNew(4, 4)
   console.log(g.edges)
   const result = mstNew(g)
-  console.log(result.edges)
-  createWallsNew(result)
+  console.log(result.vertices)
+  // createWallsNew(result)
   /**
    * Create maze and walls
    */
