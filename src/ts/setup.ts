@@ -1,5 +1,7 @@
 import { createMazeGraph, createWalls } from './utils'
 import { Point, Keys, Walls, Wall } from './types'
+import Hero from './Hero'
+import '../styles/global.scss'
 
 const ROOMS_HORIZONTAL = 6
 const ROOMS_VERTICAL = 6
@@ -31,12 +33,12 @@ let charYOffset = 0
 let walls: Walls = {}
 let now: number, then: number, elapsed: number
 
-const img = new Image()
-img.src = 'src/assets/sprites.png'
-const wallImage = new Image()
-wallImage.src = 'src/assets/wall_sp.png'
-const groundTile = new Image()
-groundTile.src = 'src/assets/ground1.png'
+// const img = new Image()
+// img.src = 'src/assets/sprites.png'
+// const wallImage = new Image()
+// wallImage.src = 'src/assets/wall_sp.png'
+// const groundTile = new Image()
+// groundTile.src = 'src/assets/ground1.png'
 
 // const drawWalls = (ctx: CanvasRenderingContext2D) => {
 //   Object.values(walls).forEach(wall => {
@@ -62,7 +64,7 @@ const drawGround = (ctx: CanvasRenderingContext2D) => {
   let translatedX = ctx.getTransform().e / 2
   let translatedY = ctx.getTransform().f / 2
   ctx.save()
-  ctx.fillStyle = ctx.createPattern(groundTile, 'repeat')
+  // ctx.fillStyle = ctx.createPattern(groundTile, 'repeat')
   ctx.fillRect(
     0 - translatedX < 0 ? -1 : 0 - translatedX,
     0 - translatedY < 0 ? -1 : 0 - translatedY,
@@ -72,23 +74,23 @@ const drawGround = (ctx: CanvasRenderingContext2D) => {
   ctx.restore()
 }
 
-const drawCharacter = (ctx: CanvasRenderingContext2D) => {
-  ctx.drawImage(
-    img,
-    4 + frame * 32,
-    charYOffset,
-    SPRITE_WIDTH,
-    SPRITE_HEIGHT,
-    coords.x,
-    coords.y,
-    CHARACTER_WIDTH,
-    CHARACTER_HEIGHT
-  )
-}
+// const drawCharacter = (ctx: CanvasRenderingContext2D) => {
+//   ctx.drawImage(
+//     img,
+//     4 + frame * 32,
+//     charYOffset,
+//     SPRITE_WIDTH,
+//     SPRITE_HEIGHT,
+//     coords.x,
+//     coords.y,
+//     CHARACTER_WIDTH,
+//     CHARACTER_HEIGHT
+//   )
+// }
 
 const render = (ctx: CanvasRenderingContext2D) => {
   // drawWalls(ctx)
-  drawCharacter(ctx)
+  // drawCharacter(ctx)
 }
 
 const move = (
@@ -188,7 +190,7 @@ const move = (
   }
   drawGround(ctx)
   // drawWalls(ctx)
-  drawCharacter(ctx)
+  // drawCharacter(ctx)
   updateSpriteFrames()
   collided = false
 }
@@ -264,16 +266,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const result = g.mst()
   const walls = createWalls(result, 100)
   drawWalls(ctx, walls)
-  /**
-   * Create maze and walls
-   */
-  // const mazeGraph = createMazeGraph(ROOMS_HORIZONTAL, ROOMS_VERTICAL)
-  // walls = createWalls(mazeGraph, {
-  //   width: ROOMS_HORIZONTAL,
-  //   height: ROOMS_VERTICAL,
-  //   cellWidth: CELL_W,
-  //   depth: WALL_DEPTH,
-  // })
+  const hero = new Hero(ctx)
+  hero.draw()
 
   /**
    * Rendering
