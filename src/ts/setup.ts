@@ -6,7 +6,7 @@ import {
   createMazeGraphNew,
   createWallsNew,
 } from './utils'
-import { Point, Keys, Walls } from './types'
+import { Point, Keys, Walls, Wall } from './types'
 import NewGraph from './NewGraph'
 
 const ROOMS_HORIZONTAL = 6
@@ -46,25 +46,25 @@ wallImage.src = 'src/assets/wall_sp.png'
 const groundTile = new Image()
 groundTile.src = 'src/assets/ground1.png'
 
-const drawWalls = (ctx: CanvasRenderingContext2D) => {
-  Object.values(walls).forEach(wall => {
-    for (let i = 0; i < wall.b.x - wall.a.x; i += 50) {
-      for (let j = 0; j < wall.b.y - wall.a.y; j += 50) {
-        ctx.drawImage(
-          wallImage,
-          0,
-          0,
-          WALL_DEPTH + 2,
-          WALL_DEPTH + 2,
-          wall.a.x + i,
-          wall.a.y + j,
-          WALL_DEPTH,
-          WALL_DEPTH
-        )
-      }
-    }
-  })
-}
+// const drawWalls = (ctx: CanvasRenderingContext2D) => {
+//   Object.values(walls).forEach(wall => {
+//     for (let i = 0; i < wall.b.x - wall.a.x; i += 50) {
+//       for (let j = 0; j < wall.b.y - wall.a.y; j += 50) {
+//         ctx.drawImage(
+//           wallImage,
+//           0,
+//           0,
+//           WALL_DEPTH + 2,
+//           WALL_DEPTH + 2,
+//           wall.a.x + i,
+//           wall.a.y + j,
+//           WALL_DEPTH,
+//           WALL_DEPTH
+//         )
+//       }
+//     }
+//   })
+// }
 
 const drawGround = (ctx: CanvasRenderingContext2D) => {
   let translatedX = ctx.getTransform().e / 2
@@ -95,7 +95,7 @@ const drawCharacter = (ctx: CanvasRenderingContext2D) => {
 }
 
 const render = (ctx: CanvasRenderingContext2D) => {
-  drawWalls(ctx)
+  // drawWalls(ctx)
   drawCharacter(ctx)
 }
 
@@ -195,7 +195,7 @@ const move = (
       break
   }
   drawGround(ctx)
-  drawWalls(ctx)
+  // drawWalls(ctx)
   drawCharacter(ctx)
   updateSpriteFrames()
   collided = false
@@ -240,6 +240,15 @@ document.addEventListener('keyup', e => {
   keys[e.keyCode] = false
 })
 
+const drawWalls = (ctx: CanvasRenderingContext2D, walls: Wall[]) => {
+  walls.forEach((wall: Wall) => {
+    ctx.beginPath()
+    ctx.moveTo(wall.a.x, wall.a.y)
+    ctx.lineTo(wall.b.x, wall.b.y)
+    ctx.stroke()
+  })
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   /**
    * Setup canvas
@@ -262,10 +271,12 @@ document.addEventListener('DOMContentLoaded', () => {
   ctx.translate(OFFSET_X, OFFSET_Y)
 
   const g = createMazeGraphNew(4, 4)
-  console.log(g.edges)
+  // console.log(g.edges)
   const result = mstNew(g)
-  console.log(result.edges)
-  // createWallsNew(result)
+  // console.log(result.edges)
+  const walls = createWallsNew(result, 100)
+  drawWalls(ctx, walls)
+  console.log(walls)
   /**
    * Create maze and walls
    */

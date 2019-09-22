@@ -4,7 +4,6 @@ import NewGraph, { Edge, Direction, Vertex } from './NewGraph'
 export const mstNew = (source: NewGraph): NewGraph => {
   const result = new NewGraph()
   let v = source.vertices[0]
-  // let heap: Edge[] = source.getVertexEdges(v)
   let heap: Edge[] = Object.values(v.edges)
   let min: Edge = {
     src: '',
@@ -19,7 +18,6 @@ export const mstNew = (source: NewGraph): NewGraph => {
     result.addEdge(min.src, min.dest, min.weight)
     v = source.getVertex(min.dest)
     // Add edges coming out from new vertex 'v'
-    // heap = heap.concat(source.getVertexEdges(v))
     heap = heap.concat(Object.values(v.edges))
     // Remove min edge
     heap = heap.filter(
@@ -136,42 +134,37 @@ interface CreateWallsConfig {
 
 export const createWallsNew = (
   g: NewGraph,
-  cellWidth: number
-  // { width, height, cellWidth, depth = 0 }: CreateWallsConfig
+  rw: number // room width
 ) => {
   const walls: Wall[] = []
   g.vertices.forEach((vertex: Vertex) => {
-    // console.log(vertex.edges)
-    // let wall = {}
-    let [vx, vy] = vertex.name.split(',')
-    // vertex.edges.forEach((edge: Edge) => {
-    //   if (edge.dir === Direction.up) {
-
-    //   }
-    // })
+    const xy = vertex.name.split(',')
+    const vx = Number(xy[0])
+    const vy = Number(xy[1])
     if (!vertex.edges[Direction.up]) {
       walls.push({
-        a: { x: 0, y: 0 },
-        b: { x: 0, y: 0 },
+        a: { x: vx * rw, y: vy * rw },
+        b: { x: (vx + 1) * rw, y: vy * rw },
       })
     }
     if (!vertex.edges[Direction.down]) {
       walls.push({
-        a: { x: 0, y: 0 },
-        b: { x: 0, y: 0 },
+        a: { x: vx * rw, y: (vy + 1) * rw },
+        b: { x: (vx + 1) * rw, y: (vy + 1) * rw },
       })
     }
     if (!vertex.edges[Direction.left]) {
       walls.push({
-        a: { x: 0, y: 0 },
-        b: { x: 0, y: 0 },
+        a: { x: vx * rw, y: vy * rw },
+        b: { x: vx * rw, y: (vy + 1) * rw },
       })
     }
     if (!vertex.edges[Direction.right]) {
       walls.push({
-        a: { x: 0, y: 0 },
-        b: { x: 0, y: 0 },
+        a: { x: (vx + 1) * rw, y: vy * rw },
+        b: { x: (vx + 1) * rw, y: (vy + 1) * rw },
       })
     }
   })
+  return walls
 }
