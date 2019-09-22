@@ -2,6 +2,7 @@ import { createMazeGraph, createWalls } from './utils'
 import { Point, Keys, Walls, Wall } from './types'
 import Hero from './Hero'
 import '../styles/global.scss'
+import { Direction } from './MazeGraph'
 
 const ROOMS_HORIZONTAL = 6
 const ROOMS_VERTICAL = 6
@@ -93,138 +94,142 @@ const render = (ctx: CanvasRenderingContext2D) => {
   // drawCharacter(ctx)
 }
 
-const move = (
-  ctx: CanvasRenderingContext2D,
-  dir: 'left' | 'right' | 'up' | 'down'
-) => {
-  let collided = false
-  // divide by two since there were adjustments for retina
-  let translatedX = ctx.getTransform().e / 2
-  let translatedY = ctx.getTransform().f / 2
-  // TODO: Think why it's working
-  ctx.clearRect(
-    0 - translatedX < 0 ? -1 : 0 - translatedX,
-    0 - translatedY < 0 ? -1 : 0 - translatedY,
-    CW - translatedX + OFFSET_X,
-    CH - translatedY + OFFSET_Y
-  )
-  switch (dir) {
-    case 'left':
-      charYOffset = 32 + 1 // sprites adjustment
-      Object.values(walls).forEach(wall => {
-        if (
-          coords.x - STEP + CHARACTER_WIDTH >= wall.b.x &&
-          coords.x - STEP <= wall.b.x &&
-          coords.y + CHARACTER_HEIGHT >= wall.a.y &&
-          coords.y <= wall.b.y
-        ) {
-          collided = true
-        }
-      })
-      if (!collided) {
-        coords.x -= STEP
-        if (coords.x < CAMERA_BORDER_X - translatedX) {
-          ctx.translate(translatedX < 0 ? STEP : 0, 0)
-        }
-      }
-      break
-    case 'right':
-      charYOffset = 64 + 1 // sprites adjustment
-      Object.values(walls).forEach(wall => {
-        if (
-          coords.x + STEP <= wall.a.x &&
-          coords.x + STEP + CHARACTER_WIDTH >= wall.a.x &&
-          coords.y + CHARACTER_HEIGHT >= wall.a.y &&
-          coords.y <= wall.b.y
-        ) {
-          collided = true
-        }
-      })
-      if (!collided) {
-        coords.x += STEP
-        if (coords.x + CHARACTER_WIDTH > CW - translatedX - CAMERA_BORDER_X) {
-          ctx.translate(translatedX < -RIGHT_BORDER + 2 ? 0 : -STEP, 0) // TODO: strange 2px adjustment
-        }
-      }
-      break
-    case 'up':
-      charYOffset = 96 + 1 // sprites adjustment
-      Object.values(walls).forEach(wall => {
-        if (
-          coords.y - STEP + CHARACTER_HEIGHT >= wall.b.y &&
-          coords.y - STEP <= wall.b.y &&
-          coords.x + CHARACTER_WIDTH >= wall.a.x &&
-          coords.x <= wall.b.x
-        ) {
-          collided = true
-        }
-      })
-      if (!collided) {
-        coords.y -= STEP
-        if (coords.y < CAMERA_BORDER_Y - translatedY) {
-          ctx.translate(0, translatedY < 0 ? STEP : 0)
-        }
-      }
-      break
-    case 'down':
-      charYOffset = 0
-      Object.values(walls).forEach(wall => {
-        if (
-          coords.y + STEP <= wall.a.y &&
-          coords.y + STEP + CHARACTER_HEIGHT >= wall.a.y &&
-          coords.x + CHARACTER_WIDTH >= wall.a.x &&
-          coords.x <= wall.b.x
-        ) {
-          collided = true
-        }
-      })
-      if (!collided) {
-        coords.y += STEP
-        if (coords.y + CHARACTER_HEIGHT > CH - translatedY - CAMERA_BORDER_Y) {
-          ctx.translate(0, translatedY < -BOTTOM_BORDER + 2 ? 0 : -STEP) // TODO: strange 2px adjustment
-        }
-      }
-      break
-    default:
-      break
-  }
-  drawGround(ctx)
-  // drawWalls(ctx)
-  // drawCharacter(ctx)
-  updateSpriteFrames()
-  collided = false
-}
+// const move = (
+//   ctx: CanvasRenderingContext2D,
+//   dir: 'left' | 'right' | 'up' | 'down'
+// ) => {
+//   let collided = false
+//   // divide by two since there were adjustments for retina
+//   let translatedX = ctx.getTransform().e / 2
+//   let translatedY = ctx.getTransform().f / 2
+//   // TODO: Think why it's working
+//   ctx.clearRect(
+//     0 - translatedX < 0 ? -1 : 0 - translatedX,
+//     0 - translatedY < 0 ? -1 : 0 - translatedY,
+//     CW - translatedX + OFFSET_X,
+//     CH - translatedY + OFFSET_Y
+//   )
+//   switch (dir) {
+//     case 'left':
+//       charYOffset = 32 + 1 // sprites adjustment
+//       Object.values(walls).forEach(wall => {
+//         if (
+//           coords.x - STEP + CHARACTER_WIDTH >= wall.b.x &&
+//           coords.x - STEP <= wall.b.x &&
+//           coords.y + CHARACTER_HEIGHT >= wall.a.y &&
+//           coords.y <= wall.b.y
+//         ) {
+//           collided = true
+//         }
+//       })
+//       if (!collided) {
+//         coords.x -= STEP
+//         if (coords.x < CAMERA_BORDER_X - translatedX) {
+//           ctx.translate(translatedX < 0 ? STEP : 0, 0)
+//         }
+//       }
+//       break
+//     case 'right':
+//       charYOffset = 64 + 1 // sprites adjustment
+//       Object.values(walls).forEach(wall => {
+//         if (
+//           coords.x + STEP <= wall.a.x &&
+//           coords.x + STEP + CHARACTER_WIDTH >= wall.a.x &&
+//           coords.y + CHARACTER_HEIGHT >= wall.a.y &&
+//           coords.y <= wall.b.y
+//         ) {
+//           collided = true
+//         }
+//       })
+//       if (!collided) {
+//         coords.x += STEP
+//         if (coords.x + CHARACTER_WIDTH > CW - translatedX - CAMERA_BORDER_X) {
+//           ctx.translate(translatedX < -RIGHT_BORDER + 2 ? 0 : -STEP, 0) // TODO: strange 2px adjustment
+//         }
+//       }
+//       break
+//     case 'up':
+//       charYOffset = 96 + 1 // sprites adjustment
+//       Object.values(walls).forEach(wall => {
+//         if (
+//           coords.y - STEP + CHARACTER_HEIGHT >= wall.b.y &&
+//           coords.y - STEP <= wall.b.y &&
+//           coords.x + CHARACTER_WIDTH >= wall.a.x &&
+//           coords.x <= wall.b.x
+//         ) {
+//           collided = true
+//         }
+//       })
+//       if (!collided) {
+//         coords.y -= STEP
+//         if (coords.y < CAMERA_BORDER_Y - translatedY) {
+//           ctx.translate(0, translatedY < 0 ? STEP : 0)
+//         }
+//       }
+//       break
+//     case 'down':
+//       charYOffset = 0
+//       Object.values(walls).forEach(wall => {
+//         if (
+//           coords.y + STEP <= wall.a.y &&
+//           coords.y + STEP + CHARACTER_HEIGHT >= wall.a.y &&
+//           coords.x + CHARACTER_WIDTH >= wall.a.x &&
+//           coords.x <= wall.b.x
+//         ) {
+//           collided = true
+//         }
+//       })
+//       if (!collided) {
+//         coords.y += STEP
+//         if (coords.y + CHARACTER_HEIGHT > CH - translatedY - CAMERA_BORDER_Y) {
+//           ctx.translate(0, translatedY < -BOTTOM_BORDER + 2 ? 0 : -STEP) // TODO: strange 2px adjustment
+//         }
+//       }
+//       break
+//     default:
+//       break
+//   }
+//   drawGround(ctx)
+//   // drawWalls(ctx)
+//   // drawCharacter(ctx)
+//   updateSpriteFrames()
+//   collided = false
+// }
 
-const updateSpriteFrames = () => {
-  now = Date.now()
-  elapsed = now - then
-  if (elapsed > FPS_INTERVAL) {
-    // adjust fpsInterval not being a multiple of RAF's interval (16.7ms)
-    then = now - (elapsed % FPS_INTERVAL)
-    if (frame < NUMBER_OF_FRAMES - 1) {
-      frame += 1
-    } else {
-      frame = 0
-    }
-  }
-}
+// const updateSpriteFrames = () => {
+//   now = Date.now()
+//   elapsed = now - then
+//   if (elapsed > FPS_INTERVAL) {
+//     // adjust fpsInterval not being a multiple of RAF's interval (16.7ms)
+//     then = now - (elapsed % FPS_INTERVAL)
+//     if (frame < NUMBER_OF_FRAMES - 1) {
+//       frame += 1
+//     } else {
+//       frame = 0
+//     }
+//   }
+// }
 
-const update = (ctx: CanvasRenderingContext2D) => {
+const update = (ctx: CanvasRenderingContext2D, hero: Hero) => {
   // moving character
   if (keys[39]) {
-    move(ctx, 'right')
+    // move(ctx, 'right')
+    // hero.move(Direction.right)
   }
   if (keys[37]) {
-    move(ctx, 'left')
+    // move(ctx, 'left')
+    // hero.move(Direction.left)
   }
   if (keys[40]) {
-    move(ctx, 'down')
+    // move(ctx, 'down')
+    hero.move(Direction.down)
   }
   if (keys[38]) {
-    move(ctx, 'up')
+    // move(ctx, 'up')
+    // hero.move(Direction.up)
   }
 
-  requestAnimationFrame(() => update(ctx))
+  requestAnimationFrame(() => update(ctx, hero))
 }
 
 document.addEventListener('keydown', e => {
@@ -265,14 +270,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const g = createMazeGraph(4, 4)
   const result = g.mst()
   const walls = createWalls(result, 100)
-  drawWalls(ctx, walls)
+  // drawWalls(ctx, walls)
   const hero = new Hero(ctx)
-  hero.draw()
 
   /**
    * Rendering
    */
   // render(ctx)
   // then = Date.now()
-  // requestAnimationFrame(() => update(ctx))
+  // hero.then = Date.now()
+  requestAnimationFrame(() => update(ctx, hero))
 })
