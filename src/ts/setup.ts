@@ -89,10 +89,10 @@ const drawGround = (ctx: CanvasRenderingContext2D) => {
 //   )
 // }
 
-const render = (ctx: CanvasRenderingContext2D) => {
-  // drawWalls(ctx)
-  // drawCharacter(ctx)
-}
+// const render = (ctx: CanvasRenderingContext2D) => {
+//   drawWalls(ctx)
+//   drawCharacter(ctx)
+// }
 
 // const move = (
 //   ctx: CanvasRenderingContext2D,
@@ -196,40 +196,21 @@ const render = (ctx: CanvasRenderingContext2D) => {
 //   collided = false
 // }
 
-// const updateSpriteFrames = () => {
-//   now = Date.now()
-//   elapsed = now - then
-//   if (elapsed > FPS_INTERVAL) {
-//     // adjust fpsInterval not being a multiple of RAF's interval (16.7ms)
-//     then = now - (elapsed % FPS_INTERVAL)
-//     if (frame < NUMBER_OF_FRAMES - 1) {
-//       frame += 1
-//     } else {
-//       frame = 0
-//     }
-//   }
-// }
-
-const update = (ctx: CanvasRenderingContext2D, hero: Hero) => {
-  // moving character
+const render = (ctx: CanvasRenderingContext2D, hero: Hero) => {
   if (keys[39]) {
-    // move(ctx, 'right')
-    // hero.move(Direction.right)
+    hero.move(Direction.right)
   }
   if (keys[37]) {
-    // move(ctx, 'left')
-    // hero.move(Direction.left)
+    hero.move(Direction.left)
   }
   if (keys[40]) {
-    // move(ctx, 'down')
     hero.move(Direction.down)
   }
   if (keys[38]) {
-    // move(ctx, 'up')
-    // hero.move(Direction.up)
+    hero.move(Direction.up)
   }
 
-  requestAnimationFrame(() => update(ctx, hero))
+  requestAnimationFrame(() => render(ctx, hero))
 }
 
 document.addEventListener('keydown', e => {
@@ -276,8 +257,5 @@ document.addEventListener('DOMContentLoaded', () => {
   /**
    * Rendering
    */
-  // render(ctx)
-  // then = Date.now()
-  // hero.then = Date.now()
-  requestAnimationFrame(() => update(ctx, hero))
+  requestAnimationFrame(() => render(ctx, hero))
 })

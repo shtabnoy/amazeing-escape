@@ -1,12 +1,6 @@
 import { Point } from './types'
 import { Direction } from './MazeGraph'
 
-// interface Images {
-//   front0: HTMLImageElement
-//   front1: HTMLImageElement
-//   front2: HTMLImageElement
-// }
-
 const SPRITE_WIDTH = 48
 const SPRITE_HEIGHT = 48
 const NUMBER_OF_FRAMES = 3
@@ -45,9 +39,9 @@ export default class Hero {
     front1.onload = () => this.drawImage(1)
   }
 
-  private drawImage(index: number) {
+  private drawImage(frame: number) {
     this.ctx.drawImage(
-      this.imgs[index],
+      this.imgs[frame],
       0,
       0,
       SPRITE_WIDTH,
@@ -59,39 +53,45 @@ export default class Hero {
     )
   }
 
-  draw() {
-    this.drawImage(this.frame)
-  }
-
-  updateSpriteFrames() {
+  // For animation
+  private updateFrame() {
     this.now = Date.now()
     this.elapsed = this.now - this.then
     if (this.elapsed > FPS_INTERVAL) {
       // adjust fpsInterval not being a multiple of RAF's interval (16.7ms)
       this.then = this.now - (this.elapsed % FPS_INTERVAL)
-      if (this.frame < NUMBER_OF_FRAMES - 1) {
-        this.frame += 1
-      } else {
-        this.frame = 0
-      }
+      this.frame = (this.frame + 1) % NUMBER_OF_FRAMES
     }
   }
 
+  draw() {
+    this.drawImage(this.frame)
+    this.updateFrame()
+  }
+
   move(dir: Direction) {
+    this.ctx.clearRect(
+      this.coords.x,
+      this.coords.y,
+      SPRITE_WIDTH,
+      SPRITE_HEIGHT
+    )
     switch (dir) {
+      case Direction.right:
+        this.coords.x += STEP
+        break
+      case Direction.left:
+        this.coords.x -= STEP
+        break
       case Direction.down:
         this.coords.y += STEP
+        break
+      case Direction.up:
+        this.coords.y -= STEP
         break
       default:
         break
     }
-    this.ctx.clearRect(
-      this.coords.x,
-      this.coords.y - 2,
-      SPRITE_WIDTH,
-      SPRITE_HEIGHT
-    )
     this.draw()
-    this.updateSpriteFrames()
   }
 }
