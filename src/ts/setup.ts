@@ -1,13 +1,5 @@
-import {
-  // createMazeGraph,
-  // createWalls,
-  mstNew,
-  randInt,
-  createMazeGraphNew,
-  createWallsNew,
-} from './utils'
+import { createMazeGraph, createWalls } from './utils'
 import { Point, Keys, Walls, Wall } from './types'
-import NewGraph from './NewGraph'
 
 const ROOMS_HORIZONTAL = 6
 const ROOMS_VERTICAL = 6
@@ -256,6 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const canvas = document.getElementById('canvas') as HTMLCanvasElement
   const ctx = canvas.getContext('2d')
   const ratio = window.devicePixelRatio
+
   // retina adjustments
   canvas.width = CW * 2
   canvas.height = CH * 2
@@ -265,18 +258,12 @@ document.addEventListener('DOMContentLoaded', () => {
   ctx.lineWidth = 2
   ctx.lineCap = 'square'
   ctx.scale(ratio, ratio)
-  // ctx.rotate((45 * Math.PI) / 180)
-  // ctx.translate(700, 0)
-  // Add a game info line to the top
-  ctx.translate(OFFSET_X, OFFSET_Y)
+  ctx.translate(10, 10)
 
-  const g = createMazeGraphNew(4, 4)
-  // console.log(g.edges)
-  const result = mstNew(g)
-  // console.log(result.edges)
-  const walls = createWallsNew(result, 100)
+  const g = createMazeGraph(4, 4)
+  const result = g.mst()
+  const walls = createWalls(result, 100)
   drawWalls(ctx, walls)
-  console.log(walls)
   /**
    * Create maze and walls
    */

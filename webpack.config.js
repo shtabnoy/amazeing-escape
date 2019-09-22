@@ -3,7 +3,7 @@ var HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
   mode: 'development',
-  entry: ['./src/ts/index.js'],
+  entry: ['./src/ts/setup.ts'],
   devServer: {
     historyApiFallback: true,
   },
