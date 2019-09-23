@@ -196,22 +196,22 @@ const drawGround = (ctx: CanvasRenderingContext2D) => {
 //   collided = false
 // }
 
-const render = (ctx: CanvasRenderingContext2D, hero: Hero) => {
-  if (keys[39]) {
-    hero.move(Direction.right)
-  }
-  if (keys[37]) {
-    hero.move(Direction.left)
-  }
-  if (keys[40]) {
-    hero.move(Direction.down)
-  }
-  if (keys[38]) {
-    hero.move(Direction.up)
-  }
+// const render = (ctx: CanvasRenderingContext2D, hero: Hero) => {
+//   if (keys[39]) {
+//     hero.move(Direction.right)
+//   }
+//   if (keys[37]) {
+//     hero.move(Direction.left)
+//   }
+//   if (keys[40]) {
+//     hero.move(Direction.down)
+//   }
+//   if (keys[38]) {
+//     hero.move(Direction.up)
+//   }
 
-  requestAnimationFrame(() => render(ctx, hero))
-}
+//   requestAnimationFrame(() => render(ctx, hero))
+// }
 
 document.addEventListener('keydown', e => {
   keys[e.keyCode] = true
@@ -251,11 +251,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const g = createMazeGraph(4, 4)
   const result = g.mst()
   const walls = createWalls(result, 100)
-  // drawWalls(ctx, walls)
+  drawWalls(ctx, walls)
   const hero = new Hero(ctx)
+  hero.animate(keys)
 
   /**
    * Rendering
    */
-  requestAnimationFrame(() => render(ctx, hero))
+  // requestAnimationFrame(() => render(ctx, hero))
 })

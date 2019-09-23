@@ -9,7 +9,13 @@ const STEP = 2
 
 export default class Hero {
   ctx: CanvasRenderingContext2D
-  imgs: HTMLImageElement[]
+  imgs: {
+    [Direction.right]: HTMLImageElement[]
+    [Direction.down]: HTMLImageElement[]
+    [Direction.left]: HTMLImageElement[]
+    [Direction.up]: HTMLImageElement[]
+  }
+
   coords: Point
   now: number
   then: number
@@ -28,20 +34,42 @@ export default class Hero {
   }
 
   private initImgs() {
-    const front0 = new Image()
-    const front1 = new Image()
-    const front2 = new Image()
-    front0.src = 'src/assets/hero/front0.png'
-    front1.src = 'src/assets/hero/front1.png'
-    front2.src = 'src/assets/hero/front2.png'
-    this.imgs = [front0, front1, front2]
-
-    front1.onload = () => this.drawImage(1)
+    const right0 = new Image()
+    const right1 = new Image()
+    const right2 = new Image()
+    const down0 = new Image()
+    const down1 = new Image()
+    const down2 = new Image()
+    const left0 = new Image()
+    const left1 = new Image()
+    const left2 = new Image()
+    const up0 = new Image()
+    const up1 = new Image()
+    const up2 = new Image()
+    right0.src = 'src/assets/hero/right0.png'
+    right1.src = 'src/assets/hero/right1.png'
+    right2.src = 'src/assets/hero/right2.png'
+    down0.src = 'src/assets/hero/down0.png'
+    down1.src = 'src/assets/hero/down1.png'
+    down2.src = 'src/assets/hero/down2.png'
+    left0.src = 'src/assets/hero/left0.png'
+    left1.src = 'src/assets/hero/left1.png'
+    left2.src = 'src/assets/hero/left2.png'
+    up0.src = 'src/assets/hero/up0.png'
+    up1.src = 'src/assets/hero/up1.png'
+    up2.src = 'src/assets/hero/up2.png'
+    this.imgs = {
+      [Direction.right]: [right0, right1, right2],
+      [Direction.down]: [down0, down1, down2],
+      [Direction.left]: [left0, left1, left2],
+      [Direction.up]: [up0, up1, up2],
+    }
+    down0.onload = () => this.drawImage(Direction.down, 1)
   }
 
-  private drawImage(frame: number) {
+  private drawImage(dir: Direction, frame: number) {
     this.ctx.drawImage(
-      this.imgs[frame],
+      this.imgs[dir][frame],
       0,
       0,
       SPRITE_WIDTH,
@@ -64,34 +92,45 @@ export default class Hero {
     }
   }
 
-  draw() {
-    this.drawImage(this.frame)
+  draw(dir: Direction) {
+    this.drawImage(dir, this.frame)
     this.updateFrame()
   }
 
-  move(dir: Direction) {
+  clear() {
     this.ctx.clearRect(
       this.coords.x,
       this.coords.y,
       SPRITE_WIDTH,
       SPRITE_HEIGHT
     )
-    switch (dir) {
-      case Direction.right:
-        this.coords.x += STEP
-        break
-      case Direction.left:
-        this.coords.x -= STEP
-        break
-      case Direction.down:
-        this.coords.y += STEP
-        break
-      case Direction.up:
-        this.coords.y -= STEP
-        break
-      default:
-        break
+  }
+
+  move(keys: any) {
+    if (keys[39]) {
+      this.clear()
+      this.coords.x += STEP
+      this.draw(Direction.right)
     }
-    this.draw()
+    if (keys[37]) {
+      this.clear()
+      this.coords.x -= STEP
+      this.draw(Direction.left)
+    }
+    if (keys[40]) {
+      this.clear()
+      this.coords.y += STEP
+      this.draw(Direction.down)
+    }
+    if (keys[38]) {
+      this.clear()
+      this.coords.y -= STEP
+      this.draw(Direction.up)
+    }
+    requestAnimationFrame(() => this.move(keys))
+  }
+
+  animate(keys: any) {
+    requestAnimationFrame(() => this.move(keys))
   }
 }
