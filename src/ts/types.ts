@@ -3,8 +3,18 @@ export interface Point {
   y: number
 }
 
+export enum ArrowKeys {
+  ArrowRight = 'ArrowRight',
+  ArrowDown = 'ArrowDown',
+  ArrowLeft = 'ArrowLeft',
+  ArrowUp = 'ArrowUp',
+}
+
 export interface Keys {
-  [key: string]: boolean
+  [ArrowKeys.ArrowRight]: boolean
+  [ArrowKeys.ArrowDown]: boolean
+  [ArrowKeys.ArrowLeft]: boolean
+  [ArrowKeys.ArrowUp]: boolean
 }
 
 export interface Wall {

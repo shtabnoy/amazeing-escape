@@ -1,79 +1,35 @@
-import { createMazeGraph, createWalls } from './utils'
-import { Point, Keys, Walls, Wall } from './types'
+import { Wall } from './types'
 import Hero from './Hero'
+import Renderer from './Renderer'
 import '../styles/global.scss'
-import { Direction } from './MazeGraph'
+import Maze from './Maze'
 
-const ROOMS_HORIZONTAL = 6
-const ROOMS_VERTICAL = 6
-const STEP = 4
-const OFFSET_X = 0
-const OFFSET_Y = 0
-const CW = window.innerWidth
-const CH = window.innerHeight
-const CELL_W = 250
-const CAMERA_BORDER_X = OFFSET_X + 100
-const CAMERA_BORDER_Y = OFFSET_Y + 100
-const coords: Point = {
-  x: 100,
-  y: 100,
-}
-const keys: Keys = {}
-const SPRITE_WIDTH = 24
-const SPRITE_HEIGHT = 32
-const CHARACTER_WIDTH = 56
-const CHARACTER_HEIGHT = 64
-const NUMBER_OF_FRAMES = 3
-const FPS_INTERVAL = 1000 / 10
-const WALL_DEPTH = 50
-const RIGHT_BORDER = ROOMS_HORIZONTAL * CELL_W + WALL_DEPTH - CW
-const BOTTOM_BORDER = ROOMS_VERTICAL * CELL_W + WALL_DEPTH - CH
+// const ROOMS_HORIZONTAL = 6
+// const ROOMS_VERTICAL = 6
+// const OFFSET_X = 0
+// const OFFSET_Y = 0
+// const CW = window.innerWidth
+// const CH = window.innerHeight
+// const CELL_W = 250
+// const CAMERA_BORDER_X = OFFSET_X + 100
+// const CAMERA_BORDER_Y = OFFSET_Y + 100
+// const WALL_DEPTH = 50
+// const RIGHT_BORDER = ROOMS_HORIZONTAL * CELL_W + WALL_DEPTH - CW
+// const BOTTOM_BORDER = ROOMS_VERTICAL * CELL_W + WALL_DEPTH - CH
 
-let frame = 0
-let charYOffset = 0
-let walls: Walls = {}
-let now: number, then: number, elapsed: number
-
-// const img = new Image()
-// img.src = 'src/assets/sprites.png'
-// const wallImage = new Image()
-// wallImage.src = 'src/assets/wall_sp.png'
-// const groundTile = new Image()
-// groundTile.src = 'src/assets/ground1.png'
-
-// const drawWalls = (ctx: CanvasRenderingContext2D) => {
-//   Object.values(walls).forEach(wall => {
-//     for (let i = 0; i < wall.b.x - wall.a.x; i += 50) {
-//       for (let j = 0; j < wall.b.y - wall.a.y; j += 50) {
-//         ctx.drawImage(
-//           wallImage,
-//           0,
-//           0,
-//           WALL_DEPTH + 2,
-//           WALL_DEPTH + 2,
-//           wall.a.x + i,
-//           wall.a.y + j,
-//           WALL_DEPTH,
-//           WALL_DEPTH
-//         )
-//       }
-//     }
-//   })
+// const drawGround = (ctx: CanvasRenderingContext2D) => {
+//   let translatedX = ctx.getTransform().e / 2
+//   let translatedY = ctx.getTransform().f / 2
+//   ctx.save()
+//   // ctx.fillStyle = ctx.createPattern(groundTile, 'repeat')
+//   ctx.fillRect(
+//     0 - translatedX < 0 ? -1 : 0 - translatedX,
+//     0 - translatedY < 0 ? -1 : 0 - translatedY,
+//     CW - translatedX + OFFSET_X,
+//     CH - translatedY + OFFSET_Y
+//   )
+//   ctx.restore()
 // }
-
-const drawGround = (ctx: CanvasRenderingContext2D) => {
-  let translatedX = ctx.getTransform().e / 2
-  let translatedY = ctx.getTransform().f / 2
-  ctx.save()
-  // ctx.fillStyle = ctx.createPattern(groundTile, 'repeat')
-  ctx.fillRect(
-    0 - translatedX < 0 ? -1 : 0 - translatedX,
-    0 - translatedY < 0 ? -1 : 0 - translatedY,
-    CW - translatedX + OFFSET_X,
-    CH - translatedY + OFFSET_Y
-  )
-  ctx.restore()
-}
 
 // const drawCharacter = (ctx: CanvasRenderingContext2D) => {
 //   ctx.drawImage(
@@ -213,13 +169,6 @@ const drawGround = (ctx: CanvasRenderingContext2D) => {
 //   requestAnimationFrame(() => render(ctx, hero))
 // }
 
-document.addEventListener('keydown', e => {
-  keys[e.keyCode] = true
-})
-document.addEventListener('keyup', e => {
-  keys[e.keyCode] = false
-})
-
 const drawWalls = (ctx: CanvasRenderingContext2D, walls: Wall[]) => {
   walls.forEach((wall: Wall) => {
     ctx.beginPath()
@@ -248,12 +197,10 @@ document.addEventListener('DOMContentLoaded', () => {
   ctx.scale(ratio, ratio)
   ctx.translate(10, 10)
 
-  const g = createMazeGraph(4, 4)
-  const result = g.mst()
-  const walls = createWalls(result, 100)
-  drawWalls(ctx, walls)
-  const hero = new Hero(ctx)
-  hero.animate(keys)
+  const r = new Renderer(ctx)
+  r.addMaze(new Maze(ctx, 4, 4, { rw: 100 }))
+  r.addHero(new Hero(ctx))
+  r.render()
 
   /**
    * Rendering

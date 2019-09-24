@@ -4,7 +4,6 @@ import { Direction } from './MazeGraph'
 const SPRITE_WIDTH = 48
 const SPRITE_HEIGHT = 48
 const NUMBER_OF_FRAMES = 3
-const FPS_INTERVAL = 1000 / 6
 const STEP = 2
 
 export default class Hero {
@@ -15,11 +14,8 @@ export default class Hero {
     [Direction.left]: HTMLImageElement[]
     [Direction.up]: HTMLImageElement[]
   }
-
+  img: HTMLImageElement
   coords: Point
-  now: number
-  then: number
-  elapsed: number
   frame: number
 
   constructor(ctx: CanvasRenderingContext2D) {
@@ -30,7 +26,6 @@ export default class Hero {
     }
     this.initImgs()
     this.frame = 0
-    this.then = Date.now()
   }
 
   private initImgs() {
@@ -64,12 +59,48 @@ export default class Hero {
       [Direction.left]: [left0, left1, left2],
       [Direction.up]: [up0, up1, up2],
     }
-    down0.onload = () => this.drawImage(Direction.down, 1)
+    this.img = down0
   }
 
-  private drawImage(dir: Direction, frame: number) {
+  private clear() {
+    this.ctx.clearRect(
+      this.coords.x,
+      this.coords.y,
+      SPRITE_WIDTH,
+      SPRITE_HEIGHT + 2
+    )
+  }
+
+  move(dir: Direction) {
+    switch (dir) {
+      case Direction.right:
+        this.img = this.imgs[Direction.right][this.frame]
+        this.coords.x += STEP
+        break
+      case Direction.left:
+        this.img = this.imgs[Direction.left][this.frame]
+        this.coords.x -= STEP
+        break
+      case Direction.down:
+        this.img = this.imgs[Direction.down][this.frame]
+        this.coords.y += STEP
+        break
+      case Direction.up:
+        this.img = this.imgs[Direction.up][this.frame]
+        this.coords.y -= STEP
+        break
+      default:
+        break
+    }
+  }
+
+  updateFrame() {
+    this.frame = (this.frame + 1) % NUMBER_OF_FRAMES
+  }
+
+  draw() {
     this.ctx.drawImage(
-      this.imgs[dir][frame],
+      this.img,
       0,
       0,
       SPRITE_WIDTH,
@@ -81,56 +112,8 @@ export default class Hero {
     )
   }
 
-  // For animation
-  private updateFrame() {
-    this.now = Date.now()
-    this.elapsed = this.now - this.then
-    if (this.elapsed > FPS_INTERVAL) {
-      // adjust fpsInterval not being a multiple of RAF's interval (16.7ms)
-      this.then = this.now - (this.elapsed % FPS_INTERVAL)
-      this.frame = (this.frame + 1) % NUMBER_OF_FRAMES
-    }
-  }
-
-  draw(dir: Direction) {
-    this.drawImage(dir, this.frame)
-    this.updateFrame()
-  }
-
-  clear() {
-    this.ctx.clearRect(
-      this.coords.x,
-      this.coords.y,
-      SPRITE_WIDTH,
-      SPRITE_HEIGHT
-    )
-  }
-
-  move(keys: any) {
-    if (keys[39]) {
-      this.clear()
-      this.coords.x += STEP
-      this.draw(Direction.right)
-    }
-    if (keys[37]) {
-      this.clear()
-      this.coords.x -= STEP
-      this.draw(Direction.left)
-    }
-    if (keys[40]) {
-      this.clear()
-      this.coords.y += STEP
-      this.draw(Direction.down)
-    }
-    if (keys[38]) {
-      this.clear()
-      this.coords.y -= STEP
-      this.draw(Direction.up)
-    }
-    requestAnimationFrame(() => this.move(keys))
-  }
-
-  animate(keys: any) {
-    requestAnimationFrame(() => this.move(keys))
+  render() {
+    this.clear()
+    this.draw()
   }
 }

@@ -7,7 +7,7 @@ export const randInt = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-const rnd = () => Math.random() // Just a shorter way to call Math.random()
+export const rnd = () => Math.random() // Just a shorter way to call Math.random()
 
 export const createMazeGraph = (w: number, h: number): MazeGraph => {
   const g = new MazeGraph()
