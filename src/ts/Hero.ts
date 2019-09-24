@@ -1,28 +1,29 @@
 import { Point } from './types'
 import { Direction } from './MazeGraph'
 
-const SPRITE_WIDTH = 48
-const SPRITE_HEIGHT = 48
 const NUMBER_OF_FRAMES = 3
-const STEP = 2
+export const SPRITE_WIDTH = 48
+export const SPRITE_HEIGHT = 48
+export const STEP = 2
 
 export default class Hero {
-  ctx: CanvasRenderingContext2D
-  imgs: {
+  private ctx: CanvasRenderingContext2D
+  private imgs: {
     [Direction.right]: HTMLImageElement[]
     [Direction.down]: HTMLImageElement[]
     [Direction.left]: HTMLImageElement[]
     [Direction.up]: HTMLImageElement[]
   }
-  img: HTMLImageElement
-  coords: Point
-  frame: number
+  private img: HTMLImageElement
+  private coords: Point
+  private frame: number
 
   constructor(ctx: CanvasRenderingContext2D) {
     this.ctx = ctx
     this.coords = {
-      x: 0,
-      y: 0,
+      // TODO: fix white outline (don't do offset)
+      x: 1,
+      y: 1,
     }
     this.initImgs()
     this.frame = 0
@@ -67,8 +68,12 @@ export default class Hero {
       this.coords.x,
       this.coords.y,
       SPRITE_WIDTH,
-      SPRITE_HEIGHT + 2
+      SPRITE_HEIGHT + 2 // TODO: don't do offests (fix outline)
     )
+  }
+
+  getCoords() {
+    return this.coords
   }
 
   move(dir: Direction) {

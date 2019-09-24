@@ -16,7 +16,6 @@ export default class Maze {
     const g = this.createMazeGraph(width, height)
     const mst = g.mst()
     this.walls = this.createWalls(mst, config.rw)
-    // this.drawWalls(walls)
   }
 
   private createMazeGraph = (w: number, h: number): MazeGraph => {

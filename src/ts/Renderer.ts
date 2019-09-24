@@ -1,6 +1,6 @@
 import Maze from './Maze'
-import Hero from './Hero'
-import { Keys, ArrowKeys } from './types'
+import Hero, { STEP, SPRITE_WIDTH, SPRITE_HEIGHT } from './Hero'
+import { Keys, ArrowKeys, Wall } from './types'
 import { Direction } from './MazeGraph'
 
 interface AnimationControls {
@@ -37,32 +37,62 @@ export default class Renderer {
     })
   }
 
-  addMaze(maze: Maze) {
-    this.maze = maze
-  }
-
-  addHero(hero: Hero) {
-    this.hero = hero
-  }
-
-  render() {
-    this.maze.render()
-    this.hero.render()
-    this.startAnimationLoop()
-  }
-
   private move() {
+    const walls = this.maze.getWalls()
+    const { x, y } = this.hero.getCoords()
+    let collide = false
+
     if (this.keys[ArrowKeys.ArrowRight]) {
-      this.hero.move(Direction.right)
+      walls.forEach((wall: Wall) => {
+        if (
+          x + STEP <= wall.a.x &&
+          x + STEP + SPRITE_WIDTH >= wall.a.x &&
+          y + SPRITE_HEIGHT >= wall.a.y &&
+          y <= wall.b.y
+        ) {
+          collide = true
+        }
+      })
+      if (!collide) this.hero.move(Direction.right)
     }
     if (this.keys[ArrowKeys.ArrowLeft]) {
-      this.hero.move(Direction.left)
+      walls.forEach((wall: Wall) => {
+        if (
+          x - STEP + SPRITE_WIDTH >= wall.b.x &&
+          x - STEP <= wall.b.x &&
+          y + SPRITE_HEIGHT >= wall.a.y &&
+          y <= wall.b.y
+        ) {
+          collide = true
+        }
+      })
+      if (!collide) this.hero.move(Direction.left)
     }
     if (this.keys[ArrowKeys.ArrowDown]) {
-      this.hero.move(Direction.down)
+      walls.forEach((wall: Wall) => {
+        if (
+          y + STEP <= wall.a.y &&
+          y + STEP + SPRITE_HEIGHT >= wall.a.y &&
+          x + SPRITE_WIDTH >= wall.a.x &&
+          x <= wall.b.x
+        ) {
+          collide = true
+        }
+      })
+      if (!collide) this.hero.move(Direction.down)
     }
     if (this.keys[ArrowKeys.ArrowUp]) {
-      this.hero.move(Direction.up)
+      walls.forEach((wall: Wall) => {
+        if (
+          y - STEP + SPRITE_HEIGHT >= wall.b.y &&
+          y - STEP <= wall.b.y &&
+          x + SPRITE_WIDTH >= wall.a.x &&
+          x <= wall.b.x
+        ) {
+          collide = true
+        }
+      })
+      if (!collide) this.hero.move(Direction.up)
     }
     this.hero.render()
     this.updateFrame()
@@ -83,5 +113,19 @@ export default class Renderer {
   private startAnimationLoop() {
     this.animCtrl.then = Date.now()
     requestAnimationFrame(this.move.bind(this))
+  }
+
+  addMaze(maze: Maze) {
+    this.maze = maze
+  }
+
+  addHero(hero: Hero) {
+    this.hero = hero
+  }
+
+  render() {
+    this.maze.render()
+    this.hero.render()
+    this.startAnimationLoop()
   }
 }

@@ -4,12 +4,10 @@ import Renderer from './Renderer'
 import '../styles/global.scss'
 import Maze from './Maze'
 
-// const ROOMS_HORIZONTAL = 6
-// const ROOMS_VERTICAL = 6
 // const OFFSET_X = 0
 // const OFFSET_Y = 0
-// const CW = window.innerWidth
-// const CH = window.innerHeight
+const CW = window.innerWidth
+const CH = window.innerHeight
 // const CELL_W = 250
 // const CAMERA_BORDER_X = OFFSET_X + 100
 // const CAMERA_BORDER_Y = OFFSET_Y + 100
@@ -29,25 +27,6 @@ import Maze from './Maze'
 //     CH - translatedY + OFFSET_Y
 //   )
 //   ctx.restore()
-// }
-
-// const drawCharacter = (ctx: CanvasRenderingContext2D) => {
-//   ctx.drawImage(
-//     img,
-//     4 + frame * 32,
-//     charYOffset,
-//     SPRITE_WIDTH,
-//     SPRITE_HEIGHT,
-//     coords.x,
-//     coords.y,
-//     CHARACTER_WIDTH,
-//     CHARACTER_HEIGHT
-//   )
-// }
-
-// const render = (ctx: CanvasRenderingContext2D) => {
-//   drawWalls(ctx)
-//   drawCharacter(ctx)
 // }
 
 // const move = (
@@ -89,10 +68,10 @@ import Maze from './Maze'
 //       charYOffset = 64 + 1 // sprites adjustment
 //       Object.values(walls).forEach(wall => {
 //         if (
-//           coords.x + STEP <= wall.a.x &&
-//           coords.x + STEP + CHARACTER_WIDTH >= wall.a.x &&
-//           coords.y + CHARACTER_HEIGHT >= wall.a.y &&
-//           coords.y <= wall.b.y
+// coords.x + STEP <= wall.a.x &&
+// coords.x + STEP + CHARACTER_WIDTH >= wall.a.x &&
+// coords.y + CHARACTER_HEIGHT >= wall.a.y &&
+// coords.y <= wall.b.y
 //         ) {
 //           collided = true
 //         }
@@ -108,10 +87,10 @@ import Maze from './Maze'
 //       charYOffset = 96 + 1 // sprites adjustment
 //       Object.values(walls).forEach(wall => {
 //         if (
-//           coords.y - STEP + CHARACTER_HEIGHT >= wall.b.y &&
-//           coords.y - STEP <= wall.b.y &&
-//           coords.x + CHARACTER_WIDTH >= wall.a.x &&
-//           coords.x <= wall.b.x
+// coords.y - STEP + CHARACTER_HEIGHT >= wall.b.y &&
+// coords.y - STEP <= wall.b.y &&
+// coords.x + CHARACTER_WIDTH >= wall.a.x &&
+// coords.x <= wall.b.x
 //         ) {
 //           collided = true
 //         }
@@ -127,10 +106,10 @@ import Maze from './Maze'
 //       charYOffset = 0
 //       Object.values(walls).forEach(wall => {
 //         if (
-//           coords.y + STEP <= wall.a.y &&
-//           coords.y + STEP + CHARACTER_HEIGHT >= wall.a.y &&
-//           coords.x + CHARACTER_WIDTH >= wall.a.x &&
-//           coords.x <= wall.b.x
+// coords.y + STEP <= wall.a.y &&
+// coords.y + STEP + CHARACTER_HEIGHT >= wall.a.y &&
+// coords.x + CHARACTER_WIDTH >= wall.a.x &&
+// coords.x <= wall.b.x
 //         ) {
 //           collided = true
 //         }
@@ -150,23 +129,6 @@ import Maze from './Maze'
 //   // drawCharacter(ctx)
 //   updateSpriteFrames()
 //   collided = false
-// }
-
-// const render = (ctx: CanvasRenderingContext2D, hero: Hero) => {
-//   if (keys[39]) {
-//     hero.move(Direction.right)
-//   }
-//   if (keys[37]) {
-//     hero.move(Direction.left)
-//   }
-//   if (keys[40]) {
-//     hero.move(Direction.down)
-//   }
-//   if (keys[38]) {
-//     hero.move(Direction.up)
-//   }
-
-//   requestAnimationFrame(() => render(ctx, hero))
 // }
 
 const drawWalls = (ctx: CanvasRenderingContext2D, walls: Wall[]) => {
