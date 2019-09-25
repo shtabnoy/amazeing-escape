@@ -115,8 +115,8 @@ export default class Hero {
       HERO_H,
       this.coords.x,
       this.coords.y,
-      SPRITE_WIDTH,
-      SPRITE_HEIGHT
+      SPRITE_WIDTH - 13,
+      SPRITE_HEIGHT - 3
     )
   }
 }

@@ -48,12 +48,12 @@ export default class Renderer {
     const walls = this.maze.getWalls()
     const { x, y } = this.hero.getCoords()
     let collide = false
-    let translatedX = this.ctx.getTransform().f / 2
+    let translatedX = this.ctx.getTransform().e / 2
     let translatedY = this.ctx.getTransform().f / 2
 
     this.maze.clear(
-      0 - translatedX < 0 ? -1 : 0 - translatedX,
-      0 - translatedY < 0 ? -1 : 0 - translatedY,
+      0 - translatedX,
+      0 - translatedY,
       CANVAS_WIDTH - translatedX + OFFSET_X,
       CANVAS_HEIGHT - translatedY + OFFSET_Y
     )
@@ -69,10 +69,10 @@ export default class Renderer {
         }
       })
       if (!collide) {
-        this.hero.move(Direction.right)
         if (x + SPRITE_WIDTH > CANVAS_WIDTH - translatedX - CAMERA_BORDER_X) {
-          this.ctx.translate(-translatedX > RIGHT_BORDER + 2 ? 0 : -STEP, 0)
+          this.ctx.translate(-translatedX > RIGHT_BORDER ? 0 : -STEP, 0)
         }
+        this.hero.move(Direction.right)
       }
     }
     if (this.keys[ArrowKeys.ArrowLeft]) {
@@ -87,10 +87,10 @@ export default class Renderer {
         }
       })
       if (!collide) {
-        this.hero.move(Direction.left)
         if (x < CAMERA_BORDER_X - translatedX) {
           this.ctx.translate(translatedX < 0 ? STEP : 0, 0)
         }
+        this.hero.move(Direction.left)
       }
     }
     if (this.keys[ArrowKeys.ArrowDown]) {
