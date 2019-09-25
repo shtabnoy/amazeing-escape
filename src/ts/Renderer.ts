@@ -1,15 +1,8 @@
 import Maze from './Maze'
 import Hero, { STEP, SPRITE_WIDTH, SPRITE_HEIGHT } from './Hero'
-import { Keys, ArrowKeys, Wall } from './types'
+import { Keys, ArrowKeys, Wall, AnimationControls } from './types'
+import { FPS_INTERVAL } from './constants'
 import { Direction } from './MazeGraph'
-
-interface AnimationControls {
-  now: number
-  then: number
-  elapsed: number
-}
-
-const FPS_INTERVAL = 1000 / 6
 
 export default class Renderer {
   // private ctx: CanvasRenderingContext2D
@@ -42,6 +35,7 @@ export default class Renderer {
     const { x, y } = this.hero.getCoords()
     let collide = false
 
+    this.hero.clear()
     if (this.keys[ArrowKeys.ArrowRight]) {
       walls.forEach((wall: Wall) => {
         if (

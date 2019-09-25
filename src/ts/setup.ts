@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
   ctx.translate(10, 10)
 
   const r = new Renderer(ctx)
-  r.addMaze(new Maze(ctx, 4, 4, { rw: 100 }))
+  r.addMaze(new Maze(ctx, 4, 4, { rw: 100, d: 10 }))
   r.addHero(new Hero(ctx))
   r.render()
 

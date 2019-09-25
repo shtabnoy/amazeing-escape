@@ -15,7 +15,7 @@ export default class Maze {
     this.ctx = ctx
     const g = this.createMazeGraph(width, height)
     const mst = g.mst()
-    this.walls = this.createWalls(mst, config.rw)
+    this.walls = this.createWalls(mst, config.rw, config.d)
   }
 
   private createMazeGraph = (w: number, h: number): MazeGraph => {
@@ -34,7 +34,8 @@ export default class Maze {
 
   private createWalls(
     g: MazeGraph,
-    rw: number // room width
+    rw: number, // room width
+    d: number = 0 // depth
   ) {
     const walls: Wall[] = []
     g.vertices.forEach((vertex: Vertex) => {
@@ -44,25 +45,25 @@ export default class Maze {
       if (!vertex.edges[Direction.up]) {
         walls.push({
           a: { x: vx * rw, y: vy * rw },
-          b: { x: (vx + 1) * rw, y: vy * rw },
+          b: { x: (vx + 1) * rw, y: vy * rw + d },
         })
       }
       if (!vertex.edges[Direction.down]) {
         walls.push({
           a: { x: vx * rw, y: (vy + 1) * rw },
-          b: { x: (vx + 1) * rw, y: (vy + 1) * rw },
+          b: { x: (vx + 1) * rw, y: (vy + 1) * rw + d },
         })
       }
       if (!vertex.edges[Direction.left]) {
         walls.push({
           a: { x: vx * rw, y: vy * rw },
-          b: { x: vx * rw, y: (vy + 1) * rw },
+          b: { x: vx * rw + d, y: (vy + 1) * rw + d },
         })
       }
       if (!vertex.edges[Direction.right]) {
         walls.push({
           a: { x: (vx + 1) * rw, y: vy * rw },
-          b: { x: (vx + 1) * rw, y: (vy + 1) * rw },
+          b: { x: (vx + 1) * rw + d, y: (vy + 1) * rw + d },
         })
       }
     })
@@ -72,8 +73,12 @@ export default class Maze {
   render() {
     this.walls.forEach((wall: Wall) => {
       this.ctx.beginPath()
-      this.ctx.moveTo(wall.a.x, wall.a.y)
-      this.ctx.lineTo(wall.b.x, wall.b.y)
+      this.ctx.strokeRect(
+        wall.a.x,
+        wall.a.y,
+        wall.b.x - wall.a.x,
+        wall.b.y - wall.a.y
+      )
       this.ctx.stroke()
     })
   }

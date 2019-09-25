@@ -25,3 +25,9 @@ export interface Wall {
 export interface Walls {
   [key: string]: Wall
 }
+
+export interface AnimationControls {
+  now: number
+  then: number
+  elapsed: number
+}

@@ -22,8 +22,8 @@ export default class Hero {
     this.ctx = ctx
     this.coords = {
       // TODO: fix white outline (don't do offset)
-      x: 1,
-      y: 1,
+      x: 11,
+      y: 11,
     }
     this.initImgs()
     this.frame = 0
@@ -63,12 +63,12 @@ export default class Hero {
     this.img = down0
   }
 
-  private clear() {
+  clear() {
     this.ctx.clearRect(
       this.coords.x,
       this.coords.y,
       SPRITE_WIDTH,
-      SPRITE_HEIGHT + 2 // TODO: don't do offests (fix outline)
+      SPRITE_HEIGHT
     )
   }
 
@@ -103,7 +103,7 @@ export default class Hero {
     this.frame = (this.frame + 1) % NUMBER_OF_FRAMES
   }
 
-  draw() {
+  render() {
     this.ctx.drawImage(
       this.img,
       0,
@@ -115,10 +115,5 @@ export default class Hero {
       SPRITE_WIDTH,
       SPRITE_HEIGHT
     )
-  }
-
-  render() {
-    this.clear()
-    this.draw()
   }
 }
