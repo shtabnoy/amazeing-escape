@@ -5,6 +5,11 @@ const NUMBER_OF_FRAMES = 3
 export const SPRITE_WIDTH = 48
 export const SPRITE_HEIGHT = 48
 export const STEP = 2
+// TODO: Should be different for different projections
+const HERO_OFFSET_X = 6
+const HERO_OFFSET_Y = 3
+const HERO_W = 35
+const HERO_H = 45
 
 export default class Hero {
   private ctx: CanvasRenderingContext2D
@@ -18,12 +23,11 @@ export default class Hero {
   private coords: Point
   private frame: number
 
-  constructor(ctx: CanvasRenderingContext2D) {
+  constructor(ctx: CanvasRenderingContext2D, coords?: Point) {
     this.ctx = ctx
     this.coords = {
-      // TODO: fix white outline (don't do offset)
-      x: 11,
-      y: 11,
+      x: coords.x || 0,
+      y: coords.y || 0,
     }
     this.initImgs()
     this.frame = 0
@@ -106,10 +110,10 @@ export default class Hero {
   render() {
     this.ctx.drawImage(
       this.img,
-      0,
-      0,
-      SPRITE_WIDTH,
-      SPRITE_HEIGHT,
+      HERO_OFFSET_X,
+      HERO_OFFSET_Y,
+      HERO_W,
+      HERO_H,
       this.coords.x,
       this.coords.y,
       SPRITE_WIDTH,

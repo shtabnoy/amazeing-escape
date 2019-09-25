@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const r = new Renderer(ctx)
   r.addMaze(new Maze(ctx, 4, 4, { rw: 100, d: 10 }))
-  r.addHero(new Hero(ctx))
+  r.addHero(new Hero(ctx, { x: 11, y: 11 }))
   r.render()
 
   /**
