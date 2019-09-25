@@ -1,11 +1,24 @@
 import Maze from './Maze'
-import Hero, { STEP, SPRITE_WIDTH, SPRITE_HEIGHT } from './Hero'
+import Hero from './Hero'
 import { Keys, ArrowKeys, Wall, AnimationControls } from './types'
-import { FPS_INTERVAL } from './constants'
+import {
+  FPS_INTERVAL,
+  CAMERA_BORDER_X,
+  CAMERA_BORDER_Y,
+  STEP,
+  SPRITE_WIDTH,
+  SPRITE_HEIGHT,
+  CANVAS_HEIGHT,
+  BOTTOM_BORDER,
+  CANVAS_WIDTH,
+  RIGHT_BORDER,
+  OFFSET_X,
+  OFFSET_Y,
+} from './constants'
 import { Direction } from './MazeGraph'
 
 export default class Renderer {
-  // private ctx: CanvasRenderingContext2D
+  private ctx: CanvasRenderingContext2D
   private maze: Maze
   private hero: Hero
 
@@ -22,6 +35,7 @@ export default class Renderer {
   }
 
   constructor(ctx: CanvasRenderingContext2D) {
+    this.ctx = ctx
     document.addEventListener('keydown', e => {
       if (e.key in ArrowKeys) this.keys[e.key as ArrowKeys] = true
     })
@@ -34,8 +48,15 @@ export default class Renderer {
     const walls = this.maze.getWalls()
     const { x, y } = this.hero.getCoords()
     let collide = false
+    let translatedX = this.ctx.getTransform().f / 2
+    let translatedY = this.ctx.getTransform().f / 2
 
-    this.hero.clear()
+    this.maze.clear(
+      0 - translatedX < 0 ? -1 : 0 - translatedX,
+      0 - translatedY < 0 ? -1 : 0 - translatedY,
+      CANVAS_WIDTH - translatedX + OFFSET_X,
+      CANVAS_HEIGHT - translatedY + OFFSET_Y
+    )
     if (this.keys[ArrowKeys.ArrowRight]) {
       walls.forEach((wall: Wall) => {
         if (
@@ -47,7 +68,12 @@ export default class Renderer {
           collide = true
         }
       })
-      if (!collide) this.hero.move(Direction.right)
+      if (!collide) {
+        this.hero.move(Direction.right)
+        if (x + SPRITE_WIDTH > CANVAS_WIDTH - translatedX - CAMERA_BORDER_X) {
+          this.ctx.translate(-translatedX > RIGHT_BORDER + 2 ? 0 : -STEP, 0)
+        }
+      }
     }
     if (this.keys[ArrowKeys.ArrowLeft]) {
       walls.forEach((wall: Wall) => {
@@ -60,7 +86,12 @@ export default class Renderer {
           collide = true
         }
       })
-      if (!collide) this.hero.move(Direction.left)
+      if (!collide) {
+        this.hero.move(Direction.left)
+        if (x < CAMERA_BORDER_X - translatedX) {
+          this.ctx.translate(translatedX < 0 ? STEP : 0, 0)
+        }
+      }
     }
     if (this.keys[ArrowKeys.ArrowDown]) {
       walls.forEach((wall: Wall) => {
@@ -73,7 +104,12 @@ export default class Renderer {
           collide = true
         }
       })
-      if (!collide) this.hero.move(Direction.down)
+      if (!collide) {
+        this.hero.move(Direction.down)
+        if (y + SPRITE_HEIGHT > CANVAS_HEIGHT - translatedY - CAMERA_BORDER_Y) {
+          this.ctx.translate(0, -translatedY > BOTTOM_BORDER ? 0 : -STEP)
+        }
+      }
     }
     if (this.keys[ArrowKeys.ArrowUp]) {
       walls.forEach((wall: Wall) => {
@@ -86,8 +122,14 @@ export default class Renderer {
           collide = true
         }
       })
-      if (!collide) this.hero.move(Direction.up)
+      if (!collide) {
+        this.hero.move(Direction.up)
+        if (y < CAMERA_BORDER_Y - translatedY) {
+          this.ctx.translate(0, translatedY < 0 ? STEP : 0)
+        }
+      }
     }
+    this.maze.render()
     this.hero.render()
     this.updateFrame()
     requestAnimationFrame(this.move.bind(this))

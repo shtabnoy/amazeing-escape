@@ -1,6 +1,7 @@
 import { Wall } from './types'
 import MazeGraph, { Direction, Vertex } from './MazeGraph'
 import { rnd } from './utils'
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from './constants'
 
 export default class Maze {
   private ctx: CanvasRenderingContext2D
@@ -68,6 +69,10 @@ export default class Maze {
       }
     })
     return walls
+  }
+
+  clear(x: number, y: number, w: number, h: number) {
+    this.ctx.clearRect(x, y, w, h)
   }
 
   render() {

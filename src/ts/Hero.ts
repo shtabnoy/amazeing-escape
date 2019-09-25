@@ -1,10 +1,9 @@
 import { Point } from './types'
 import { Direction } from './MazeGraph'
+import { STEP, SPRITE_WIDTH, SPRITE_HEIGHT } from './constants'
 
 const NUMBER_OF_FRAMES = 3
-export const SPRITE_WIDTH = 48
-export const SPRITE_HEIGHT = 48
-export const STEP = 2
+
 // TODO: Should be different for different projections
 const HERO_OFFSET_X = 6
 const HERO_OFFSET_Y = 3
