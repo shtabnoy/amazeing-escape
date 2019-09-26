@@ -44,10 +44,53 @@ export default class Renderer {
     })
   }
 
+  private collisionRight = (wall: Wall) => {
+    const { x: x1, y: y1 } = this.hero.getCoords()
+    const { x: x2, y: y2 } = this.hero.getBottomRightCoords()
+    return (
+      x1 + STEP <= wall.a.x &&
+      x2 + STEP >= wall.a.x &&
+      y1 <= wall.b.y &&
+      y2 >= wall.a.y
+    )
+  }
+
+  private collisionLeft = (wall: Wall) => {
+    const { x: x1, y: y1 } = this.hero.getCoords()
+    const { x: x2, y: y2 } = this.hero.getBottomRightCoords()
+    return (
+      x1 - STEP <= wall.b.x &&
+      x2 - STEP >= wall.b.x &&
+      y1 <= wall.b.y &&
+      y2 >= wall.a.y
+    )
+  }
+
+  private collisionUp = (wall: Wall) => {
+    const { x: x1, y: y1 } = this.hero.getCoords()
+    const { x: x2, y: y2 } = this.hero.getBottomRightCoords()
+    return (
+      x1 <= wall.b.x &&
+      x2 >= wall.a.x &&
+      y1 - STEP <= wall.b.y &&
+      y2 - STEP >= wall.b.y
+    )
+  }
+
+  private collisionDown = (wall: Wall) => {
+    const { x: x1, y: y1 } = this.hero.getCoords()
+    const { x: x2, y: y2 } = this.hero.getBottomRightCoords()
+    return (
+      x1 <= wall.b.x &&
+      x2 >= wall.a.x &&
+      y1 + STEP <= wall.a.y &&
+      y2 + STEP >= wall.a.y
+    )
+  }
+
   private move() {
     const walls = this.maze.getWalls()
     const { x, y } = this.hero.getCoords()
-    let collide = false
     let translatedX = this.ctx.getTransform().e / 2
     let translatedY = this.ctx.getTransform().f / 2
 
@@ -58,53 +101,23 @@ export default class Renderer {
       CANVAS_HEIGHT - translatedY + OFFSET_Y
     )
     if (this.keys[ArrowKeys.ArrowRight]) {
-      walls.forEach((wall: Wall) => {
-        if (
-          x + STEP <= wall.a.x &&
-          x + STEP + SPRITE_WIDTH >= wall.a.x &&
-          y + SPRITE_HEIGHT >= wall.a.y &&
-          y <= wall.b.y
-        ) {
-          collide = true
-        }
-      })
-      if (!collide) {
+      if (!walls.some(this.collisionRight)) {
+        this.hero.move(Direction.right)
         if (x + SPRITE_WIDTH > CANVAS_WIDTH - translatedX - CAMERA_BORDER_X) {
           this.ctx.translate(-translatedX > RIGHT_BORDER ? 0 : -STEP, 0)
         }
-        this.hero.move(Direction.right)
       }
     }
     if (this.keys[ArrowKeys.ArrowLeft]) {
-      walls.forEach((wall: Wall) => {
-        if (
-          x - STEP + SPRITE_WIDTH >= wall.b.x &&
-          x - STEP <= wall.b.x &&
-          y + SPRITE_HEIGHT >= wall.a.y &&
-          y <= wall.b.y
-        ) {
-          collide = true
-        }
-      })
-      if (!collide) {
+      if (!walls.some(this.collisionLeft)) {
+        this.hero.move(Direction.left)
         if (x < CAMERA_BORDER_X - translatedX) {
           this.ctx.translate(translatedX < 0 ? STEP : 0, 0)
         }
-        this.hero.move(Direction.left)
       }
     }
     if (this.keys[ArrowKeys.ArrowDown]) {
-      walls.forEach((wall: Wall) => {
-        if (
-          y + STEP <= wall.a.y &&
-          y + STEP + SPRITE_HEIGHT >= wall.a.y &&
-          x + SPRITE_WIDTH >= wall.a.x &&
-          x <= wall.b.x
-        ) {
-          collide = true
-        }
-      })
-      if (!collide) {
+      if (!walls.some(this.collisionDown)) {
         this.hero.move(Direction.down)
         if (y + SPRITE_HEIGHT > CANVAS_HEIGHT - translatedY - CAMERA_BORDER_Y) {
           this.ctx.translate(0, -translatedY > BOTTOM_BORDER ? 0 : -STEP)
@@ -112,17 +125,7 @@ export default class Renderer {
       }
     }
     if (this.keys[ArrowKeys.ArrowUp]) {
-      walls.forEach((wall: Wall) => {
-        if (
-          y - STEP + SPRITE_HEIGHT >= wall.b.y &&
-          y - STEP <= wall.b.y &&
-          x + SPRITE_WIDTH >= wall.a.x &&
-          x <= wall.b.x
-        ) {
-          collide = true
-        }
-      })
-      if (!collide) {
+      if (!walls.some(this.collisionUp)) {
         this.hero.move(Direction.up)
         if (y < CAMERA_BORDER_Y - translatedY) {
           this.ctx.translate(0, translatedY < 0 ? STEP : 0)

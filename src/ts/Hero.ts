@@ -79,6 +79,13 @@ export default class Hero {
     return this.coords
   }
 
+  getBottomRightCoords() {
+    return {
+      x: this.coords.x + SPRITE_WIDTH,
+      y: this.coords.y + SPRITE_HEIGHT,
+    }
+  }
+
   move(dir: Direction) {
     switch (dir) {
       case Direction.right:
