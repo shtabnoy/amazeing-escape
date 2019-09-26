@@ -128,29 +128,24 @@ export default class Renderer {
   private move = () => {
     const walls = this.maze.getWalls()
 
-    if (this.keys[ArrowKeys.ArrowRight]) {
-      if (!walls.some(this.collisionRight)) {
-        this.hero.move(Direction.right)
-        this.moveCamera(Direction.right)
-      }
+    if (this.keys[ArrowKeys.ArrowRight] && !walls.some(this.collisionRight)) {
+      this.hero.move(Direction.right)
+      this.moveCamera(Direction.right)
     }
-    if (this.keys[ArrowKeys.ArrowLeft]) {
-      if (!walls.some(this.collisionLeft)) {
-        this.hero.move(Direction.left)
-        this.moveCamera(Direction.left)
-      }
+
+    if (this.keys[ArrowKeys.ArrowLeft] && !walls.some(this.collisionLeft)) {
+      this.hero.move(Direction.left)
+      this.moveCamera(Direction.left)
     }
-    if (this.keys[ArrowKeys.ArrowDown]) {
-      if (!walls.some(this.collisionDown)) {
-        this.hero.move(Direction.down)
-        this.moveCamera(Direction.down)
-      }
+
+    if (this.keys[ArrowKeys.ArrowDown] && !walls.some(this.collisionDown)) {
+      this.hero.move(Direction.down)
+      this.moveCamera(Direction.down)
     }
-    if (this.keys[ArrowKeys.ArrowUp]) {
-      if (!walls.some(this.collisionUp)) {
-        this.hero.move(Direction.up)
-        this.moveCamera(Direction.up)
-      }
+
+    if (this.keys[ArrowKeys.ArrowUp] && !walls.some(this.collisionUp)) {
+      this.hero.move(Direction.up)
+      this.moveCamera(Direction.up)
     }
 
     this.hero.render()
