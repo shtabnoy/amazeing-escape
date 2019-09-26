@@ -88,9 +88,9 @@ export default class Renderer {
     )
   }
 
-  private move() {
-    const walls = this.maze.getWalls()
-    const { x, y } = this.hero.getCoords()
+  private moveCamera(dir: Direction) {
+    const { x: x1, y: y1 } = this.hero.getCoords()
+    const { x: x2, y: y2 } = this.hero.getBottomRightCoords()
     let translatedX = this.ctx.getTransform().e / 2
     let translatedY = this.ctx.getTransform().f / 2
 
@@ -100,42 +100,62 @@ export default class Renderer {
       CANVAS_WIDTH - translatedX + OFFSET_X,
       CANVAS_HEIGHT - translatedY + OFFSET_Y
     )
+    switch (dir) {
+      case Direction.left:
+        if (x1 < CAMERA_BORDER_X - translatedX) {
+          this.ctx.translate(translatedX < 0 ? STEP : 0, 0)
+        }
+        break
+      case Direction.right:
+        if (x2 > CANVAS_WIDTH - translatedX - CAMERA_BORDER_X) {
+          this.ctx.translate(-translatedX > RIGHT_BORDER ? 0 : -STEP, 0)
+        }
+        break
+      case Direction.up:
+        if (y1 < CAMERA_BORDER_Y - translatedY) {
+          this.ctx.translate(0, translatedY < 0 ? STEP : 0)
+        }
+        break
+      case Direction.down:
+        if (y2 > CANVAS_HEIGHT - translatedY - CAMERA_BORDER_Y) {
+          this.ctx.translate(0, -translatedY > BOTTOM_BORDER ? 0 : -STEP)
+        }
+        break
+    }
+    this.maze.render()
+  }
+
+  private move = () => {
+    const walls = this.maze.getWalls()
+
     if (this.keys[ArrowKeys.ArrowRight]) {
       if (!walls.some(this.collisionRight)) {
         this.hero.move(Direction.right)
-        if (x + SPRITE_WIDTH > CANVAS_WIDTH - translatedX - CAMERA_BORDER_X) {
-          this.ctx.translate(-translatedX > RIGHT_BORDER ? 0 : -STEP, 0)
-        }
+        this.moveCamera(Direction.right)
       }
     }
     if (this.keys[ArrowKeys.ArrowLeft]) {
       if (!walls.some(this.collisionLeft)) {
         this.hero.move(Direction.left)
-        if (x < CAMERA_BORDER_X - translatedX) {
-          this.ctx.translate(translatedX < 0 ? STEP : 0, 0)
-        }
+        this.moveCamera(Direction.left)
       }
     }
     if (this.keys[ArrowKeys.ArrowDown]) {
       if (!walls.some(this.collisionDown)) {
         this.hero.move(Direction.down)
-        if (y + SPRITE_HEIGHT > CANVAS_HEIGHT - translatedY - CAMERA_BORDER_Y) {
-          this.ctx.translate(0, -translatedY > BOTTOM_BORDER ? 0 : -STEP)
-        }
+        this.moveCamera(Direction.down)
       }
     }
     if (this.keys[ArrowKeys.ArrowUp]) {
       if (!walls.some(this.collisionUp)) {
         this.hero.move(Direction.up)
-        if (y < CAMERA_BORDER_Y - translatedY) {
-          this.ctx.translate(0, translatedY < 0 ? STEP : 0)
-        }
+        this.moveCamera(Direction.up)
       }
     }
-    this.maze.render()
+
     this.hero.render()
     this.updateFrame()
-    requestAnimationFrame(this.move.bind(this))
+    requestAnimationFrame(this.move)
   }
 
   private updateFrame() {
@@ -151,7 +171,7 @@ export default class Renderer {
 
   private startAnimationLoop() {
     this.animCtrl.then = Date.now()
-    requestAnimationFrame(this.move.bind(this))
+    requestAnimationFrame(this.move)
   }
 
   addMaze(maze: Maze) {
