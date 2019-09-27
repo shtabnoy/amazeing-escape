@@ -13,20 +13,6 @@ import {
 } from './constants'
 import '../styles/global.scss'
 
-// const drawGround = (ctx: CanvasRenderingContext2D) => {
-//   let translatedX = ctx.getTransform().e / 2
-//   let translatedY = ctx.getTransform().f / 2
-//   ctx.save()
-//   // ctx.fillStyle = ctx.createPattern(groundTile, 'repeat')
-//   ctx.fillRect(
-//     0 - translatedX < 0 ? -1 : 0 - translatedX,
-//     0 - translatedY < 0 ? -1 : 0 - translatedY,
-//     CW - translatedX + OFFSET_X,
-//     CH - translatedY + OFFSET_Y
-//   )
-//   ctx.restore()
-// }
-
 document.addEventListener('DOMContentLoaded', () => {
   /**
    * Setup canvas

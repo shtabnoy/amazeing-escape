@@ -93,32 +93,39 @@ export default class Renderer {
     const { x: x2, y: y2 } = this.hero.getBottomRightCoords()
     let translatedX = this.ctx.getTransform().e / 2
     let translatedY = this.ctx.getTransform().f / 2
+    let mx1 = 0 - translatedX
+    let my1 = 0 - translatedY
+    let mx2 = CANVAS_WIDTH - translatedX + OFFSET_X
+    let my2 = CANVAS_HEIGHT - translatedY + OFFSET_Y
 
-    this.maze.clear(
-      0 - translatedX,
-      0 - translatedY,
-      CANVAS_WIDTH - translatedX + OFFSET_X,
-      CANVAS_HEIGHT - translatedY + OFFSET_Y
-    )
+    this.maze.clear(mx1, my1, mx2, my2)
     switch (dir) {
       case Direction.left:
         if (x1 < CAMERA_BORDER_X - translatedX) {
+          // this.maze.clear(mx1, my1, mx2, my2)
           this.ctx.translate(translatedX < 0 ? STEP : 0, 0)
+          // this.maze.render()
         }
         break
       case Direction.right:
         if (x2 > CANVAS_WIDTH - translatedX - CAMERA_BORDER_X) {
+          // this.maze.clear(mx1, my1, mx2, my2)
           this.ctx.translate(-translatedX > RIGHT_BORDER ? 0 : -STEP, 0)
+          // this.maze.render()
         }
         break
       case Direction.up:
         if (y1 < CAMERA_BORDER_Y - translatedY) {
+          // this.maze.clear(mx1, my1, mx2, my2)
           this.ctx.translate(0, translatedY < 0 ? STEP : 0)
+          // this.maze.render()
         }
         break
       case Direction.down:
         if (y2 > CANVAS_HEIGHT - translatedY - CAMERA_BORDER_Y) {
+          // this.maze.clear(mx1, my1, mx2, my2)
           this.ctx.translate(0, -translatedY > BOTTOM_BORDER ? 0 : -STEP)
+          // this.maze.render()
         }
         break
     }
@@ -129,27 +136,42 @@ export default class Renderer {
     const walls = this.maze.getWalls()
 
     if (this.keys[ArrowKeys.ArrowRight] && !walls.some(this.collisionRight)) {
+      // this.hero.clear()
       this.hero.move(Direction.right)
       this.moveCamera(Direction.right)
+      this.hero.render()
     }
 
     if (this.keys[ArrowKeys.ArrowLeft] && !walls.some(this.collisionLeft)) {
+      // this.hero.clear()
       this.hero.move(Direction.left)
       this.moveCamera(Direction.left)
+      this.hero.render()
     }
 
     if (this.keys[ArrowKeys.ArrowDown] && !walls.some(this.collisionDown)) {
+      // this.hero.clear()
       this.hero.move(Direction.down)
       this.moveCamera(Direction.down)
+      this.hero.render()
     }
 
     if (this.keys[ArrowKeys.ArrowUp] && !walls.some(this.collisionUp)) {
+      // this.hero.clear()
       this.hero.move(Direction.up)
       this.moveCamera(Direction.up)
+      this.hero.render()
     }
 
-    this.hero.render()
+    // if (
+    //   this.keys[ArrowKeys.ArrowLeft] ||
+    //   this.keys[ArrowKeys.ArrowRight] ||
+    //   this.keys[ArrowKeys.ArrowUp] ||
+    //   this.keys[ArrowKeys.ArrowDown]
+    // ) {
     this.updateFrame()
+    // }
+
     requestAnimationFrame(this.move)
   }
 

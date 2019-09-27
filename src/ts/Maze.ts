@@ -26,7 +26,7 @@ export default class Maze {
     const groundImg = new Image()
     groundImg.src = 'src/assets/ground/ground2.png'
     this.groundImg = groundImg
-    this.drawGround()
+    this.groundImg.onload = () => this.render()
   }
 
   private createMazeGraph = (w: number, h: number): MazeGraph => {
