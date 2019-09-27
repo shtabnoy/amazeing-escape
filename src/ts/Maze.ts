@@ -1,11 +1,12 @@
 import { Wall } from './types'
 import MazeGraph, { Direction, Vertex } from './MazeGraph'
 import { rnd } from './utils'
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from './constants'
+import { CANVAS_WIDTH, CANVAS_HEIGHT, OFFSET_X, OFFSET_Y } from './constants'
 
 export default class Maze {
   private ctx: CanvasRenderingContext2D
   private walls: Wall[]
+  private groundImg: HTMLImageElement
 
   constructor(
     ctx: CanvasRenderingContext2D,
@@ -17,6 +18,15 @@ export default class Maze {
     const g = this.createMazeGraph(width, height)
     const mst = g.mst()
     this.walls = this.createWalls(mst, config.rw, config.d)
+
+    this.initGround()
+  }
+
+  private initGround() {
+    const groundImg = new Image()
+    groundImg.src = 'src/assets/ground/ground2.png'
+    this.groundImg = groundImg
+    this.drawGround()
   }
 
   private createMazeGraph = (w: number, h: number): MazeGraph => {
@@ -75,7 +85,7 @@ export default class Maze {
     this.ctx.clearRect(x, y, w, h)
   }
 
-  render() {
+  drawWalls = () => {
     this.walls.forEach((wall: Wall) => {
       this.ctx.beginPath()
       this.ctx.strokeRect(
@@ -86,6 +96,25 @@ export default class Maze {
       )
       this.ctx.stroke()
     })
+  }
+
+  drawGround = () => {
+    let translatedX = this.ctx.getTransform().e / 2
+    let translatedY = this.ctx.getTransform().f / 2
+    this.ctx.save()
+    this.ctx.fillStyle = this.ctx.createPattern(this.groundImg, 'repeat')
+    this.ctx.fillRect(
+      0 - translatedX < 0 ? -1 : 0 - translatedX,
+      0 - translatedY < 0 ? -1 : 0 - translatedY,
+      CANVAS_WIDTH - translatedX + OFFSET_X,
+      CANVAS_HEIGHT - translatedY + OFFSET_Y
+    )
+    this.ctx.restore()
+  }
+
+  render() {
+    this.drawGround()
+    this.drawWalls()
   }
 
   getWalls() {
