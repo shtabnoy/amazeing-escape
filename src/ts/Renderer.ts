@@ -21,6 +21,7 @@ export default class Renderer {
   private ctx: CanvasRenderingContext2D
   private maze: Maze
   private hero: Hero
+  private footstep: HTMLAudioElement
 
   private animCtrl: AnimationControls = {
     now: 0,
@@ -42,6 +43,10 @@ export default class Renderer {
     document.addEventListener('keyup', e => {
       if (e.key in ArrowKeys) this.keys[e.key as ArrowKeys] = false
     })
+
+    this.footstep = new Audio('src/assets/audio/footstep1.mp3')
+    this.footstep.loop = true
+    this.footstep.playbackRate = 1.3
   }
 
   private collisionRight = (wall: Wall) => {
@@ -163,14 +168,18 @@ export default class Renderer {
       this.hero.render()
     }
 
-    // if (
-    //   this.keys[ArrowKeys.ArrowLeft] ||
-    //   this.keys[ArrowKeys.ArrowRight] ||
-    //   this.keys[ArrowKeys.ArrowUp] ||
-    //   this.keys[ArrowKeys.ArrowDown]
-    // ) {
     this.updateFrame()
-    // }
+    if (
+      this.keys[ArrowKeys.ArrowLeft] ||
+      this.keys[ArrowKeys.ArrowRight] ||
+      this.keys[ArrowKeys.ArrowUp] ||
+      this.keys[ArrowKeys.ArrowDown]
+    ) {
+      this.footstep.play()
+    } else {
+      this.footstep.pause()
+      this.footstep.currentTime = 0
+    }
 
     requestAnimationFrame(this.move)
   }

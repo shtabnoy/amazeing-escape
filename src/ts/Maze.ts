@@ -96,23 +96,53 @@ export default class Maze {
 
   drawWalls = () => {
     this.walls.forEach((wall: Wall) => {
-      // this.ctx.beginPath()
-      // this.ctx.strokeRect(
-      //   wall.a.x,
-      //   wall.a.y,
-      //   wall.b.x - wall.a.x,
-      //   wall.b.y - wall.a.y
-      // )
-      // this.ctx.stroke()
-      this.ctx.save()
-      this.ctx.fillStyle = this.ctx.createPattern(this.wallImg, 'repeat')
+      let horizontal = wall.b.x - wall.a.x > wall.b.y - wall.a.y
+      this.ctx.fillStyle = '#444'
+      // let dr = 15
+      // if (horizontal) {
+      //   this.ctx.strokeRect(
+      //     wall.a.x,
+      //     wall.a.y,
+      //     wall.b.x - wall.a.x,
+      //     wall.b.y - wall.a.y
+      //   )
+      // } else {
+      //   this.ctx.beginPath()
+      //   this.ctx.moveTo(wall.a.x + dr, wall.a.y)
+      //   this.ctx.lineTo(wall.a.x, wall.a.y + dr)
+      //   this.ctx.lineTo(wall.a.x, wall.b.y)
+      //   this.ctx.lineTo(wall.b.x, wall.b.y)
+      //   this.ctx.lineTo(wall.b.x, wall.a.y + dr)
+      //   this.ctx.lineTo(wall.b.x - dr, wall.a.y)
+      //   this.ctx.lineTo(wall.b.x - dr, wall.b.y - dr)
+      //   this.ctx.lineTo(wall.a.x + dr, wall.b.y - dr)
+      //   this.ctx.lineTo(wall.a.x + dr, wall.a.y)
+
+      //   this.ctx.fill()
+      //   this.ctx.moveTo(wall.a.x, wall.b.y)
+      //   this.ctx.lineTo(wall.a.x + dr, wall.b.y - dr)
+
+      //   this.ctx.moveTo(wall.b.x, wall.b.y)
+      //   this.ctx.lineTo(wall.b.x - dr, wall.b.y - dr)
+      //   this.ctx.stroke()
+      //   this.ctx.fillStyle = '#000'
+      //   this.ctx.fillRect(
+      //     wall.a.x + dr,
+      //     wall.a.y,
+      //     wall.b.x - wall.a.x - 2 * dr,
+      //     wall.b.y - wall.a.y - dr
+      //   )
+      // }
+
+      // this.ctx.save()
+      // this.ctx.fillStyle = this.ctx.createPattern(this.wallImg, 'repeat')
       this.ctx.fillRect(
         wall.a.x,
         wall.a.y,
         wall.b.x - wall.a.x,
         wall.b.y - wall.a.y
       )
-      this.ctx.restore()
+      // this.ctx.restore()
     })
   }
 
@@ -121,6 +151,7 @@ export default class Maze {
     let translatedY = this.ctx.getTransform().f / 2
     this.ctx.save()
     this.ctx.fillStyle = this.ctx.createPattern(this.groundImg, 'repeat')
+    // this.ctx.transform(1, 0, 1, 1, -100, 0)
     this.ctx.fillRect(
       0 - translatedX < 0 ? -1 : 0 - translatedX,
       0 - translatedY < 0 ? -1 : 0 - translatedY,
@@ -128,6 +159,7 @@ export default class Maze {
       CANVAS_HEIGHT - translatedY + OFFSET_Y
     )
     this.ctx.restore()
+    // this.ctx.transform(1, 0, 0, 1, 0, 0)
   }
 
   render() {

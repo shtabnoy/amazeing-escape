@@ -39,6 +39,12 @@ document.addEventListener('DOMContentLoaded', () => {
       d: WALL_DEPTH,
     })
   )
-  r.addHero(new Hero(ctx, { x: 21, y: 21 }))
+  r.addHero(new Hero(ctx, { x: 61, y: 61 }))
   r.render()
+
+  // background audio
+  // const audio = new Audio('src/assets/audio/footstep1.mp3')
+  // audio.loop = true
+  // audio.playbackRate = 1.3
+  // // audio.play()
 })
