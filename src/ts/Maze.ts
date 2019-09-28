@@ -7,6 +7,7 @@ export default class Maze {
   private ctx: CanvasRenderingContext2D
   private walls: Wall[]
   private groundImg: HTMLImageElement
+  private wallImg: HTMLImageElement
 
   constructor(
     ctx: CanvasRenderingContext2D,
@@ -20,6 +21,7 @@ export default class Maze {
     this.walls = this.createWalls(mst, config.rw, config.d)
 
     this.initGround()
+    this.initWalls()
   }
 
   private initGround() {
@@ -27,6 +29,13 @@ export default class Maze {
     groundImg.src = 'src/assets/ground/ground2.png'
     this.groundImg = groundImg
     this.groundImg.onload = () => this.render()
+  }
+
+  private initWalls() {
+    const wallImg = new Image()
+    wallImg.src = 'src/assets/ground/ground0.png'
+    this.wallImg = wallImg
+    this.wallImg.onload = () => this.render()
   }
 
   private createMazeGraph = (w: number, h: number): MazeGraph => {
@@ -87,14 +96,23 @@ export default class Maze {
 
   drawWalls = () => {
     this.walls.forEach((wall: Wall) => {
-      this.ctx.beginPath()
-      this.ctx.strokeRect(
+      // this.ctx.beginPath()
+      // this.ctx.strokeRect(
+      //   wall.a.x,
+      //   wall.a.y,
+      //   wall.b.x - wall.a.x,
+      //   wall.b.y - wall.a.y
+      // )
+      // this.ctx.stroke()
+      this.ctx.save()
+      this.ctx.fillStyle = this.ctx.createPattern(this.wallImg, 'repeat')
+      this.ctx.fillRect(
         wall.a.x,
         wall.a.y,
         wall.b.x - wall.a.x,
         wall.b.y - wall.a.y
       )
-      this.ctx.stroke()
+      this.ctx.restore()
     })
   }
 
