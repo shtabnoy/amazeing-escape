@@ -2,16 +2,17 @@ import { Point } from './types'
 import { Direction } from './MazeGraph'
 import { STEP } from './constants'
 
-const NUMBER_OF_FRAMES = 3
-
 const HERO_W = 48
 const HERO_H = 48
+const FRAMES = [0, 1, 2, 1]
+const NUMBER_OF_FRAMES = FRAMES.length
 
 export default class Hero {
   private ctx: CanvasRenderingContext2D
   private img: HTMLImageElement
   private coords: Point
   private frame: number
+  private frameIndex: number
   private offsetY: number
 
   constructor(ctx: CanvasRenderingContext2D, coords?: Point) {
@@ -21,13 +22,14 @@ export default class Hero {
       y: coords.y || 0,
     }
     this.initImgs()
-    this.frame = 0
+    this.frameIndex = 0
+    this.frame = FRAMES[this.frameIndex]
     this.offsetY = 0
   }
 
   private initImgs() {
     const heroSprites = new Image()
-    heroSprites.src = 'src/assets/sprites.png'
+    heroSprites.src = 'src/assets/sprites1.png'
     this.img = heroSprites
   }
 
@@ -70,7 +72,8 @@ export default class Hero {
   }
 
   updateFrame() {
-    this.frame = (this.frame + 1) % NUMBER_OF_FRAMES
+    this.frameIndex = (this.frameIndex + 1) % NUMBER_OF_FRAMES
+    this.frame = FRAMES[this.frameIndex]
   }
 
   render() {
