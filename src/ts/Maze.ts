@@ -7,35 +7,18 @@ export default class Maze {
   private ctx: CanvasRenderingContext2D
   private walls: Wall[]
   private groundImg: HTMLImageElement
-  private wallImg: HTMLImageElement
 
   constructor(
     ctx: CanvasRenderingContext2D,
     width: number,
     height: number,
-    config?: any
+    config: any // TODO: Define the interface
   ) {
     this.ctx = ctx
+    this.groundImg = config.groundImg
     const g = this.createMazeGraph(width, height)
     const mst = g.mst()
     this.walls = this.createWalls(mst, config.rw, config.d)
-
-    this.initGround()
-    this.initWalls()
-  }
-
-  private initGround() {
-    const groundImg = new Image()
-    groundImg.src = 'src/assets/ground/ground2.png'
-    this.groundImg = groundImg
-    this.groundImg.onload = () => this.render()
-  }
-
-  private initWalls() {
-    const wallImg = new Image()
-    wallImg.src = 'src/assets/ground/ground0.png'
-    this.wallImg = wallImg
-    this.wallImg.onload = () => this.render()
   }
 
   private createMazeGraph = (w: number, h: number): MazeGraph => {
@@ -95,10 +78,11 @@ export default class Maze {
   }
 
   drawWalls = () => {
-    console.log('draw walla')
     this.walls.forEach((wall: Wall) => {
-      let horizontal = wall.b.x - wall.a.x > wall.b.y - wall.a.y
-      this.ctx.fillStyle = '#444'
+      // let horizontal = wall.b.x - wall.a.x > wall.b.y - wall.a.y
+      this.ctx.fillStyle = '#6aa3e6'
+      this.ctx.strokeStyle = '#111'
+      this.ctx.lineWidth = 10
       // let dr = 15
       // if (horizontal) {
       //   this.ctx.strokeRect(
@@ -137,6 +121,12 @@ export default class Maze {
 
       // this.ctx.save()
       // this.ctx.fillStyle = this.ctx.createPattern(this.wallImg, 'repeat')
+      this.ctx.strokeRect(
+        wall.a.x,
+        wall.a.y,
+        wall.b.x - wall.a.x,
+        wall.b.y - wall.a.y
+      )
       this.ctx.fillRect(
         wall.a.x,
         wall.a.y,
@@ -150,17 +140,15 @@ export default class Maze {
   drawGround = () => {
     let translatedX = this.ctx.getTransform().e / 2
     let translatedY = this.ctx.getTransform().f / 2
-    this.ctx.save()
+    // this.ctx.save()
     this.ctx.fillStyle = this.ctx.createPattern(this.groundImg, 'repeat')
-    // this.ctx.transform(1, 0, 1, 1, -100, 0)
     this.ctx.fillRect(
       0 - translatedX < 0 ? -1 : 0 - translatedX,
       0 - translatedY < 0 ? -1 : 0 - translatedY,
       CANVAS_WIDTH - translatedX + OFFSET_X,
       CANVAS_HEIGHT - translatedY + OFFSET_Y
     )
-    this.ctx.restore()
-    // this.ctx.transform(1, 0, 0, 1, 0, 0)
+    // this.ctx.restore()
   }
 
   render() {

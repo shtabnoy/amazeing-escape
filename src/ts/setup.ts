@@ -12,8 +12,9 @@ import {
   OFFSET_Y,
 } from './constants'
 import '../styles/global.scss'
+import { loadImage } from './utils'
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   /**
    * Setup canvas
    */
@@ -32,14 +33,18 @@ document.addEventListener('DOMContentLoaded', () => {
   ctx.scale(ratio, ratio)
   ctx.translate(OFFSET_X, OFFSET_Y)
 
+  const heroImg = await loadImage('src/assets/hero/metal.png')
+  const groundImg = await loadImage('src/assets/ground/ground2.png')
+
   const r = new Renderer(ctx)
   r.addMaze(
     new Maze(ctx, ROOMS_HORIZONTAL, ROOMS_VERTICAL, {
       rw: ROOM_WIDTH,
       d: WALL_DEPTH,
+      groundImg,
     })
   )
-  r.addHero(new Hero(ctx, { x: 61, y: 61 }))
+  r.addHero(new Hero(ctx, heroImg, { x: 61, y: 61 }))
   r.render()
 
   const canvas1 = document.getElementById('ground') as HTMLCanvasElement

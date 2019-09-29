@@ -1,9 +1,7 @@
 import { Point } from './types'
 import { Direction } from './MazeGraph'
-import { STEP } from './constants'
+import { STEP, SPRITE_SIZE } from './constants'
 
-const HERO_W = 48
-const HERO_H = 48
 const FRAMES = [0, 1, 2, 1]
 const NUMBER_OF_FRAMES = FRAMES.length
 
@@ -13,28 +11,26 @@ export default class Hero {
   private coords: Point
   private frame: number
   private frameIndex: number
-  private offsetY: number
+  private spriteOffset: number
 
-  constructor(ctx: CanvasRenderingContext2D, coords?: Point) {
+  constructor(
+    ctx: CanvasRenderingContext2D,
+    img: HTMLImageElement,
+    coords?: Point
+  ) {
     this.ctx = ctx
+    this.img = img
     this.coords = {
       x: coords.x || 0,
       y: coords.y || 0,
     }
-    this.initImgs()
     this.frameIndex = 0
     this.frame = FRAMES[this.frameIndex]
-    this.offsetY = 0
-  }
-
-  private initImgs() {
-    const heroSprites = new Image()
-    heroSprites.src = 'src/assets/sprites1.png'
-    this.img = heroSprites
+    this.spriteOffset = 0
   }
 
   clear() {
-    this.ctx.clearRect(this.coords.x, this.coords.y, HERO_W, HERO_H)
+    this.ctx.clearRect(this.coords.x, this.coords.y, SPRITE_SIZE, SPRITE_SIZE)
   }
 
   getCoords() {
@@ -43,27 +39,27 @@ export default class Hero {
 
   getBottomRightCoords() {
     return {
-      x: this.coords.x + HERO_W,
-      y: this.coords.y + HERO_H,
+      x: this.coords.x + SPRITE_SIZE,
+      y: this.coords.y + SPRITE_SIZE,
     }
   }
 
   move(dir: Direction) {
     switch (dir) {
       case Direction.left:
-        this.offsetY = 0
+        this.spriteOffset = 0
         this.coords.x -= STEP
         break
       case Direction.right:
-        this.offsetY = 48 + 1
+        this.spriteOffset = SPRITE_SIZE + 1
         this.coords.x += STEP
         break
       case Direction.up:
-        this.offsetY = 48 * 2 + 1
+        this.spriteOffset = SPRITE_SIZE * 2 + 1
         this.coords.y -= STEP
         break
       case Direction.down:
-        this.offsetY = 48 * 3 + 1
+        this.spriteOffset = SPRITE_SIZE * 3 + 1
         this.coords.y += STEP
         break
       default:
@@ -79,14 +75,14 @@ export default class Hero {
   render() {
     this.ctx.drawImage(
       this.img,
-      this.frame * 48 + 1,
-      this.offsetY,
-      HERO_W,
-      HERO_H,
+      this.frame * SPRITE_SIZE + 1,
+      this.spriteOffset,
+      SPRITE_SIZE,
+      SPRITE_SIZE,
       this.coords.x,
       this.coords.y,
-      HERO_W,
-      HERO_H
+      SPRITE_SIZE,
+      SPRITE_SIZE
     )
   }
 }

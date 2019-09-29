@@ -6,8 +6,6 @@ import {
   CAMERA_BORDER_X,
   CAMERA_BORDER_Y,
   STEP,
-  SPRITE_WIDTH,
-  SPRITE_HEIGHT,
   CANVAS_HEIGHT,
   BOTTOM_BORDER,
   CANVAS_WIDTH,
@@ -16,6 +14,7 @@ import {
   OFFSET_Y,
 } from './constants'
 import { Direction } from './MazeGraph'
+import { loadImage } from './utils'
 
 export default class Renderer {
   private ctx: CanvasRenderingContext2D
@@ -169,17 +168,17 @@ export default class Renderer {
     }
 
     this.updateFrame()
-    if (
-      this.keys[ArrowKeys.ArrowLeft] ||
-      this.keys[ArrowKeys.ArrowRight] ||
-      this.keys[ArrowKeys.ArrowUp] ||
-      this.keys[ArrowKeys.ArrowDown]
-    ) {
-      this.footstep.play()
-    } else {
-      this.footstep.pause()
-      this.footstep.currentTime = 0
-    }
+    // if (
+    //   this.keys[ArrowKeys.ArrowLeft] ||
+    //   this.keys[ArrowKeys.ArrowRight] ||
+    //   this.keys[ArrowKeys.ArrowUp] ||
+    //   this.keys[ArrowKeys.ArrowDown]
+    // ) {
+    //   this.footstep.play()
+    // } else {
+    //   this.footstep.pause()
+    //   this.footstep.currentTime = 0
+    // }
 
     requestAnimationFrame(this.move)
   }
@@ -200,6 +199,13 @@ export default class Renderer {
     requestAnimationFrame(this.move)
   }
 
+  // private async loadImages() {
+  //   // hero image
+  //   await loadImage('src/assets/hero/metal.png')
+  //   // ground image
+  //   await loadImage('src/assets/ground/ground2.png')
+  // }
+
   addMaze(maze: Maze) {
     this.maze = maze
   }
@@ -208,7 +214,9 @@ export default class Renderer {
     this.hero = hero
   }
 
-  render() {
+  async render() {
+    // console.log('render')
+    // await loadImage('src/assets/hero/metal.png')
     this.maze.render()
     this.hero.render()
     this.startAnimationLoop()
