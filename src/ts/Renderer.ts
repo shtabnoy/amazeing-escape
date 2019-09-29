@@ -12,16 +12,19 @@ import {
   RIGHT_BORDER,
   OFFSET_X,
   OFFSET_Y,
+  RATIO,
+  ROOMS_HORIZONTAL,
+  ROOMS_VERTICAL,
+  ROOM_WIDTH,
+  WALL_DEPTH,
 } from './constants'
 import { Direction } from './MazeGraph'
 import { loadImage } from './utils'
 
 export default class Renderer {
-  private ctx: CanvasRenderingContext2D
+  private layers: CanvasRenderingContext2D[]
   private maze: Maze
   private hero: Hero
-  private footstep: HTMLAudioElement
-
   private animCtrl: AnimationControls = {
     now: 0,
     then: 0,
@@ -34,18 +37,18 @@ export default class Renderer {
     ArrowUp: false,
   }
 
-  constructor(ctx: CanvasRenderingContext2D) {
-    this.ctx = ctx
+  constructor() {
     document.addEventListener('keydown', e => {
       if (e.key in ArrowKeys) this.keys[e.key as ArrowKeys] = true
     })
     document.addEventListener('keyup', e => {
       if (e.key in ArrowKeys) this.keys[e.key as ArrowKeys] = false
     })
+    this.layers = []
 
-    this.footstep = new Audio('src/assets/audio/footstep2.mp3')
-    this.footstep.loop = true
-    this.footstep.playbackRate = 1
+    // this.footstep = new Audio('src/assets/audio/footstep2.mp3')
+    // this.footstep.loop = true
+    // this.footstep.playbackRate = 1
   }
 
   private collisionRight = (wall: Wall) => {
@@ -95,76 +98,74 @@ export default class Renderer {
   private moveCamera(dir: Direction) {
     const { x: x1, y: y1 } = this.hero.getCoords()
     const { x: x2, y: y2 } = this.hero.getBottomRightCoords()
-    let translatedX = this.ctx.getTransform().e / 2
-    let translatedY = this.ctx.getTransform().f / 2
+    let translatedX = this.layers[1].getTransform().e / 2
+    let translatedY = this.layers[1].getTransform().f / 2
     let mx1 = 0 - translatedX
     let my1 = 0 - translatedY
     let mx2 = CANVAS_WIDTH - translatedX + OFFSET_X
     let my2 = CANVAS_HEIGHT - translatedY + OFFSET_Y
 
-    this.maze.clear(mx1, my1, mx2, my2)
     switch (dir) {
       case Direction.left:
         if (x1 < CAMERA_BORDER_X - translatedX) {
-          // this.maze.clear(mx1, my1, mx2, my2)
-          this.ctx.translate(translatedX < 0 ? STEP : 0, 0)
-          // this.maze.render()
+          this.layers[1].clearRect(mx1, my1, mx2, my2)
+          this.layers[1].translate(translatedX < 0 ? STEP : 0, 0)
+          this.maze.drawWalls(this.layers[1])
         }
         break
       case Direction.right:
         if (x2 > CANVAS_WIDTH - translatedX - CAMERA_BORDER_X) {
-          // this.maze.clear(mx1, my1, mx2, my2)
-          this.ctx.translate(-translatedX > RIGHT_BORDER ? 0 : -STEP, 0)
-          // this.maze.render()
+          this.layers[1].clearRect(mx1, my1, mx2, my2)
+          this.layers[1].translate(-translatedX > RIGHT_BORDER ? 0 : -STEP, 0)
+          this.maze.drawWalls(this.layers[1])
         }
         break
       case Direction.up:
         if (y1 < CAMERA_BORDER_Y - translatedY) {
-          // this.maze.clear(mx1, my1, mx2, my2)
-          this.ctx.translate(0, translatedY < 0 ? STEP : 0)
-          // this.maze.render()
+          this.layers[1].clearRect(mx1, my1, mx2, my2)
+          this.layers[1].translate(0, translatedY < 0 ? STEP : 0)
+          this.maze.drawWalls(this.layers[1])
         }
         break
       case Direction.down:
         if (y2 > CANVAS_HEIGHT - translatedY - CAMERA_BORDER_Y) {
-          // this.maze.clear(mx1, my1, mx2, my2)
-          this.ctx.translate(0, -translatedY > BOTTOM_BORDER ? 0 : -STEP)
-          // this.maze.render()
+          this.layers[1].clearRect(mx1, my1, mx2, my2)
+          this.layers[1].translate(0, -translatedY > BOTTOM_BORDER ? 0 : -STEP)
+          this.maze.drawWalls(this.layers[1])
         }
         break
     }
-    this.maze.render()
   }
 
   private move = () => {
     const walls = this.maze.getWalls()
 
     if (this.keys[ArrowKeys.ArrowRight] && !walls.some(this.collisionRight)) {
-      // this.hero.clear()
+      this.hero.clear(this.layers[1])
       this.hero.move(Direction.right)
       this.moveCamera(Direction.right)
-      this.hero.render()
+      this.hero.render(this.layers[1])
     }
 
     if (this.keys[ArrowKeys.ArrowLeft] && !walls.some(this.collisionLeft)) {
-      // this.hero.clear()
+      this.hero.clear(this.layers[1])
       this.hero.move(Direction.left)
       this.moveCamera(Direction.left)
-      this.hero.render()
+      this.hero.render(this.layers[1])
     }
 
     if (this.keys[ArrowKeys.ArrowDown] && !walls.some(this.collisionDown)) {
-      // this.hero.clear()
+      this.hero.clear(this.layers[1])
       this.hero.move(Direction.down)
       this.moveCamera(Direction.down)
-      this.hero.render()
+      this.hero.render(this.layers[1])
     }
 
     if (this.keys[ArrowKeys.ArrowUp] && !walls.some(this.collisionUp)) {
-      // this.hero.clear()
+      this.hero.clear(this.layers[1])
       this.hero.move(Direction.up)
       this.moveCamera(Direction.up)
-      this.hero.render()
+      this.hero.render(this.layers[1])
     }
 
     this.updateFrame()
@@ -199,12 +200,22 @@ export default class Renderer {
     requestAnimationFrame(this.move)
   }
 
-  // private async loadImages() {
-  //   // hero image
-  //   await loadImage('src/assets/hero/metal.png')
-  //   // ground image
-  //   await loadImage('src/assets/ground/ground2.png')
-  // }
+  addLayer(canvasId: string) {
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    canvas.id = canvasId
+    document.body.appendChild(canvas)
+
+    // retina adjustments
+    canvas.width = CANVAS_WIDTH * 2
+    canvas.height = CANVAS_HEIGHT * 2
+    canvas.style.width = `${CANVAS_WIDTH}px`
+    canvas.style.height = `${CANVAS_HEIGHT}px`
+    ctx.scale(RATIO, RATIO)
+    ctx.translate(OFFSET_X, OFFSET_Y)
+
+    this.layers.push(ctx)
+  }
 
   addMaze(maze: Maze) {
     this.maze = maze
@@ -215,10 +226,21 @@ export default class Renderer {
   }
 
   async render() {
-    // console.log('render')
-    // await loadImage('src/assets/hero/metal.png')
-    this.maze.render()
-    this.hero.render()
+    this.addLayer('ground')
+    this.addLayer('walls-and-hero')
+    const heroImg = await loadImage('src/assets/hero/metal.png')
+    const groundImg = await loadImage('src/assets/ground/ground2.png')
+    this.addMaze(
+      new Maze(ROOMS_HORIZONTAL, ROOMS_VERTICAL, {
+        rw: ROOM_WIDTH,
+        d: WALL_DEPTH,
+        groundImg,
+      })
+    )
+    this.addHero(new Hero(heroImg, { x: 65, y: 65 }))
+    this.maze.drawGround(this.layers[0])
+    this.maze.drawWalls(this.layers[1])
+    this.hero.render(this.layers[1])
     this.startAnimationLoop()
   }
 }

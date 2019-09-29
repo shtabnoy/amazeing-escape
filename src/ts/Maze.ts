@@ -4,17 +4,14 @@ import { rnd } from './utils'
 import { CANVAS_WIDTH, CANVAS_HEIGHT, OFFSET_X, OFFSET_Y } from './constants'
 
 export default class Maze {
-  private ctx: CanvasRenderingContext2D
   private walls: Wall[]
   private groundImg: HTMLImageElement
 
   constructor(
-    ctx: CanvasRenderingContext2D,
     width: number,
     height: number,
     config: any // TODO: Define the interface
   ) {
-    this.ctx = ctx
     this.groundImg = config.groundImg
     const g = this.createMazeGraph(width, height)
     const mst = g.mst()
@@ -73,16 +70,12 @@ export default class Maze {
     return walls
   }
 
-  clear(x: number, y: number, w: number, h: number) {
-    this.ctx.clearRect(x, y, w, h)
-  }
-
-  drawWalls = () => {
+  drawWalls = (ctx: CanvasRenderingContext2D) => {
     this.walls.forEach((wall: Wall) => {
       // let horizontal = wall.b.x - wall.a.x > wall.b.y - wall.a.y
-      this.ctx.fillStyle = '#6aa3e6'
-      this.ctx.strokeStyle = '#111'
-      this.ctx.lineWidth = 10
+      ctx.fillStyle = '#6aa3e6'
+      ctx.strokeStyle = '#111'
+      ctx.lineWidth = 10
       // let dr = 15
       // if (horizontal) {
       //   this.ctx.strokeRect(
@@ -119,41 +112,28 @@ export default class Maze {
       //   )
       // }
 
-      // this.ctx.save()
-      // this.ctx.fillStyle = this.ctx.createPattern(this.wallImg, 'repeat')
-      this.ctx.strokeRect(
+      ctx.strokeRect(
         wall.a.x,
         wall.a.y,
         wall.b.x - wall.a.x,
         wall.b.y - wall.a.y
       )
-      this.ctx.fillRect(
-        wall.a.x,
-        wall.a.y,
-        wall.b.x - wall.a.x,
-        wall.b.y - wall.a.y
-      )
-      // this.ctx.restore()
+      ctx.fillRect(wall.a.x, wall.a.y, wall.b.x - wall.a.x, wall.b.y - wall.a.y)
     })
   }
 
-  drawGround = () => {
-    let translatedX = this.ctx.getTransform().e / 2
-    let translatedY = this.ctx.getTransform().f / 2
-    // this.ctx.save()
-    this.ctx.fillStyle = this.ctx.createPattern(this.groundImg, 'repeat')
-    this.ctx.fillRect(
+  drawGround = (ctx: CanvasRenderingContext2D) => {
+    let translatedX = ctx.getTransform().e / 2
+    let translatedY = ctx.getTransform().f / 2
+    // ctx.save()
+    ctx.fillStyle = ctx.createPattern(this.groundImg, 'repeat')
+    ctx.fillRect(
       0 - translatedX < 0 ? -1 : 0 - translatedX,
       0 - translatedY < 0 ? -1 : 0 - translatedY,
       CANVAS_WIDTH - translatedX + OFFSET_X,
       CANVAS_HEIGHT - translatedY + OFFSET_Y
     )
-    // this.ctx.restore()
-  }
-
-  render() {
-    this.drawGround()
-    this.drawWalls()
+    // ctx.restore()
   }
 
   getWalls() {

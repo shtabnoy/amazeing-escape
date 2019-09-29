@@ -6,7 +6,7 @@ const FRAMES = [0, 1, 2, 1]
 const NUMBER_OF_FRAMES = FRAMES.length
 
 export default class Hero {
-  private ctx: CanvasRenderingContext2D
+  // private ctx: CanvasRenderingContext2D
   private img: HTMLImageElement
   private coords: Point
   private frame: number
@@ -14,11 +14,11 @@ export default class Hero {
   private spriteOffset: number
 
   constructor(
-    ctx: CanvasRenderingContext2D,
+    // ctx: CanvasRenderingContext2D,
     img: HTMLImageElement,
     coords?: Point
   ) {
-    this.ctx = ctx
+    // this.ctx = ctx
     this.img = img
     this.coords = {
       x: coords.x || 0,
@@ -29,8 +29,8 @@ export default class Hero {
     this.spriteOffset = 0
   }
 
-  clear() {
-    this.ctx.clearRect(this.coords.x, this.coords.y, SPRITE_SIZE, SPRITE_SIZE)
+  clear(ctx: CanvasRenderingContext2D) {
+    ctx.clearRect(this.coords.x, this.coords.y, SPRITE_SIZE, SPRITE_SIZE)
   }
 
   getCoords() {
@@ -72,8 +72,8 @@ export default class Hero {
     this.frame = FRAMES[this.frameIndex]
   }
 
-  render() {
-    this.ctx.drawImage(
+  render(ctx: CanvasRenderingContext2D) {
+    ctx.drawImage(
       this.img,
       this.frame * SPRITE_SIZE + 1,
       this.spriteOffset,

@@ -1,65 +1,9 @@
-import Hero from './Hero'
 import Renderer from './Renderer'
-import Maze from './Maze'
-import {
-  CANVAS_WIDTH,
-  CANVAS_HEIGHT,
-  ROOMS_HORIZONTAL,
-  ROOMS_VERTICAL,
-  ROOM_WIDTH,
-  WALL_DEPTH,
-  OFFSET_X,
-  OFFSET_Y,
-} from './constants'
 import '../styles/global.scss'
-import { loadImage } from './utils'
 
 document.addEventListener('DOMContentLoaded', async () => {
-  /**
-   * Setup canvas
-   */
-  const canvas = document.getElementById('canvas') as HTMLCanvasElement
-  const ctx = canvas.getContext('2d')
-  const ratio = window.devicePixelRatio
-
-  // retina adjustments
-  canvas.width = CANVAS_WIDTH * 2
-  canvas.height = CANVAS_HEIGHT * 2
-  canvas.style.width = `${CANVAS_WIDTH}px`
-  canvas.style.height = `${CANVAS_HEIGHT}px`
-  ctx.strokeStyle = 'black'
-  ctx.lineWidth = 2
-  ctx.lineCap = 'square'
-  ctx.scale(ratio, ratio)
-  ctx.translate(OFFSET_X, OFFSET_Y)
-
-  const heroImg = await loadImage('src/assets/hero/metal.png')
-  const groundImg = await loadImage('src/assets/ground/ground2.png')
-
-  const r = new Renderer(ctx)
-  r.addMaze(
-    new Maze(ctx, ROOMS_HORIZONTAL, ROOMS_VERTICAL, {
-      rw: ROOM_WIDTH,
-      d: WALL_DEPTH,
-      groundImg,
-    })
-  )
-  r.addHero(new Hero(ctx, heroImg, { x: 61, y: 61 }))
+  const r = new Renderer()
   r.render()
-
-  const canvas1 = document.getElementById('ground') as HTMLCanvasElement
-  const ctx1 = canvas1.getContext('2d')
-
-  // retina adjustments
-  canvas1.width = CANVAS_WIDTH * 2
-  canvas1.height = CANVAS_HEIGHT * 2
-  canvas1.style.width = `${CANVAS_WIDTH}px`
-  canvas1.style.height = `${CANVAS_HEIGHT}px`
-  ctx1.strokeStyle = 'black'
-  ctx1.lineWidth = 2
-  ctx1.lineCap = 'square'
-  ctx1.scale(ratio, ratio)
-  ctx1.translate(OFFSET_X, OFFSET_Y)
 
   // background audio
   // const audio = new Audio('src/assets/audio/footstep1.mp3')

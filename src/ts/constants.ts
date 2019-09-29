@@ -1,5 +1,6 @@
 export const CANVAS_WIDTH = window.innerWidth
 export const CANVAS_HEIGHT = window.innerHeight
+export const RATIO = window.devicePixelRatio
 export const OFFSET_X = 10
 export const OFFSET_Y = 10
 
