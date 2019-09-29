@@ -44,9 +44,9 @@ export default class Renderer {
       if (e.key in ArrowKeys) this.keys[e.key as ArrowKeys] = false
     })
 
-    this.footstep = new Audio('src/assets/audio/footstep1.mp3')
+    this.footstep = new Audio('src/assets/audio/footstep2.mp3')
     this.footstep.loop = true
-    this.footstep.playbackRate = 1.3
+    this.footstep.playbackRate = 1
   }
 
   private collisionRight = (wall: Wall) => {

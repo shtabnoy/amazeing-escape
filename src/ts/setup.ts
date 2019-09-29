@@ -42,6 +42,20 @@ document.addEventListener('DOMContentLoaded', () => {
   r.addHero(new Hero(ctx, { x: 61, y: 61 }))
   r.render()
 
+  const canvas1 = document.getElementById('ground') as HTMLCanvasElement
+  const ctx1 = canvas1.getContext('2d')
+
+  // retina adjustments
+  canvas1.width = CANVAS_WIDTH * 2
+  canvas1.height = CANVAS_HEIGHT * 2
+  canvas1.style.width = `${CANVAS_WIDTH}px`
+  canvas1.style.height = `${CANVAS_HEIGHT}px`
+  ctx1.strokeStyle = 'black'
+  ctx1.lineWidth = 2
+  ctx1.lineCap = 'square'
+  ctx1.scale(ratio, ratio)
+  ctx1.translate(OFFSET_X, OFFSET_Y)
+
   // background audio
   // const audio = new Audio('src/assets/audio/footstep1.mp3')
   // audio.loop = true

@@ -85,8 +85,8 @@ export default class Hero {
       HERO_H,
       this.coords.x,
       this.coords.y,
-      HERO_W * 2,
-      HERO_H * 2
+      HERO_W,
+      HERO_H
     )
   }
 }

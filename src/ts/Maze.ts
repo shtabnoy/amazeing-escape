@@ -95,6 +95,7 @@ export default class Maze {
   }
 
   drawWalls = () => {
+    console.log('draw walla')
     this.walls.forEach((wall: Wall) => {
       let horizontal = wall.b.x - wall.a.x > wall.b.y - wall.a.y
       this.ctx.fillStyle = '#444'
