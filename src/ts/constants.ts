@@ -1,11 +1,11 @@
 export const CANVAS_WIDTH = window.innerWidth
 export const CANVAS_HEIGHT = window.innerHeight
 export const RATIO = window.devicePixelRatio
-export const OFFSET_X = 10
-export const OFFSET_Y = 10
+export const OFFSET_X = 0
+export const OFFSET_Y = 0
 
-export const ROOMS_HORIZONTAL = 4
-export const ROOMS_VERTICAL = 4
+export const ROOMS_HORIZONTAL = 7
+export const ROOMS_VERTICAL = 7
 export const ROOM_WIDTH = 300
 export const WALL_DEPTH = 60
 
