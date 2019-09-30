@@ -1,24 +1,18 @@
 import { Point } from './types'
 import { Direction } from './MazeGraph'
-import { STEP, SPRITE_SIZE } from './constants'
+import { STEP, SPRITE_SIZE, HERO_SIZE } from './constants'
 
 const FRAMES = [0, 1, 2, 1]
 const NUMBER_OF_FRAMES = FRAMES.length
 
 export default class Hero {
-  // private ctx: CanvasRenderingContext2D
   private img: HTMLImageElement
   private coords: Point
   private frame: number
   private frameIndex: number
   private spriteOffset: number
 
-  constructor(
-    // ctx: CanvasRenderingContext2D,
-    img: HTMLImageElement,
-    coords?: Point
-  ) {
-    // this.ctx = ctx
+  constructor(img: HTMLImageElement, coords?: Point) {
     this.img = img
     this.coords = {
       x: coords.x || 0,
@@ -30,7 +24,7 @@ export default class Hero {
   }
 
   clear(ctx: CanvasRenderingContext2D) {
-    ctx.clearRect(this.coords.x, this.coords.y, SPRITE_SIZE, SPRITE_SIZE)
+    ctx.clearRect(this.coords.x, this.coords.y, HERO_SIZE, HERO_SIZE)
   }
 
   getCoords() {
@@ -39,8 +33,8 @@ export default class Hero {
 
   getBottomRightCoords() {
     return {
-      x: this.coords.x + SPRITE_SIZE,
-      y: this.coords.y + SPRITE_SIZE,
+      x: this.coords.x + HERO_SIZE,
+      y: this.coords.y + HERO_SIZE,
     }
   }
 
@@ -73,6 +67,9 @@ export default class Hero {
   }
 
   render(ctx: CanvasRenderingContext2D) {
+    // ctx.lineWidth = 1
+    // ctx.strokeStyle = '#ff0000'
+    // ctx.strokeRect(this.coords.x, this.coords.y, HERO_SIZE, HERO_SIZE)
     ctx.drawImage(
       this.img,
       this.frame * SPRITE_SIZE + 1,
@@ -81,8 +78,8 @@ export default class Hero {
       SPRITE_SIZE,
       this.coords.x,
       this.coords.y,
-      SPRITE_SIZE,
-      SPRITE_SIZE
+      HERO_SIZE,
+      HERO_SIZE
     )
   }
 }

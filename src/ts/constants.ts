@@ -9,7 +9,7 @@ export const ROOMS_VERTICAL = 4
 export const ROOM_WIDTH = 300
 export const WALL_DEPTH = 60
 
-export const FPS_INTERVAL = 1000 / 5.33 // 160 beats per minute
+export const FPS_INTERVAL = 1000 / 5.33 // 160 (x2 - two steps in a second) beats per minute
 export const CAMERA_BORDER_X = 200
 export const CAMERA_BORDER_Y = 200
 export const BOTTOM_BORDER =
@@ -17,5 +17,5 @@ export const BOTTOM_BORDER =
 export const RIGHT_BORDER =
   ROOMS_HORIZONTAL * ROOM_WIDTH + WALL_DEPTH - CANVAS_WIDTH
 export const SPRITE_SIZE = 48
-// export const SPRITE_HEIGHT = 48
-export const STEP = 10
+export const HERO_SIZE = 96
+export const STEP = 6

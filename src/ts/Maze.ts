@@ -75,7 +75,7 @@ export default class Maze {
       // let horizontal = wall.b.x - wall.a.x > wall.b.y - wall.a.y
       ctx.fillStyle = '#6aa3e6'
       ctx.strokeStyle = '#111'
-      ctx.lineWidth = 10
+
       // let dr = 15
       // if (horizontal) {
       //   this.ctx.strokeRect(
@@ -111,14 +111,14 @@ export default class Maze {
       //     wall.b.y - wall.a.y - dr
       //   )
       // }
-
-      ctx.strokeRect(
-        wall.a.x,
-        wall.a.y,
-        wall.b.x - wall.a.x,
-        wall.b.y - wall.a.y
-      )
-      ctx.fillRect(wall.a.x, wall.a.y, wall.b.x - wall.a.x, wall.b.y - wall.a.y)
+      let lw = 5
+      ctx.lineWidth = lw
+      let x = wall.a.x + lw
+      let y = wall.a.y + lw
+      let w = wall.b.x - wall.a.x - lw
+      let h = wall.b.y - wall.a.y - lw
+      ctx.fillRect(x, y, w, h)
+      ctx.strokeRect(x, y, w, h)
     })
   }
 
