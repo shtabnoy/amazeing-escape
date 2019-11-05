@@ -228,7 +228,7 @@ export default class Renderer {
   async render() {
     this.addLayer('ground')
     this.addLayer('walls-and-hero')
-    const heroImg = await loadImage('src/assets/hero/metal.png')
+    const heroImg = await loadImage('src/assets/hero/regularBig.png')
     const groundImg = await loadImage('src/assets/ground/ground2.png')
     this.addMaze(
       new Maze(ROOMS_HORIZONTAL, ROOMS_VERTICAL, {

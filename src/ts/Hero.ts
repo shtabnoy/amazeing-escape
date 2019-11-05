@@ -2,7 +2,7 @@ import { Point } from './types'
 import { Direction } from './MazeGraph'
 import { STEP, SPRITE_SIZE, HERO_SIZE } from './constants'
 
-const FRAMES = [0, 1, 2, 1]
+const FRAMES = [0, 1, 2, 3]
 const NUMBER_OF_FRAMES = FRAMES.length
 
 export default class Hero {

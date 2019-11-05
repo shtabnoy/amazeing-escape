@@ -16,6 +16,6 @@ export const BOTTOM_BORDER =
   ROOMS_VERTICAL * ROOM_WIDTH + WALL_DEPTH - CANVAS_HEIGHT
 export const RIGHT_BORDER =
   ROOMS_HORIZONTAL * ROOM_WIDTH + WALL_DEPTH - CANVAS_WIDTH
-export const SPRITE_SIZE = 48
+export const SPRITE_SIZE = 96
 export const HERO_SIZE = 96
 export const STEP = 6
