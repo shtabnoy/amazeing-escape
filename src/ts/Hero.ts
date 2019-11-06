@@ -11,6 +11,7 @@ export default class Hero {
   private frame: number
   private frameIndex: number
   private spriteOffset: number
+  private currentRoom: [number, number]
 
   constructor(img: HTMLImageElement, coords?: Point) {
     this.img = img
@@ -81,5 +82,13 @@ export default class Hero {
       HERO_SIZE,
       HERO_SIZE
     )
+  }
+
+  setCurrentRoom(room: [number, number]) {
+    this.currentRoom = room
+  }
+
+  getCurrentRoom(): [number, number] {
+    return this.currentRoom
   }
 }

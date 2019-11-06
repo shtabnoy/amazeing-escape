@@ -6,6 +6,7 @@ import { CANVAS_WIDTH, CANVAS_HEIGHT, OFFSET_X, OFFSET_Y } from './constants'
 export default class Maze {
   private walls: Wall[]
   private groundImg: HTMLImageElement
+  private rooms: any[]
 
   constructor(
     width: number,
@@ -15,6 +16,7 @@ export default class Maze {
     this.groundImg = config.groundImg
     const g = this.createMazeGraph(width, height)
     const mst = g.mst()
+    this.rooms = []
     this.walls = this.createWalls(mst, config.rw, config.d)
   }
 
@@ -38,6 +40,7 @@ export default class Maze {
     d: number = 0 // depth
   ) {
     const walls: Wall[] = []
+    const h = d / 2
     g.vertices.forEach((vertex: Vertex) => {
       const xy = vertex.name.split(',')
       const vx = Number(xy[0])
@@ -66,6 +69,38 @@ export default class Maze {
           b: { x: (vx + 1) * rw + d, y: (vy + 1) * rw + d },
         })
       }
+      const [rx, ry] = vertex.name.split(',')
+      const room: any = {
+        name: [Number(rx), Number(ry)],
+        a: { x: vx * rw, y: vy * rw },
+        b: { x: (vx + 1) * rw, y: (vy + 1) * rw },
+        walls: {},
+      }
+      if (!vertex.edges[Direction.up]) {
+        room.walls[Direction.up] = [
+          { x: vx * rw, y: vy * rw },
+          { x: (vx + 1) * rw, y: vy * rw + d },
+        ]
+      }
+      if (!vertex.edges[Direction.down]) {
+        room.walls[Direction.down] = [
+          { x: vx * rw, y: (vy + 1) * rw },
+          { x: (vx + 1) * rw, y: (vy + 1) * rw + d },
+        ]
+      }
+      if (!vertex.edges[Direction.left]) {
+        room.walls[Direction.left] = [
+          { x: vx * rw, y: vy * rw },
+          { x: vx * rw + d, y: (vy + 1) * rw + d },
+        ]
+      }
+      if (!vertex.edges[Direction.right]) {
+        room.walls[Direction.right] = [
+          { x: (vx + 1) * rw, y: vy * rw },
+          { x: (vx + 1) * rw + d, y: (vy + 1) * rw + d },
+        ]
+      }
+      this.rooms.push(room)
     })
     return walls
   }
@@ -138,5 +173,9 @@ export default class Maze {
 
   getWalls() {
     return this.walls
+  }
+
+  getRooms() {
+    return this.rooms
   }
 }

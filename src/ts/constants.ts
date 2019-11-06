@@ -4,8 +4,8 @@ export const RATIO = window.devicePixelRatio
 export const OFFSET_X = 0
 export const OFFSET_Y = 0
 
-export const ROOMS_HORIZONTAL = 7
-export const ROOMS_VERTICAL = 7
+export const ROOMS_HORIZONTAL = 3
+export const ROOMS_VERTICAL = 3
 export const ROOM_WIDTH = 300
 export const WALL_DEPTH = 60
 

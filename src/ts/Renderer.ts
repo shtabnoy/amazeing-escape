@@ -20,6 +20,7 @@ import {
 } from './constants'
 import { Direction } from './MazeGraph'
 import { loadImage } from './utils'
+var GH = require('greiner-hormann')
 
 export default class Renderer {
   private layers: CanvasRenderingContext2D[]
@@ -139,34 +140,66 @@ export default class Renderer {
 
   private move = () => {
     const walls = this.maze.getWalls()
-
-    if (this.keys[ArrowKeys.ArrowRight] && !walls.some(this.collisionRight)) {
-      this.hero.clear(this.layers[1])
-      this.hero.move(Direction.right)
-      this.moveCamera(Direction.right)
-      this.hero.render(this.layers[1])
+    const { x: x1, y: y1 } = this.hero.getCoords()
+    const { x: x2, y: y2 } = this.hero.getBottomRightCoords()
+    const rooms = this.maze.getRooms()
+    const cr = this.hero.getCurrentRoom()
+    const room = rooms.find(
+      room => cr[0] === room.name[0] && cr[1] === room.name[1]
+    )
+    if (this.keys[ArrowKeys.ArrowRight]) {
+      // console.log(cr)
+      if (x2 + STEP < room.b.x) {
+        this.hero.clear(this.layers[1])
+        this.hero.move(Direction.right)
+        this.moveCamera(Direction.right)
+        this.hero.render(this.layers[1])
+      }
+      if (
+        // room.walls[Direction.right]
+        // x1 + STEP <= wall.a.x &&
+        // x2 + STEP >= wall.a.x &&
+        // y1 <= wall.b.y &&
+        // y2 >= wall.a.y
+        x2 + STEP >= room.b.x &&
+        !room.walls[Direction.right]
+      ) {
+        this.hero.clear(this.layers[1])
+        this.hero.move(Direction.right)
+        this.moveCamera(Direction.right)
+        this.hero.render(this.layers[1])
+        this.hero.setCurrentRoom([cr[0] + 1, cr[1]])
+        console.log('you are in the room ' + (cr[0] + 1) + ',' + cr[1])
+      }
     }
 
-    if (this.keys[ArrowKeys.ArrowLeft] && !walls.some(this.collisionLeft)) {
-      this.hero.clear(this.layers[1])
-      this.hero.move(Direction.left)
-      this.moveCamera(Direction.left)
-      this.hero.render(this.layers[1])
-    }
+    // if (this.keys[ArrowKeys.ArrowRight] && !walls.some(this.collisionRight)) {
+    //   this.hero.clear(this.layers[1])
+    //   this.hero.move(Direction.right)
+    //   this.moveCamera(Direction.right)
+    //   this.hero.render(this.layers[1])
+    // }
 
-    if (this.keys[ArrowKeys.ArrowDown] && !walls.some(this.collisionDown)) {
-      this.hero.clear(this.layers[1])
-      this.hero.move(Direction.down)
-      this.moveCamera(Direction.down)
-      this.hero.render(this.layers[1])
-    }
+    // if (this.keys[ArrowKeys.ArrowLeft] && !walls.some(this.collisionLeft)) {
+    //   this.hero.clear(this.layers[1])
+    //   this.hero.move(Direction.left)
+    //   this.moveCamera(Direction.left)
+    //   this.hero.render(this.layers[1])
+    // }
 
-    if (this.keys[ArrowKeys.ArrowUp] && !walls.some(this.collisionUp)) {
-      this.hero.clear(this.layers[1])
-      this.hero.move(Direction.up)
-      this.moveCamera(Direction.up)
-      this.hero.render(this.layers[1])
-    }
+    // if (this.keys[ArrowKeys.ArrowDown] && !walls.some(this.collisionDown)) {
+    //   this.hero.clear(this.layers[1])
+    //   this.hero.move(Direction.down)
+    //   this.moveCamera(Direction.down)
+    //   this.hero.render(this.layers[1])
+    // }
+
+    // if (this.keys[ArrowKeys.ArrowUp] && !walls.some(this.collisionUp)) {
+    //   this.hero.clear(this.layers[1])
+    //   this.hero.move(Direction.up)
+    //   this.moveCamera(Direction.up)
+    //   this.hero.render(this.layers[1])
+    // }
 
     this.updateFrame()
     // if (
@@ -241,6 +274,7 @@ export default class Renderer {
     this.maze.drawGround(this.layers[0])
     this.maze.drawWalls(this.layers[1])
     this.hero.render(this.layers[1])
+    this.hero.setCurrentRoom([0, 0])
     this.startAnimationLoop()
   }
 }
