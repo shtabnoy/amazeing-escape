@@ -15,9 +15,11 @@ export default class Maze {
   ) {
     this.groundImg = config.groundImg
     const g = this.createMazeGraph(width, height)
+    console.log(g)
     const mst = g.mst()
+    console.log(mst)
     this.rooms = []
-    this.walls = this.createWalls(mst, config.rw, config.d)
+    // this.walls = this.createWalls(mst, config.rw, config.d)
   }
 
   private createMazeGraph = (w: number, h: number): MazeGraph => {
@@ -26,8 +28,20 @@ export default class Maze {
 
     for (let i = 0; i < w; i++) {
       for (let j = 0; j < h; j++) {
-        if (i != w - 1) g.addEdge(`${i},${j}`, `${i + 1},${j}`, rnd())
-        if (j < h - 1) g.addEdge(`${i},${j}`, `${i},${j + 1}`, rnd())
+        if (i != w - 1)
+          g.addEdge({
+            v1: `${i},${j}`,
+            v2: `${i + 1},${j}`,
+            weight: rnd(),
+          })
+        if (j < h - 1)
+          g.addEdge({
+            v1: `${i},${j}`,
+            v2: `${i},${j + 1}`,
+            weight: rnd(),
+          })
+        // if (i != w - 1) g.addEdge(`${i},${j}`, `${i + 1},${j}`, rnd())
+        // if (j < h - 1) g.addEdge(`${i},${j}`, `${i},${j + 1}`, rnd())
       }
     }
 
