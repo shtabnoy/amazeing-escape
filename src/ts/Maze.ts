@@ -1,4 +1,4 @@
-import { Wall } from './types'
+import { Wall, Point } from './types'
 import MazeGraph, { Direction, Vertex } from './MazeGraph'
 import { rnd } from './utils'
 import { CANVAS_WIDTH, CANVAS_HEIGHT, OFFSET_X, OFFSET_Y } from './constants'
@@ -15,11 +15,11 @@ export default class Maze {
   ) {
     this.groundImg = config.groundImg
     const g = this.createMazeGraph(width, height)
-    console.log(g)
     const mst = g.mst()
-    console.log(mst)
+    // console.log(g)
+    // console.log(mst)
     this.rooms = []
-    // this.walls = this.createWalls(mst, config.rw, config.d)
+    this.createRooms(mst, config.rw, config.d)
   }
 
   private createMazeGraph = (w: number, h: number): MazeGraph => {
@@ -40,49 +40,47 @@ export default class Maze {
             v2: `${i},${j + 1}`,
             weight: rnd(),
           })
-        // if (i != w - 1) g.addEdge(`${i},${j}`, `${i + 1},${j}`, rnd())
-        // if (j < h - 1) g.addEdge(`${i},${j}`, `${i},${j + 1}`, rnd())
       }
     }
 
     return g
   }
 
-  private createWalls(
+  private createRooms(
     g: MazeGraph,
     rw: number, // room width
     d: number = 0 // depth
   ) {
-    const walls: Wall[] = []
-    const h = d / 2
+    // const walls: Wall[] = []
+    // const h = d / 2
     g.vertices.forEach((vertex: Vertex) => {
       const xy = vertex.name.split(',')
       const vx = Number(xy[0])
       const vy = Number(xy[1])
-      if (!vertex.edges[Direction.up]) {
-        walls.push({
-          a: { x: vx * rw, y: vy * rw },
-          b: { x: (vx + 1) * rw, y: vy * rw + d },
-        })
-      }
-      if (!vertex.edges[Direction.down]) {
-        walls.push({
-          a: { x: vx * rw, y: (vy + 1) * rw },
-          b: { x: (vx + 1) * rw, y: (vy + 1) * rw + d },
-        })
-      }
-      if (!vertex.edges[Direction.left]) {
-        walls.push({
-          a: { x: vx * rw, y: vy * rw },
-          b: { x: vx * rw + d, y: (vy + 1) * rw + d },
-        })
-      }
-      if (!vertex.edges[Direction.right]) {
-        walls.push({
-          a: { x: (vx + 1) * rw, y: vy * rw },
-          b: { x: (vx + 1) * rw + d, y: (vy + 1) * rw + d },
-        })
-      }
+      //   if (!vertex.edges[Direction.up]) {
+      //     walls.push({
+      //       a: { x: vx * rw, y: vy * rw },
+      //       b: { x: (vx + 1) * rw, y: vy * rw + d },
+      //     })
+      //   }
+      //   if (!vertex.edges[Direction.down]) {
+      //     walls.push({
+      //       a: { x: vx * rw, y: (vy + 1) * rw },
+      //       b: { x: (vx + 1) * rw, y: (vy + 1) * rw + d },
+      //     })
+      //   }
+      //   if (!vertex.edges[Direction.left]) {
+      //     walls.push({
+      //       a: { x: vx * rw, y: vy * rw },
+      //       b: { x: vx * rw + d, y: (vy + 1) * rw + d },
+      //     })
+      //   }
+      //   if (!vertex.edges[Direction.right]) {
+      //     walls.push({
+      //       a: { x: (vx + 1) * rw, y: vy * rw },
+      //       b: { x: (vx + 1) * rw + d, y: (vy + 1) * rw + d },
+      //     })
+      //   }
       const [rx, ry] = vertex.name.split(',')
       const room: any = {
         name: [Number(rx), Number(ry)],
@@ -116,58 +114,25 @@ export default class Maze {
       }
       this.rooms.push(room)
     })
-    return walls
+    console.log(this.rooms)
+    // return walls
   }
 
   drawWalls = (ctx: CanvasRenderingContext2D) => {
-    this.walls.forEach((wall: Wall) => {
-      // let horizontal = wall.b.x - wall.a.x > wall.b.y - wall.a.y
-      ctx.fillStyle = '#6aa3e6'
-      ctx.strokeStyle = '#111'
+    this.rooms.forEach(room => {
+      Object.values(room.walls).forEach((wall: [Point, Point]) => {
+        ctx.fillStyle = '#6aa3e6'
+        ctx.strokeStyle = '#111'
 
-      // let dr = 15
-      // if (horizontal) {
-      //   this.ctx.strokeRect(
-      //     wall.a.x,
-      //     wall.a.y,
-      //     wall.b.x - wall.a.x,
-      //     wall.b.y - wall.a.y
-      //   )
-      // } else {
-      //   this.ctx.beginPath()
-      //   this.ctx.moveTo(wall.a.x + dr, wall.a.y)
-      //   this.ctx.lineTo(wall.a.x, wall.a.y + dr)
-      //   this.ctx.lineTo(wall.a.x, wall.b.y)
-      //   this.ctx.lineTo(wall.b.x, wall.b.y)
-      //   this.ctx.lineTo(wall.b.x, wall.a.y + dr)
-      //   this.ctx.lineTo(wall.b.x - dr, wall.a.y)
-      //   this.ctx.lineTo(wall.b.x - dr, wall.b.y - dr)
-      //   this.ctx.lineTo(wall.a.x + dr, wall.b.y - dr)
-      //   this.ctx.lineTo(wall.a.x + dr, wall.a.y)
-
-      //   this.ctx.fill()
-      //   this.ctx.moveTo(wall.a.x, wall.b.y)
-      //   this.ctx.lineTo(wall.a.x + dr, wall.b.y - dr)
-
-      //   this.ctx.moveTo(wall.b.x, wall.b.y)
-      //   this.ctx.lineTo(wall.b.x - dr, wall.b.y - dr)
-      //   this.ctx.stroke()
-      //   this.ctx.fillStyle = '#000'
-      //   this.ctx.fillRect(
-      //     wall.a.x + dr,
-      //     wall.a.y,
-      //     wall.b.x - wall.a.x - 2 * dr,
-      //     wall.b.y - wall.a.y - dr
-      //   )
-      // }
-      let lw = 5
-      ctx.lineWidth = lw
-      let x = wall.a.x + lw
-      let y = wall.a.y + lw
-      let w = wall.b.x - wall.a.x - lw
-      let h = wall.b.y - wall.a.y - lw
-      ctx.fillRect(x, y, w, h)
-      ctx.strokeRect(x, y, w, h)
+        let lw = 5
+        ctx.lineWidth = lw
+        let x = wall[0].x + lw
+        let y = wall[0].y + lw
+        let w = wall[1].x - wall[0].x - lw
+        let h = wall[1].y - wall[0].y - lw
+        ctx.fillRect(x, y, w, h)
+        ctx.strokeRect(x, y, w, h)
+      })
     })
   }
 
