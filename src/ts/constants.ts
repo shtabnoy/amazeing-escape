@@ -7,7 +7,7 @@ export const OFFSET_Y = 0
 export const ROOMS_HORIZONTAL = 3
 export const ROOMS_VERTICAL = 3
 export const ROOM_WIDTH = 300
-export const WALL_DEPTH = 60
+export const WALL_DEPTH = 30
 
 export const FPS_INTERVAL = 1000 / 5.33 // 160 (x2 - two steps in a second) beats per minute
 export const CAMERA_BORDER_X = 200

@@ -3,6 +3,19 @@ import MazeGraph, { Direction, Vertex } from './MazeGraph'
 import { rnd } from './utils'
 import { CANVAS_WIDTH, CANVAS_HEIGHT, OFFSET_X, OFFSET_Y } from './constants'
 
+type P = [number, number]
+type Block4 = [P, P, P, P]
+type Block6 = [P, P, P, P, P, P]
+type Block8 = [P, P, P, P, P, P, P, P]
+
+interface Room {
+  wall?: Block4 | Block6 | Block8
+  walls?: any
+  a?: any
+  b?: any
+  name?: [number, number]
+}
+
 export default class Maze {
   private walls: Wall[]
   private groundImg: HTMLImageElement
@@ -57,89 +70,234 @@ export default class Maze {
       const xy = vertex.name.split(',')
       const vx = Number(xy[0])
       const vy = Number(xy[1])
-      //   if (!vertex.edges[Direction.up]) {
-      //     walls.push({
-      //       a: { x: vx * rw, y: vy * rw },
-      //       b: { x: (vx + 1) * rw, y: vy * rw + d },
-      //     })
-      //   }
-      //   if (!vertex.edges[Direction.down]) {
-      //     walls.push({
-      //       a: { x: vx * rw, y: (vy + 1) * rw },
-      //       b: { x: (vx + 1) * rw, y: (vy + 1) * rw + d },
-      //     })
-      //   }
-      //   if (!vertex.edges[Direction.left]) {
-      //     walls.push({
-      //       a: { x: vx * rw, y: vy * rw },
-      //       b: { x: vx * rw + d, y: (vy + 1) * rw + d },
-      //     })
-      //   }
-      //   if (!vertex.edges[Direction.right]) {
-      //     walls.push({
-      //       a: { x: (vx + 1) * rw, y: vy * rw },
-      //       b: { x: (vx + 1) * rw + d, y: (vy + 1) * rw + d },
-      //     })
-      //   }
       const [rx, ry] = vertex.name.split(',')
-      const room: any = {
+      const room: Room = {
         name: [Number(rx), Number(ry)],
         a: { x: vx * rw, y: vy * rw },
         b: { x: (vx + 1) * rw, y: (vy + 1) * rw },
-        walls: {},
       }
-      if (!vertex.edges[Direction.up]) {
-        room.walls[Direction.up] = [
-          { x: vx * rw, y: vy * rw },
-          { x: (vx + 1) * rw, y: vy * rw + d },
+      // if (!vertex.edges[Direction.up]) {
+      //   room.walls[Direction.up] = [
+      //     { x: vx * rw, y: vy * rw },
+      //     { x: (vx + 1) * rw, y: vy * rw + d },
+      //   ]
+      // }
+      // if (!vertex.edges[Direction.down]) {
+      //   room.walls[Direction.down] = [
+      //     { x: vx * rw, y: (vy + 1) * rw },
+      //     { x: (vx + 1) * rw, y: (vy + 1) * rw + d },
+      //   ]
+      // }
+      // if (!vertex.edges[Direction.left]) {
+      //   room.walls[Direction.left] = [
+      //     { x: vx * rw, y: vy * rw },
+      //     { x: vx * rw + d, y: (vy + 1) * rw + d },
+      //   ]
+      // }
+      // if (!vertex.edges[Direction.right]) {
+      //   room.walls[Direction.right] = [
+      //     { x: (vx + 1) * rw, y: vy * rw },
+      //     { x: (vx + 1) * rw + d, y: (vy + 1) * rw + d },
+      //   ]
+      // }
+      if (
+        vertex.edges[Direction.up] &&
+        vertex.edges[Direction.down] &&
+        vertex.edges[Direction.right] &&
+        vertex.edges[Direction.left]
+      ) {
+        return
+      }
+
+      const x1 = vx * rw // left X
+      const x2 = (vx + 1) * rw // right X
+      const y1 = vy * rw // top Y
+      const y2 = (vy + 1) * rw // bottom Y
+
+      // Left-only wall
+      if (
+        vertex.edges[Direction.up] &&
+        vertex.edges[Direction.down] &&
+        vertex.edges[Direction.right]
+      ) {
+        room.wall = [[x1, y1], [x1 + d, y1], [x1 + d, y2], [x1, y2]]
+        this.rooms.push(room)
+        return
+      }
+
+      // Right-only wall
+      if (
+        vertex.edges[Direction.up] &&
+        vertex.edges[Direction.down] &&
+        vertex.edges[Direction.left]
+      ) {
+        room.wall = [[x2 - d, y1], [x2, y1], [x2, y2], [x2 - d, y2]]
+        this.rooms.push(room)
+        return
+      }
+
+      // Top-only wall
+      if (
+        vertex.edges[Direction.down] &&
+        vertex.edges[Direction.left] &&
+        vertex.edges[Direction.right]
+      ) {
+        room.wall = [[x1, y1], [x2, y1], [x2, y1 + d], [x1, y1 + d]]
+        this.rooms.push(room)
+        return
+      }
+
+      // Bottom-only wall
+      if (
+        vertex.edges[Direction.up] &&
+        vertex.edges[Direction.left] &&
+        vertex.edges[Direction.right]
+      ) {
+        room.wall = [[x1, y2 - d], [x2, y2 - d], [x2, y2], [x1, y2]]
+        this.rooms.push(room)
+        return
+      }
+
+      // Left-top wall
+      if (vertex.edges[Direction.right] && vertex.edges[Direction.down]) {
+        room.wall = [
+          [x1, y1],
+          [x2, y1],
+          [x2, y1 + d],
+          [x1 + d, y1 + d],
+          [x1 + d, y2],
+          [x1, y2],
         ]
+        this.rooms.push(room)
+        return
       }
-      if (!vertex.edges[Direction.down]) {
-        room.walls[Direction.down] = [
-          { x: vx * rw, y: (vy + 1) * rw },
-          { x: (vx + 1) * rw, y: (vy + 1) * rw + d },
+
+      // Right-top wall
+      if (vertex.edges[Direction.left] && vertex.edges[Direction.down]) {
+        room.wall = [
+          [x1, y1],
+          [x2, y1],
+          [x2, y2],
+          [x2 - d, y2],
+          [x2 - d, y1 + d],
+          [x1, y1 + d],
         ]
+        this.rooms.push(room)
+        return
       }
-      if (!vertex.edges[Direction.left]) {
-        room.walls[Direction.left] = [
-          { x: vx * rw, y: vy * rw },
-          { x: vx * rw + d, y: (vy + 1) * rw + d },
+
+      // Left-bottom wall
+      if (vertex.edges[Direction.up] && vertex.edges[Direction.right]) {
+        room.wall = [
+          [x1, y1],
+          [x1 + d, y1],
+          [x1 + d, y2 - d],
+          [x2, y2 - d],
+          [x2, y2],
+          [x1, y2],
         ]
+        this.rooms.push(room)
+        return
       }
-      if (!vertex.edges[Direction.right]) {
-        room.walls[Direction.right] = [
-          { x: (vx + 1) * rw, y: vy * rw },
-          { x: (vx + 1) * rw + d, y: (vy + 1) * rw + d },
+
+      // Right-bottom wall
+      if (vertex.edges[Direction.up] && vertex.edges[Direction.left]) {
+        room.wall = [
+          [x2 - d, y1],
+          [x2, y1],
+          [x2, y2],
+          [x1, y2],
+          [x1, y2 - d],
+          [x2 - d, y2 - d],
         ]
+        this.rooms.push(room)
+        return
       }
-      this.rooms.push(room)
+
+      // Left-bottom-right wall
+      if (vertex.edges[Direction.up]) {
+        room.wall = [
+          [x1, y1],
+          [x1 + d, y1],
+          [x1 + d, y2 - d],
+          [x2 - d, y2 - d],
+          [x2 - d, y1],
+          [x2, y1],
+          [x2, y2],
+          [x1, y2],
+        ]
+        this.rooms.push(room)
+        return
+      }
+
+      // Left-top-right wall
+      if (vertex.edges[Direction.down]) {
+        room.wall = [
+          [x1, y1],
+          [x2, y1],
+          [x2, y2],
+          [x2 - d, y2],
+          [x2 - d, y1 + d],
+          [x1 + d, y1 + d],
+          [x1 + d, y2],
+          [x1, y2],
+        ]
+        this.rooms.push(room)
+        return
+      }
+
+      // Top-left-down wall
+      if (vertex.edges[Direction.right]) {
+        room.wall = [
+          [x1, y1],
+          [x2, y1],
+          [x2, y1 + d],
+          [x1 + d, y1 + d],
+          [x1 + d, y2 - d],
+          [x2, y2 - d],
+          [x2, y2],
+          [x1, y2],
+        ]
+        this.rooms.push(room)
+        return
+      }
+
+      // Top-right-down wall
+      if (vertex.edges[Direction.left]) {
+        room.wall = [
+          [x1, y1],
+          [x2, y1],
+          [x2, y2],
+          [x1, y2],
+          [x1, y2 - d],
+          [x2 - d, y2 - d],
+          [x2 - d, y1 + d],
+          [x1, y1 + d],
+        ]
+        this.rooms.push(room)
+        return
+      }
     })
-    console.log(this.rooms)
-    // return walls
   }
 
   drawWalls = (ctx: CanvasRenderingContext2D) => {
-    this.rooms.forEach(room => {
-      Object.values(room.walls).forEach((wall: [Point, Point]) => {
-        ctx.fillStyle = '#6aa3e6'
-        ctx.strokeStyle = '#111'
-
-        let lw = 5
-        ctx.lineWidth = lw
-        let x = wall[0].x + lw
-        let y = wall[0].y + lw
-        let w = wall[1].x - wall[0].x - lw
-        let h = wall[1].y - wall[0].y - lw
-        ctx.fillRect(x, y, w, h)
-        ctx.strokeRect(x, y, w, h)
+    this.rooms.forEach((room: Room) => {
+      ctx.strokeStyle = '#111'
+      ctx.fillStyle = '#6aa3e6'
+      ctx.beginPath()
+      ctx.moveTo(room.wall[0][0], room.wall[0][1])
+      room.wall.slice(1).forEach((block: [number, number]) => {
+        ctx.lineTo(block[0], block[1])
       })
+      ctx.closePath()
+      ctx.stroke()
+      ctx.fill()
     })
   }
 
   drawGround = (ctx: CanvasRenderingContext2D) => {
     let translatedX = ctx.getTransform().e / 2
     let translatedY = ctx.getTransform().f / 2
-    // ctx.save()
     ctx.fillStyle = ctx.createPattern(this.groundImg, 'repeat')
     ctx.fillRect(
       0 - translatedX < 0 ? -1 : 0 - translatedX,
@@ -147,7 +305,6 @@ export default class Maze {
       CANVAS_WIDTH - translatedX + OFFSET_X,
       CANVAS_HEIGHT - translatedY + OFFSET_Y
     )
-    // ctx.restore()
   }
 
   getWalls() {
