@@ -11,7 +11,12 @@ type Wall = Block4 | Block6 | Block8
 
 interface Room {
   walls?: Wall[]
-  // walls?: any
+  ailes?: {
+    [Direction.up]?: boolean
+    [Direction.down]?: boolean
+    [Direction.left]?: boolean
+    [Direction.right]?: boolean
+  }
   a?: any
   b?: any
   name?: [number, number]
@@ -34,7 +39,7 @@ export default class Maze {
     this.rooms = []
     this.createRooms(mst, config.rw, config.d)
     // console.log(mst.vertices)
-    // console.log(this.rooms)
+    console.log(this.rooms)
   }
 
   private createMazeGraph = (w: number, h: number): MazeGraph => {
@@ -77,37 +82,20 @@ export default class Maze {
         name: [Number(rx), Number(ry)],
         a: { x: vx * rw, y: vy * rw },
         b: { x: (vx + 1) * rw, y: (vy + 1) * rw },
+        ailes: {},
       }
-      // if (!vertex.edges[Direction.up]) {
-      //   room.walls[Direction.up] = [
-      //     { x: vx * rw, y: vy * rw },
-      //     { x: (vx + 1) * rw, y: vy * rw + d },
-      //   ]
-      // }
-      // if (!vertex.edges[Direction.down]) {
-      //   room.walls[Direction.down] = [
-      //     { x: vx * rw, y: (vy + 1) * rw },
-      //     { x: (vx + 1) * rw, y: (vy + 1) * rw + d },
-      //   ]
-      // }
-      // if (!vertex.edges[Direction.left]) {
-      //   room.walls[Direction.left] = [
-      //     { x: vx * rw, y: vy * rw },
-      //     { x: vx * rw + d, y: (vy + 1) * rw + d },
-      //   ]
-      // }
-      // if (!vertex.edges[Direction.right]) {
-      //   room.walls[Direction.right] = [
-      //     { x: (vx + 1) * rw, y: vy * rw },
-      //     { x: (vx + 1) * rw + d, y: (vy + 1) * rw + d },
-      //   ]
-      // }
+
+      // No walls
       if (
         vertex.edges[Direction.up] &&
         vertex.edges[Direction.down] &&
-        vertex.edges[Direction.right] &&
-        vertex.edges[Direction.left]
+        vertex.edges[Direction.left] &&
+        vertex.edges[Direction.right]
       ) {
+        room.ailes[Direction.up] = true
+        room.ailes[Direction.down] = true
+        room.ailes[Direction.left] = true
+        room.ailes[Direction.right] = true
         return
       }
 
@@ -123,6 +111,9 @@ export default class Maze {
         vertex.edges[Direction.right]
       ) {
         room.walls = [[[x1, y1], [x1 + d, y1], [x1 + d, y2], [x1, y2]]]
+        room.ailes[Direction.up] = true
+        room.ailes[Direction.down] = true
+        room.ailes[Direction.right] = true
         this.rooms.push(room)
         return
       }
@@ -134,6 +125,9 @@ export default class Maze {
         vertex.edges[Direction.left]
       ) {
         room.walls = [[[x2 - d, y1], [x2, y1], [x2, y2], [x2 - d, y2]]]
+        room.ailes[Direction.up] = true
+        room.ailes[Direction.down] = true
+        room.ailes[Direction.left] = true
         this.rooms.push(room)
         return
       }
@@ -145,6 +139,9 @@ export default class Maze {
         vertex.edges[Direction.right]
       ) {
         room.walls = [[[x1, y1], [x2, y1], [x2, y1 + d], [x1, y1 + d]]]
+        room.ailes[Direction.down] = true
+        room.ailes[Direction.left] = true
+        room.ailes[Direction.right] = true
         this.rooms.push(room)
         return
       }
@@ -156,6 +153,9 @@ export default class Maze {
         vertex.edges[Direction.right]
       ) {
         room.walls = [[[x1, y2 - d], [x2, y2 - d], [x2, y2], [x1, y2]]]
+        room.ailes[Direction.up] = true
+        room.ailes[Direction.left] = true
+        room.ailes[Direction.right] = true
         this.rooms.push(room)
         return
       }
@@ -172,6 +172,8 @@ export default class Maze {
             [x1, y2],
           ],
         ]
+        room.ailes[Direction.right] = true
+        room.ailes[Direction.down] = true
         this.rooms.push(room)
         return
       }
@@ -188,6 +190,8 @@ export default class Maze {
             [x1, y1 + d],
           ],
         ]
+        room.ailes[Direction.left] = true
+        room.ailes[Direction.down] = true
         this.rooms.push(room)
         return
       }
@@ -204,6 +208,8 @@ export default class Maze {
             [x1, y2],
           ],
         ]
+        room.ailes[Direction.up] = true
+        room.ailes[Direction.right] = true
         this.rooms.push(room)
         return
       }
@@ -220,6 +226,8 @@ export default class Maze {
             [x2 - d, y2 - d],
           ],
         ]
+        room.ailes[Direction.up] = true
+        room.ailes[Direction.left] = true
         this.rooms.push(room)
         return
       }
@@ -230,6 +238,8 @@ export default class Maze {
           [[x1, y1], [x2, y1], [x2, y1 + d], [x1, y1 + d]],
           [[x1, y2 - d], [x2, y2 - d], [x2, y2], [x1, y2]],
         ]
+        room.ailes[Direction.left] = true
+        room.ailes[Direction.right] = true
         this.rooms.push(room)
         return
       }
@@ -240,6 +250,8 @@ export default class Maze {
           [[x1, y1], [x1 + d, y1], [x1 + d, y2], [x1, y2]],
           [[x2 - d, y1], [x2, y1], [x2, y2], [x2 - d, y2]],
         ]
+        room.ailes[Direction.up] = true
+        room.ailes[Direction.down] = true
         this.rooms.push(room)
         return
       }
@@ -258,6 +270,7 @@ export default class Maze {
             [x1, y2],
           ],
         ]
+        room.ailes[Direction.up] = true
         this.rooms.push(room)
         return
       }
@@ -276,6 +289,7 @@ export default class Maze {
             [x1, y2],
           ],
         ]
+        room.ailes[Direction.down] = true
         this.rooms.push(room)
         return
       }
@@ -294,6 +308,7 @@ export default class Maze {
             [x1, y2],
           ],
         ]
+        room.ailes[Direction.right] = true
         this.rooms.push(room)
         return
       }
@@ -312,6 +327,7 @@ export default class Maze {
             [x1, y1 + d],
           ],
         ]
+        room.ailes[Direction.left] = true
         this.rooms.push(room)
         return
       }

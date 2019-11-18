@@ -138,7 +138,7 @@ export default class Renderer {
   }
 
   private move = () => {
-    const walls = this.maze.getWalls()
+    // const walls = this.maze.getWalls()
     const { x: x1, y: y1 } = this.hero.getCoords()
     const { x: x2, y: y2 } = this.hero.getBottomRightCoords()
     const rooms = this.maze.getRooms()
@@ -152,7 +152,7 @@ export default class Renderer {
         this.hero.move(Direction.right)
         this.moveCamera(Direction.right)
         this.hero.render(this.layers[1])
-      } else if (!room.walls[Direction.right]) {
+      } else if (room.ailes[Direction.right]) {
         this.hero.setCurrentRoom([cr[0] + 1, cr[1]])
         console.log('you are in the room ' + (cr[0] + 1) + ',' + cr[1])
       }
@@ -163,7 +163,7 @@ export default class Renderer {
         this.hero.move(Direction.left)
         this.moveCamera(Direction.left)
         this.hero.render(this.layers[1])
-      } else if (!room.walls[Direction.left]) {
+      } else if (room.ailes[Direction.left]) {
         this.hero.setCurrentRoom([cr[0] - 1, cr[1]])
         console.log('you are in the room ' + (cr[0] - 1) + ',' + cr[1])
       }
@@ -174,7 +174,7 @@ export default class Renderer {
         this.hero.move(Direction.down)
         this.moveCamera(Direction.down)
         this.hero.render(this.layers[1])
-      } else if (!room.walls[Direction.down]) {
+      } else if (room.ailes[Direction.down]) {
         this.hero.setCurrentRoom([cr[0], cr[1] + 1])
         console.log('you are in the room ' + cr[0] + ',' + (cr[1] + 1))
       }
@@ -185,7 +185,7 @@ export default class Renderer {
         this.hero.move(Direction.up)
         this.moveCamera(Direction.up)
         this.hero.render(this.layers[1])
-      } else if (!room.walls[Direction.up]) {
+      } else if (room.ailes[Direction.up]) {
         this.hero.setCurrentRoom([cr[0], cr[1] - 1])
         console.log('you are in the room ' + cr[0] + ',' + (cr[1] - 1))
       }
