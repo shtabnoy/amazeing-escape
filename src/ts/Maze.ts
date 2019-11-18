@@ -1,4 +1,4 @@
-import { Wall, Point } from './types'
+import { Point } from './types'
 import MazeGraph, { Direction, Vertex } from './MazeGraph'
 import { rnd } from './utils'
 import { CANVAS_WIDTH, CANVAS_HEIGHT, OFFSET_X, OFFSET_Y } from './constants'
@@ -7,10 +7,11 @@ type P = [number, number]
 type Block4 = [P, P, P, P]
 type Block6 = [P, P, P, P, P, P]
 type Block8 = [P, P, P, P, P, P, P, P]
+type Wall = Block4 | Block6 | Block8
 
 interface Room {
-  wall?: Block4 | Block6 | Block8
-  walls?: any
+  walls?: Wall[]
+  // walls?: any
   a?: any
   b?: any
   name?: [number, number]
@@ -30,9 +31,10 @@ export default class Maze {
     const g = this.createMazeGraph(width, height)
     const mst = g.mst()
     // console.log(g)
-    // console.log(mst)
     this.rooms = []
     this.createRooms(mst, config.rw, config.d)
+    // console.log(mst.vertices)
+    // console.log(this.rooms)
   }
 
   private createMazeGraph = (w: number, h: number): MazeGraph => {
@@ -120,7 +122,7 @@ export default class Maze {
         vertex.edges[Direction.down] &&
         vertex.edges[Direction.right]
       ) {
-        room.wall = [[x1, y1], [x1 + d, y1], [x1 + d, y2], [x1, y2]]
+        room.walls = [[[x1, y1], [x1 + d, y1], [x1 + d, y2], [x1, y2]]]
         this.rooms.push(room)
         return
       }
@@ -131,7 +133,7 @@ export default class Maze {
         vertex.edges[Direction.down] &&
         vertex.edges[Direction.left]
       ) {
-        room.wall = [[x2 - d, y1], [x2, y1], [x2, y2], [x2 - d, y2]]
+        room.walls = [[[x2 - d, y1], [x2, y1], [x2, y2], [x2 - d, y2]]]
         this.rooms.push(room)
         return
       }
@@ -142,7 +144,7 @@ export default class Maze {
         vertex.edges[Direction.left] &&
         vertex.edges[Direction.right]
       ) {
-        room.wall = [[x1, y1], [x2, y1], [x2, y1 + d], [x1, y1 + d]]
+        room.walls = [[[x1, y1], [x2, y1], [x2, y1 + d], [x1, y1 + d]]]
         this.rooms.push(room)
         return
       }
@@ -153,20 +155,22 @@ export default class Maze {
         vertex.edges[Direction.left] &&
         vertex.edges[Direction.right]
       ) {
-        room.wall = [[x1, y2 - d], [x2, y2 - d], [x2, y2], [x1, y2]]
+        room.walls = [[[x1, y2 - d], [x2, y2 - d], [x2, y2], [x1, y2]]]
         this.rooms.push(room)
         return
       }
 
       // Left-top wall
       if (vertex.edges[Direction.right] && vertex.edges[Direction.down]) {
-        room.wall = [
-          [x1, y1],
-          [x2, y1],
-          [x2, y1 + d],
-          [x1 + d, y1 + d],
-          [x1 + d, y2],
-          [x1, y2],
+        room.walls = [
+          [
+            [x1, y1],
+            [x2, y1],
+            [x2, y1 + d],
+            [x1 + d, y1 + d],
+            [x1 + d, y2],
+            [x1, y2],
+          ],
         ]
         this.rooms.push(room)
         return
@@ -174,13 +178,15 @@ export default class Maze {
 
       // Right-top wall
       if (vertex.edges[Direction.left] && vertex.edges[Direction.down]) {
-        room.wall = [
-          [x1, y1],
-          [x2, y1],
-          [x2, y2],
-          [x2 - d, y2],
-          [x2 - d, y1 + d],
-          [x1, y1 + d],
+        room.walls = [
+          [
+            [x1, y1],
+            [x2, y1],
+            [x2, y2],
+            [x2 - d, y2],
+            [x2 - d, y1 + d],
+            [x1, y1 + d],
+          ],
         ]
         this.rooms.push(room)
         return
@@ -188,13 +194,15 @@ export default class Maze {
 
       // Left-bottom wall
       if (vertex.edges[Direction.up] && vertex.edges[Direction.right]) {
-        room.wall = [
-          [x1, y1],
-          [x1 + d, y1],
-          [x1 + d, y2 - d],
-          [x2, y2 - d],
-          [x2, y2],
-          [x1, y2],
+        room.walls = [
+          [
+            [x1, y1],
+            [x1 + d, y1],
+            [x1 + d, y2 - d],
+            [x2, y2 - d],
+            [x2, y2],
+            [x1, y2],
+          ],
         ]
         this.rooms.push(room)
         return
@@ -202,13 +210,35 @@ export default class Maze {
 
       // Right-bottom wall
       if (vertex.edges[Direction.up] && vertex.edges[Direction.left]) {
-        room.wall = [
-          [x2 - d, y1],
-          [x2, y1],
-          [x2, y2],
-          [x1, y2],
-          [x1, y2 - d],
-          [x2 - d, y2 - d],
+        room.walls = [
+          [
+            [x2 - d, y1],
+            [x2, y1],
+            [x2, y2],
+            [x1, y2],
+            [x1, y2 - d],
+            [x2 - d, y2 - d],
+          ],
+        ]
+        this.rooms.push(room)
+        return
+      }
+
+      // top and bottom walls
+      if (vertex.edges[Direction.left] && vertex.edges[Direction.right]) {
+        room.walls = [
+          [[x1, y1], [x2, y1], [x2, y1 + d], [x1, y1 + d]],
+          [[x1, y2 - d], [x2, y2 - d], [x2, y2], [x1, y2]],
+        ]
+        this.rooms.push(room)
+        return
+      }
+
+      // left and right walls
+      if (vertex.edges[Direction.up] && vertex.edges[Direction.down]) {
+        room.walls = [
+          [[x1, y1], [x1 + d, y1], [x1 + d, y2], [x1, y2]],
+          [[x2 - d, y1], [x2, y1], [x2, y2], [x2 - d, y2]],
         ]
         this.rooms.push(room)
         return
@@ -216,15 +246,17 @@ export default class Maze {
 
       // Left-bottom-right wall
       if (vertex.edges[Direction.up]) {
-        room.wall = [
-          [x1, y1],
-          [x1 + d, y1],
-          [x1 + d, y2 - d],
-          [x2 - d, y2 - d],
-          [x2 - d, y1],
-          [x2, y1],
-          [x2, y2],
-          [x1, y2],
+        room.walls = [
+          [
+            [x1, y1],
+            [x1 + d, y1],
+            [x1 + d, y2 - d],
+            [x2 - d, y2 - d],
+            [x2 - d, y1],
+            [x2, y1],
+            [x2, y2],
+            [x1, y2],
+          ],
         ]
         this.rooms.push(room)
         return
@@ -232,15 +264,17 @@ export default class Maze {
 
       // Left-top-right wall
       if (vertex.edges[Direction.down]) {
-        room.wall = [
-          [x1, y1],
-          [x2, y1],
-          [x2, y2],
-          [x2 - d, y2],
-          [x2 - d, y1 + d],
-          [x1 + d, y1 + d],
-          [x1 + d, y2],
-          [x1, y2],
+        room.walls = [
+          [
+            [x1, y1],
+            [x2, y1],
+            [x2, y2],
+            [x2 - d, y2],
+            [x2 - d, y1 + d],
+            [x1 + d, y1 + d],
+            [x1 + d, y2],
+            [x1, y2],
+          ],
         ]
         this.rooms.push(room)
         return
@@ -248,15 +282,17 @@ export default class Maze {
 
       // Top-left-down wall
       if (vertex.edges[Direction.right]) {
-        room.wall = [
-          [x1, y1],
-          [x2, y1],
-          [x2, y1 + d],
-          [x1 + d, y1 + d],
-          [x1 + d, y2 - d],
-          [x2, y2 - d],
-          [x2, y2],
-          [x1, y2],
+        room.walls = [
+          [
+            [x1, y1],
+            [x2, y1],
+            [x2, y1 + d],
+            [x1 + d, y1 + d],
+            [x1 + d, y2 - d],
+            [x2, y2 - d],
+            [x2, y2],
+            [x1, y2],
+          ],
         ]
         this.rooms.push(room)
         return
@@ -264,15 +300,17 @@ export default class Maze {
 
       // Top-right-down wall
       if (vertex.edges[Direction.left]) {
-        room.wall = [
-          [x1, y1],
-          [x2, y1],
-          [x2, y2],
-          [x1, y2],
-          [x1, y2 - d],
-          [x2 - d, y2 - d],
-          [x2 - d, y1 + d],
-          [x1, y1 + d],
+        room.walls = [
+          [
+            [x1, y1],
+            [x2, y1],
+            [x2, y2],
+            [x1, y2],
+            [x1, y2 - d],
+            [x2 - d, y2 - d],
+            [x2 - d, y1 + d],
+            [x1, y1 + d],
+          ],
         ]
         this.rooms.push(room)
         return
@@ -282,16 +320,18 @@ export default class Maze {
 
   drawWalls = (ctx: CanvasRenderingContext2D) => {
     this.rooms.forEach((room: Room) => {
-      ctx.strokeStyle = '#111'
-      ctx.fillStyle = '#6aa3e6'
-      ctx.beginPath()
-      ctx.moveTo(room.wall[0][0], room.wall[0][1])
-      room.wall.slice(1).forEach((block: [number, number]) => {
-        ctx.lineTo(block[0], block[1])
+      room.walls.forEach((wall: Wall) => {
+        ctx.strokeStyle = '#111'
+        ctx.fillStyle = '#6aa3e6'
+        ctx.beginPath()
+        ctx.moveTo(wall[0][0], wall[0][1])
+        wall.slice(1).forEach((block: [number, number]) => {
+          ctx.lineTo(block[0], block[1])
+        })
+        ctx.closePath()
+        ctx.stroke()
+        ctx.fill()
       })
-      ctx.closePath()
-      ctx.stroke()
-      ctx.fill()
     })
   }
 
