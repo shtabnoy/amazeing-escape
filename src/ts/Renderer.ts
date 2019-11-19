@@ -20,6 +20,7 @@ import {
 } from './constants'
 import { Direction } from './MazeGraph'
 import { loadImage } from './utils'
+// import Collisions from 'collisions'
 
 export default class Renderer {
   private layers: CanvasRenderingContext2D[]
@@ -49,6 +50,8 @@ export default class Renderer {
     // this.footstep = new Audio('src/assets/audio/footstep2.mp3')
     // this.footstep.loop = true
     // this.footstep.playbackRate = 1
+
+    // this.system = new Collisions()
   }
 
   private collisionRight = (wall: Wall) => {
@@ -146,6 +149,7 @@ export default class Renderer {
     const room = rooms.find(
       room => cr[0] === room.name[0] && cr[1] === room.name[1]
     )
+    // console.log(room)
     if (this.keys[ArrowKeys.ArrowRight]) {
       if (x2 + STEP < room.b.x) {
         this.hero.clear(this.layers[1])

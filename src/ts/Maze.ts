@@ -10,7 +10,7 @@ type Block8 = [P, P, P, P, P, P, P, P]
 type Wall = Block4 | Block6 | Block8
 
 interface Room {
-  walls?: Wall[]
+  walls?: any[]
   ailes?: {
     [Direction.up]?: boolean
     [Direction.down]?: boolean
@@ -83,20 +83,7 @@ export default class Maze {
         a: { x: vx * rw, y: vy * rw },
         b: { x: (vx + 1) * rw, y: (vy + 1) * rw },
         ailes: {},
-      }
-
-      // No walls
-      if (
-        vertex.edges[Direction.up] &&
-        vertex.edges[Direction.down] &&
-        vertex.edges[Direction.left] &&
-        vertex.edges[Direction.right]
-      ) {
-        room.ailes[Direction.up] = true
-        room.ailes[Direction.down] = true
-        room.ailes[Direction.left] = true
-        room.ailes[Direction.right] = true
-        return
+        walls: [],
       }
 
       const x1 = vx * rw // left X
@@ -104,249 +91,37 @@ export default class Maze {
       const y1 = vy * rw // top Y
       const y2 = (vy + 1) * rw // bottom Y
 
-      // Left-only wall
-      if (
-        vertex.edges[Direction.up] &&
-        vertex.edges[Direction.down] &&
-        vertex.edges[Direction.right]
-      ) {
-        room.walls = [[[x1, y1], [x1 + d, y1], [x1 + d, y2], [x1, y2]]]
-        room.ailes[Direction.up] = true
-        room.ailes[Direction.down] = true
-        room.ailes[Direction.right] = true
-        this.rooms.push(room)
-        return
+      if (!vertex.edges[Direction.up]) {
+        room.walls.push([[x1 + d, y1], [x2 - d, y1 + d]]) // top wall
       }
 
-      // Right-only wall
-      if (
-        vertex.edges[Direction.up] &&
-        vertex.edges[Direction.down] &&
-        vertex.edges[Direction.left]
-      ) {
-        room.walls = [[[x2 - d, y1], [x2, y1], [x2, y2], [x2 - d, y2]]]
-        room.ailes[Direction.up] = true
-        room.ailes[Direction.down] = true
-        room.ailes[Direction.left] = true
-        this.rooms.push(room)
-        return
+      if (!vertex.edges[Direction.down]) {
+        room.walls.push([[x1 + d, y2 - d], [x2 - d, y2]]) // down wall
       }
 
-      // Top-only wall
-      if (
-        vertex.edges[Direction.down] &&
-        vertex.edges[Direction.left] &&
-        vertex.edges[Direction.right]
-      ) {
-        room.walls = [[[x1, y1], [x2, y1], [x2, y1 + d], [x1, y1 + d]]]
-        room.ailes[Direction.down] = true
-        room.ailes[Direction.left] = true
-        room.ailes[Direction.right] = true
-        this.rooms.push(room)
-        return
+      if (!vertex.edges[Direction.left]) {
+        room.walls.push([[x1, y1 + d], [x1 + d, y2 - d]]) // left wall
       }
 
-      // Bottom-only wall
-      if (
-        vertex.edges[Direction.up] &&
-        vertex.edges[Direction.left] &&
-        vertex.edges[Direction.right]
-      ) {
-        room.walls = [[[x1, y2 - d], [x2, y2 - d], [x2, y2], [x1, y2]]]
-        room.ailes[Direction.up] = true
-        room.ailes[Direction.left] = true
-        room.ailes[Direction.right] = true
-        this.rooms.push(room)
-        return
+      if (!vertex.edges[Direction.right]) {
+        room.walls.push([[x2 - d, y1 + d], [x2, y2 - d]]) // right wall
       }
-
-      // Left-top wall
-      if (vertex.edges[Direction.right] && vertex.edges[Direction.down]) {
-        room.walls = [
-          [
-            [x1, y1],
-            [x2, y1],
-            [x2, y1 + d],
-            [x1 + d, y1 + d],
-            [x1 + d, y2],
-            [x1, y2],
-          ],
-        ]
-        room.ailes[Direction.right] = true
-        room.ailes[Direction.down] = true
-        this.rooms.push(room)
-        return
-      }
-
-      // Right-top wall
-      if (vertex.edges[Direction.left] && vertex.edges[Direction.down]) {
-        room.walls = [
-          [
-            [x1, y1],
-            [x2, y1],
-            [x2, y2],
-            [x2 - d, y2],
-            [x2 - d, y1 + d],
-            [x1, y1 + d],
-          ],
-        ]
-        room.ailes[Direction.left] = true
-        room.ailes[Direction.down] = true
-        this.rooms.push(room)
-        return
-      }
-
-      // Left-bottom wall
-      if (vertex.edges[Direction.up] && vertex.edges[Direction.right]) {
-        room.walls = [
-          [
-            [x1, y1],
-            [x1 + d, y1],
-            [x1 + d, y2 - d],
-            [x2, y2 - d],
-            [x2, y2],
-            [x1, y2],
-          ],
-        ]
-        room.ailes[Direction.up] = true
-        room.ailes[Direction.right] = true
-        this.rooms.push(room)
-        return
-      }
-
-      // Right-bottom wall
-      if (vertex.edges[Direction.up] && vertex.edges[Direction.left]) {
-        room.walls = [
-          [
-            [x2 - d, y1],
-            [x2, y1],
-            [x2, y2],
-            [x1, y2],
-            [x1, y2 - d],
-            [x2 - d, y2 - d],
-          ],
-        ]
-        room.ailes[Direction.up] = true
-        room.ailes[Direction.left] = true
-        this.rooms.push(room)
-        return
-      }
-
-      // top and bottom walls
-      if (vertex.edges[Direction.left] && vertex.edges[Direction.right]) {
-        room.walls = [
-          [[x1, y1], [x2, y1], [x2, y1 + d], [x1, y1 + d]],
-          [[x1, y2 - d], [x2, y2 - d], [x2, y2], [x1, y2]],
-        ]
-        room.ailes[Direction.left] = true
-        room.ailes[Direction.right] = true
-        this.rooms.push(room)
-        return
-      }
-
-      // left and right walls
-      if (vertex.edges[Direction.up] && vertex.edges[Direction.down]) {
-        room.walls = [
-          [[x1, y1], [x1 + d, y1], [x1 + d, y2], [x1, y2]],
-          [[x2 - d, y1], [x2, y1], [x2, y2], [x2 - d, y2]],
-        ]
-        room.ailes[Direction.up] = true
-        room.ailes[Direction.down] = true
-        this.rooms.push(room)
-        return
-      }
-
-      // Left-bottom-right wall
-      if (vertex.edges[Direction.up]) {
-        room.walls = [
-          [
-            [x1, y1],
-            [x1 + d, y1],
-            [x1 + d, y2 - d],
-            [x2 - d, y2 - d],
-            [x2 - d, y1],
-            [x2, y1],
-            [x2, y2],
-            [x1, y2],
-          ],
-        ]
-        room.ailes[Direction.up] = true
-        this.rooms.push(room)
-        return
-      }
-
-      // Left-top-right wall
-      if (vertex.edges[Direction.down]) {
-        room.walls = [
-          [
-            [x1, y1],
-            [x2, y1],
-            [x2, y2],
-            [x2 - d, y2],
-            [x2 - d, y1 + d],
-            [x1 + d, y1 + d],
-            [x1 + d, y2],
-            [x1, y2],
-          ],
-        ]
-        room.ailes[Direction.down] = true
-        this.rooms.push(room)
-        return
-      }
-
-      // Top-left-down wall
-      if (vertex.edges[Direction.right]) {
-        room.walls = [
-          [
-            [x1, y1],
-            [x2, y1],
-            [x2, y1 + d],
-            [x1 + d, y1 + d],
-            [x1 + d, y2 - d],
-            [x2, y2 - d],
-            [x2, y2],
-            [x1, y2],
-          ],
-        ]
-        room.ailes[Direction.right] = true
-        this.rooms.push(room)
-        return
-      }
-
-      // Top-right-down wall
-      if (vertex.edges[Direction.left]) {
-        room.walls = [
-          [
-            [x1, y1],
-            [x2, y1],
-            [x2, y2],
-            [x1, y2],
-            [x1, y2 - d],
-            [x2 - d, y2 - d],
-            [x2 - d, y1 + d],
-            [x1, y1 + d],
-          ],
-        ]
-        room.ailes[Direction.left] = true
-        this.rooms.push(room)
-        return
-      }
+      this.rooms.push(room)
     })
   }
 
   drawWalls = (ctx: CanvasRenderingContext2D) => {
-    this.rooms.forEach((room: Room) => {
-      room.walls.forEach((wall: Wall) => {
+    this.rooms.forEach(room => {
+      room.walls.forEach((wall: any) => {
         ctx.strokeStyle = '#111'
         ctx.fillStyle = '#6aa3e6'
-        ctx.beginPath()
-        ctx.moveTo(wall[0][0], wall[0][1])
-        wall.slice(1).forEach((block: [number, number]) => {
-          ctx.lineTo(block[0], block[1])
-        })
-        ctx.closePath()
-        ctx.stroke()
-        ctx.fill()
+        ctx.lineWidth = 5
+        ctx.strokeRect(
+          wall[0][0],
+          wall[0][1],
+          wall[1][0] - wall[0][0],
+          wall[1][1] - wall[0][1]
+        )
       })
     })
   }
