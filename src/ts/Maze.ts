@@ -86,10 +86,10 @@ export default class Maze {
         walls: [],
       }
 
-      const x1 = vx * rw // left X
-      const x2 = (vx + 1) * rw // right X
-      const y1 = vy * rw // top Y
-      const y2 = (vy + 1) * rw // bottom Y
+      const x1 = vx * rw + 2 // left X
+      const x2 = (vx + 1) * rw - 2 // right X
+      const y1 = vy * rw + 2 // top Y
+      const y2 = (vy + 1) * rw - 2 // bottom Y
 
       if (!vertex.edges[Direction.up]) {
         room.walls.push([[x1 + d, y1], [x2 - d, y1 + d]]) // top wall
@@ -106,6 +106,12 @@ export default class Maze {
       if (!vertex.edges[Direction.right]) {
         room.walls.push([[x2 - d, y1 + d], [x2, y2 - d]]) // right wall
       }
+
+      room.walls.push([[x1, y1], [x1 + d, y1 + d]])
+      room.walls.push([[x2 - d, y1], [x2, y1 + d]])
+      room.walls.push([[x1, y2 - d], [x1 + d, y2]])
+      room.walls.push([[x2 - d, y2 - d], [x2, y2]])
+
       this.rooms.push(room)
     })
   }
@@ -115,8 +121,14 @@ export default class Maze {
       room.walls.forEach((wall: any) => {
         ctx.strokeStyle = '#111'
         ctx.fillStyle = '#6aa3e6'
-        ctx.lineWidth = 5
+        ctx.lineWidth = 8
         ctx.strokeRect(
+          wall[0][0],
+          wall[0][1],
+          wall[1][0] - wall[0][0],
+          wall[1][1] - wall[0][1]
+        )
+        ctx.fillRect(
           wall[0][0],
           wall[0][1],
           wall[1][0] - wall[0][0],
