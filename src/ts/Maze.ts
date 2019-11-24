@@ -1,15 +1,6 @@
-import { Point } from './types'
 import MazeGraph, { Direction, Vertex } from './MazeGraph'
 import { rnd } from './utils'
-import {
-  CANVAS_WIDTH,
-  CANVAS_HEIGHT,
-  OFFSET_X,
-  OFFSET_Y,
-  ROOMS_HORIZONTAL,
-  ROOM_WIDTH,
-  ROOMS_VERTICAL,
-} from './constants'
+import { CANVAS_WIDTH, CANVAS_HEIGHT, OFFSET_X, OFFSET_Y } from './constants'
 
 type P = [number, number]
 type Block4 = [P, P, P, P]
@@ -19,12 +10,6 @@ type Wall = Block4 | Block6 | Block8
 
 interface Room {
   walls?: any[]
-  ailes?: {
-    [Direction.up]?: boolean
-    [Direction.down]?: boolean
-    [Direction.left]?: boolean
-    [Direction.right]?: boolean
-  }
   a?: any
   b?: any
   name?: [number, number]
@@ -33,7 +18,7 @@ interface Room {
 export default class Maze {
   private walls: Wall[]
   private groundImg: HTMLImageElement
-  private rooms: any[]
+  private rooms: any
 
   constructor(
     width: number,
@@ -43,11 +28,8 @@ export default class Maze {
     this.groundImg = config.groundImg
     const g = this.createMazeGraph(width, height)
     const mst = g.mst()
-    // console.log(g)
     this.rooms = []
     this.createRooms(mst, config.rw, config.d)
-    // console.log(mst.vertices)
-    console.log(this.rooms)
   }
 
   private createMazeGraph = (w: number, h: number): MazeGraph => {
@@ -79,18 +61,13 @@ export default class Maze {
     rw: number, // room width
     d: number = 0 // depth
   ) {
-    // const walls: Wall[] = []
-    // const h = d / 2
     g.vertices.forEach((vertex: Vertex) => {
       const xy = vertex.name.split(',')
       const vx = Number(xy[0])
       const vy = Number(xy[1])
-      const [rx, ry] = vertex.name.split(',')
       const room: Room = {
-        name: [Number(rx), Number(ry)],
         a: { x: vx * rw, y: vy * rw },
         b: { x: (vx + 1) * rw, y: (vy + 1) * rw },
-        ailes: {},
         walls: [],
       }
 
@@ -120,12 +97,12 @@ export default class Maze {
       room.walls.push([[x1, y2 - d], [x1 + d, y2]])
       room.walls.push([[x2 - d, y2 - d], [x2, y2]])
 
-      this.rooms.push(room)
+      this.rooms[vertex.name] = room
     })
   }
 
   drawWalls = (ctx: CanvasRenderingContext2D) => {
-    this.rooms.forEach(room => {
+    Object.values(this.rooms).forEach((room: Room) => {
       room.walls.forEach((wall: any) => {
         ctx.strokeStyle = '#111'
         ctx.fillStyle = '#6aa3e6'
@@ -154,23 +131,6 @@ export default class Maze {
     const mx2 = CANVAS_WIDTH - translatedX + OFFSET_X
     const my2 = CANVAS_HEIGHT - translatedY + OFFSET_Y
     ctx.drawImage(this.groundImg, mx1, my1, mx2, my2, mx1, my1, mx2, my2)
-    // const tilesH = (ROOMS_HORIZONTAL * ROOM_WIDTH) / this.groundImg.width
-    // const tilesV = (ROOMS_VERTICAL * ROOM_WIDTH) / this.groundImg.height
-    // for (let i = 0; i < tilesH; i++) {
-    //   for (let j = 0; j < tilesV; j++) {
-    //     ctx.drawImage(
-    //       this.groundImg,
-    //       i * this.groundImg.width,
-    //       j * this.groundImg.height
-    //     )
-    //   }
-    // }
-    // ctx.fillRect(
-    //   0 - translatedX < 0 ? -1 : 0 - translatedX,
-    //   0 - translatedY < 0 ? -1 : 0 - translatedY,
-    //   CANVAS_WIDTH - translatedX + OFFSET_X,
-    //   CANVAS_HEIGHT - translatedY + OFFSET_Y
-    // )
   }
 
   getWalls() {

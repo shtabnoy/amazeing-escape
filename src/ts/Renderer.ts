@@ -20,7 +20,9 @@ import {
 } from './constants'
 import { Direction } from './MazeGraph'
 import { loadImage } from './utils'
-// import Collisions from 'collisions'
+
+type P = [number, number]
+type W = [P, P]
 
 export default class Renderer {
   private layers: CanvasRenderingContext2D[]
@@ -46,57 +48,67 @@ export default class Renderer {
       if (e.key in ArrowKeys) this.keys[e.key as ArrowKeys] = false
     })
     this.layers = []
-
-    // this.footstep = new Audio('src/assets/audio/footstep2.mp3')
-    // this.footstep.loop = true
-    // this.footstep.playbackRate = 1
-
-    // this.system = new Collisions()
   }
 
-  private collisionRight = (wall: Wall) => {
-    const { x: x1, y: y1 } = this.hero.getCoords()
-    const { x: x2, y: y2 } = this.hero.getBottomRightCoords()
-    return (
-      x1 + STEP <= wall.a.x &&
-      x2 + STEP >= wall.a.x &&
-      y1 <= wall.b.y &&
-      y2 >= wall.a.y
+  private collisionRight = (
+    walls: W[],
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number
+  ) =>
+    walls.some(
+      (wall: W) =>
+        x1 + STEP <= wall[0][0] &&
+        x2 + STEP >= wall[0][0] &&
+        y1 <= wall[1][1] &&
+        y2 >= wall[0][1]
     )
-  }
 
-  private collisionLeft = (wall: Wall) => {
-    const { x: x1, y: y1 } = this.hero.getCoords()
-    const { x: x2, y: y2 } = this.hero.getBottomRightCoords()
-    return (
-      x1 - STEP <= wall.b.x &&
-      x2 - STEP >= wall.b.x &&
-      y1 <= wall.b.y &&
-      y2 >= wall.a.y
+  private collisionLeft = (
+    walls: W[],
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number
+  ) =>
+    walls.some(
+      (wall: W) =>
+        x1 - STEP <= wall[1][0] &&
+        x2 - STEP >= wall[1][0] &&
+        y1 <= wall[1][1] &&
+        y2 >= wall[0][1]
     )
-  }
 
-  private collisionUp = (wall: Wall) => {
-    const { x: x1, y: y1 } = this.hero.getCoords()
-    const { x: x2, y: y2 } = this.hero.getBottomRightCoords()
-    return (
-      x1 <= wall.b.x &&
-      x2 >= wall.a.x &&
-      y1 - STEP <= wall.b.y &&
-      y2 - STEP >= wall.b.y
+  private collisionUp = (
+    walls: W[],
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number
+  ) =>
+    walls.some(
+      (wall: W) =>
+        x1 <= wall[1][0] &&
+        x2 >= wall[0][0] &&
+        y1 - STEP <= wall[1][1] &&
+        y2 - STEP >= wall[1][1]
     )
-  }
 
-  private collisionDown = (wall: Wall) => {
-    const { x: x1, y: y1 } = this.hero.getCoords()
-    const { x: x2, y: y2 } = this.hero.getBottomRightCoords()
-    return (
-      x1 <= wall.b.x &&
-      x2 >= wall.a.x &&
-      y1 + STEP <= wall.a.y &&
-      y2 + STEP >= wall.a.y
+  private collisionDown = (
+    walls: W[],
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number
+  ) =>
+    walls.some(
+      (wall: W) =>
+        x1 <= wall[1][0] &&
+        x2 >= wall[0][0] &&
+        y1 + STEP <= wall[0][1] &&
+        y2 + STEP >= wall[0][1]
     )
-  }
 
   private moveCamera(dir: Direction) {
     const { x: x1, y: y1 } = this.hero.getCoords()
@@ -152,59 +164,93 @@ export default class Renderer {
     }
   }
 
+  private getCollisionPotentials = () => {
+    const currentRoom = this.hero.getCurrentRoom()
+    const rooms = this.maze.getRooms()
+    const result = []
+    result.push(...rooms[currentRoom].walls)
+
+    const [x, y] = currentRoom.split(',').map(x => Number(x))
+    const lr = [x - 1, y].join(',')
+    const ltr = [x - 1, y - 1].join(',')
+    const tr = [x, y - 1].join(',')
+    const rtr = [x + 1, y - 1].join(',')
+    const rr = [x + 1, y].join(',')
+    const rbr = [x + 1, y + 1].join(',')
+    const br = [x, y + 1].join(',')
+    const lbr = [x - 1, y + 1].join(',')
+    if (rooms[lr]) result.push(...rooms[lr].walls)
+    if (rooms[ltr]) result.push(...rooms[ltr].walls)
+    if (rooms[tr]) result.push(...rooms[tr].walls)
+    if (rooms[rtr]) result.push(...rooms[rtr].walls)
+    if (rooms[rr]) result.push(...rooms[rr].walls)
+    if (rooms[rbr]) result.push(...rooms[rbr].walls)
+    if (rooms[br]) result.push(...rooms[br].walls)
+    if (rooms[lbr]) result.push(...rooms[lbr].walls)
+    return result
+  }
+
   private move = () => {
-    // const walls = this.maze.getWalls()
     const { x: x1, y: y1 } = this.hero.getCoords()
     const { x: x2, y: y2 } = this.hero.getBottomRightCoords()
     const rooms = this.maze.getRooms()
     const cr = this.hero.getCurrentRoom()
-    const room = rooms.find(
-      room => cr[0] === room.name[0] && cr[1] === room.name[1]
-    )
-    // console.log(room)
-    if (this.keys[ArrowKeys.ArrowRight]) {
-      // if (x2 + STEP < room.b.x) {
-      this.hero.clear(this.layers[1])
-      this.hero.move(Direction.right)
-      this.moveCamera(Direction.right)
-      this.hero.render(this.layers[1])
-      // } else if (room.ailes[Direction.right]) {
-      //   this.hero.setCurrentRoom([cr[0] + 1, cr[1]])
-      //   console.log('you are in the room ' + (cr[0] + 1) + ',' + cr[1])
-      // }
+    const room = rooms[cr]
+    const [x, y] = cr.split(',').map((x: string) => Number(x))
+
+    const cp = this.getCollisionPotentials()
+    if (
+      this.keys[ArrowKeys.ArrowRight] &&
+      !this.collisionRight(cp, x1, y1, x2, y2)
+    ) {
+      if (x2 + STEP < room.b.x) {
+        this.hero.clear(this.layers[1])
+        this.hero.move(Direction.right)
+        this.moveCamera(Direction.right)
+        this.hero.render(this.layers[1])
+      } else {
+        this.hero.setCurrentRoom([x + 1, y].join(','))
+        console.log('you are in the room ' + this.hero.getCurrentRoom())
+      }
     }
-    if (this.keys[ArrowKeys.ArrowLeft]) {
-      // if (x1 - STEP > room.a.x) {
-      this.hero.clear(this.layers[1])
-      this.hero.move(Direction.left)
-      this.moveCamera(Direction.left)
-      this.hero.render(this.layers[1])
-      // } else if (room.ailes[Direction.left]) {
-      //   this.hero.setCurrentRoom([cr[0] - 1, cr[1]])
-      //   console.log('you are in the room ' + (cr[0] - 1) + ',' + cr[1])
-      // }
+    if (
+      this.keys[ArrowKeys.ArrowLeft] &&
+      !this.collisionLeft(cp, x1, y1, x2, y2)
+    ) {
+      if (x1 - STEP > room.a.x) {
+        this.hero.clear(this.layers[1])
+        this.hero.move(Direction.left)
+        this.moveCamera(Direction.left)
+        this.hero.render(this.layers[1])
+      } else {
+        this.hero.setCurrentRoom([x - 1, y].join(','))
+        console.log('you are in the room ' + this.hero.getCurrentRoom())
+      }
     }
-    if (this.keys[ArrowKeys.ArrowDown]) {
-      // if (y2 + STEP < room.b.y) {
-      this.hero.clear(this.layers[1])
-      this.hero.move(Direction.down)
-      this.moveCamera(Direction.down)
-      this.hero.render(this.layers[1])
-      // } else if (room.ailes[Direction.down]) {
-      //   this.hero.setCurrentRoom([cr[0], cr[1] + 1])
-      //   console.log('you are in the room ' + cr[0] + ',' + (cr[1] + 1))
-      // }
+    if (
+      this.keys[ArrowKeys.ArrowDown] &&
+      !this.collisionDown(cp, x1, y1, x2, y2)
+    ) {
+      if (y2 + STEP < room.b.y) {
+        this.hero.clear(this.layers[1])
+        this.hero.move(Direction.down)
+        this.moveCamera(Direction.down)
+        this.hero.render(this.layers[1])
+      } else {
+        this.hero.setCurrentRoom([x, y + 1].join(','))
+        console.log('you are in the room ' + this.hero.getCurrentRoom())
+      }
     }
-    if (this.keys[ArrowKeys.ArrowUp]) {
-      // if (y1 - STEP > room.a.y) {
-      this.hero.clear(this.layers[1])
-      this.hero.move(Direction.up)
-      this.moveCamera(Direction.up)
-      this.hero.render(this.layers[1])
-      // } else if (room.ailes[Direction.up]) {
-      //   this.hero.setCurrentRoom([cr[0], cr[1] - 1])
-      //   console.log('you are in the room ' + cr[0] + ',' + (cr[1] - 1))
-      // }
+    if (this.keys[ArrowKeys.ArrowUp] && !this.collisionUp(cp, x1, y1, x2, y2)) {
+      if (y1 - STEP > room.a.y) {
+        this.hero.clear(this.layers[1])
+        this.hero.move(Direction.up)
+        this.moveCamera(Direction.up)
+        this.hero.render(this.layers[1])
+      } else {
+        this.hero.setCurrentRoom([x, y - 1].join(','))
+        console.log('you are in the room ' + this.hero.getCurrentRoom())
+      }
     }
 
     this.updateFrame()
@@ -269,7 +315,7 @@ export default class Renderer {
     this.maze.drawGround(this.layers[0])
     this.maze.drawWalls(this.layers[1])
     this.hero.render(this.layers[1])
-    this.hero.setCurrentRoom([0, 0])
+    this.hero.setCurrentRoom('0,0')
     this.startAnimationLoop()
   }
 }

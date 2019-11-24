@@ -2,7 +2,6 @@ import { Point } from './types'
 import { Direction } from './MazeGraph'
 import { STEP, SPRITE_SIZE, HERO_SIZE } from './constants'
 
-// const FRAMES = [0, 1, 2, 3]
 const FRAMES = [1, 2, 3, 4]
 const NUMBER_OF_FRAMES = FRAMES.length
 
@@ -12,7 +11,7 @@ export default class Hero {
   private frame: number
   private frameIndex: number
   private spriteOffset: number
-  private currentRoom: [number, number]
+  private currentRoom: string
 
   constructor(img: HTMLImageElement, coords?: Point) {
     this.img = img
@@ -69,9 +68,6 @@ export default class Hero {
   }
 
   render(ctx: CanvasRenderingContext2D) {
-    // ctx.lineWidth = 1
-    // ctx.strokeStyle = '#ff0000'
-    // ctx.strokeRect(this.coords.x, this.coords.y, HERO_SIZE, HERO_SIZE)
     ctx.drawImage(
       this.img,
       this.frame * SPRITE_SIZE + 1,
@@ -85,11 +81,11 @@ export default class Hero {
     )
   }
 
-  setCurrentRoom(room: [number, number]) {
+  setCurrentRoom(room: string) {
     this.currentRoom = room
   }
 
-  getCurrentRoom(): [number, number] {
+  getCurrentRoom(): string {
     return this.currentRoom
   }
 }
