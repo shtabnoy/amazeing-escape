@@ -114,6 +114,9 @@ export default class Renderer {
           this.layers[1].clearRect(mx1, my1, mx2, my2)
           this.layers[1].translate(translatedX < 0 ? STEP : 0, 0)
           this.maze.drawWalls(this.layers[1])
+          this.layers[0].clearRect(mx1, my1, mx2, my2)
+          this.layers[0].translate(translatedX < 0 ? STEP : 0, 0)
+          this.maze.drawGround(this.layers[0])
         }
         break
       case Direction.right:
@@ -121,6 +124,9 @@ export default class Renderer {
           this.layers[1].clearRect(mx1, my1, mx2, my2)
           this.layers[1].translate(-translatedX > RIGHT_BORDER ? 0 : -STEP, 0)
           this.maze.drawWalls(this.layers[1])
+          this.layers[0].clearRect(mx1, my1, mx2, my2)
+          this.layers[0].translate(-translatedX > RIGHT_BORDER ? 0 : -STEP, 0)
+          this.maze.drawGround(this.layers[0])
         }
         break
       case Direction.up:
@@ -128,6 +134,9 @@ export default class Renderer {
           this.layers[1].clearRect(mx1, my1, mx2, my2)
           this.layers[1].translate(0, translatedY < 0 ? STEP : 0)
           this.maze.drawWalls(this.layers[1])
+          this.layers[0].clearRect(mx1, my1, mx2, my2)
+          this.layers[0].translate(0, translatedY < 0 ? STEP : 0)
+          this.maze.drawGround(this.layers[0])
         }
         break
       case Direction.down:
@@ -135,6 +144,9 @@ export default class Renderer {
           this.layers[1].clearRect(mx1, my1, mx2, my2)
           this.layers[1].translate(0, -translatedY > BOTTOM_BORDER ? 0 : -STEP)
           this.maze.drawWalls(this.layers[1])
+          this.layers[0].clearRect(mx1, my1, mx2, my2)
+          this.layers[0].translate(0, -translatedY > BOTTOM_BORDER ? 0 : -STEP)
+          this.maze.drawGround(this.layers[0])
         }
         break
     }
@@ -244,8 +256,8 @@ export default class Renderer {
   async render() {
     this.addLayer('ground')
     this.addLayer('walls-and-hero')
-    const heroImg = await loadImage('src/assets/hero/newHero.png')
-    const groundImg = await loadImage('src/assets/ground/ground2.png')
+    const heroImg = await loadImage('src/assets/hero/hero.png')
+    const groundImg = await loadImage('src/assets/ground/floor.jpg')
     this.addMaze(
       new Maze(ROOMS_HORIZONTAL, ROOMS_VERTICAL, {
         rw: ROOM_WIDTH,

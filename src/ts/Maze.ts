@@ -1,7 +1,15 @@
 import { Point } from './types'
 import MazeGraph, { Direction, Vertex } from './MazeGraph'
 import { rnd } from './utils'
-import { CANVAS_WIDTH, CANVAS_HEIGHT, OFFSET_X, OFFSET_Y } from './constants'
+import {
+  CANVAS_WIDTH,
+  CANVAS_HEIGHT,
+  OFFSET_X,
+  OFFSET_Y,
+  ROOMS_HORIZONTAL,
+  ROOM_WIDTH,
+  ROOMS_VERTICAL,
+} from './constants'
 
 type P = [number, number]
 type Block4 = [P, P, P, P]
@@ -86,10 +94,10 @@ export default class Maze {
         walls: [],
       }
 
-      const x1 = vx * rw + 2 // left X
-      const x2 = (vx + 1) * rw - 2 // right X
-      const y1 = vy * rw + 2 // top Y
-      const y2 = (vy + 1) * rw - 2 // bottom Y
+      const x1 = vx * rw // left X
+      const x2 = (vx + 1) * rw // right X
+      const y1 = vy * rw // top Y
+      const y2 = (vy + 1) * rw // bottom Y
 
       if (!vertex.edges[Direction.up]) {
         room.walls.push([[x1 + d, y1], [x2 - d, y1 + d]]) // top wall
@@ -121,7 +129,7 @@ export default class Maze {
       room.walls.forEach((wall: any) => {
         ctx.strokeStyle = '#111'
         ctx.fillStyle = '#6aa3e6'
-        ctx.lineWidth = 8
+        ctx.lineWidth = 0
         ctx.strokeRect(
           wall[0][0],
           wall[0][1],
@@ -141,13 +149,28 @@ export default class Maze {
   drawGround = (ctx: CanvasRenderingContext2D) => {
     let translatedX = ctx.getTransform().e / 2
     let translatedY = ctx.getTransform().f / 2
-    ctx.fillStyle = ctx.createPattern(this.groundImg, 'repeat')
-    ctx.fillRect(
-      0 - translatedX < 0 ? -1 : 0 - translatedX,
-      0 - translatedY < 0 ? -1 : 0 - translatedY,
-      CANVAS_WIDTH - translatedX + OFFSET_X,
-      CANVAS_HEIGHT - translatedY + OFFSET_Y
-    )
+    const mx1 = 0 - translatedX < 0 ? -1 : 0 - translatedX
+    const my1 = 0 - translatedY < 0 ? -1 : 0 - translatedY
+    const mx2 = CANVAS_WIDTH - translatedX + OFFSET_X
+    const my2 = CANVAS_HEIGHT - translatedY + OFFSET_Y
+    ctx.drawImage(this.groundImg, mx1, my1, mx2, my2, mx1, my1, mx2, my2)
+    // const tilesH = (ROOMS_HORIZONTAL * ROOM_WIDTH) / this.groundImg.width
+    // const tilesV = (ROOMS_VERTICAL * ROOM_WIDTH) / this.groundImg.height
+    // for (let i = 0; i < tilesH; i++) {
+    //   for (let j = 0; j < tilesV; j++) {
+    //     ctx.drawImage(
+    //       this.groundImg,
+    //       i * this.groundImg.width,
+    //       j * this.groundImg.height
+    //     )
+    //   }
+    // }
+    // ctx.fillRect(
+    //   0 - translatedX < 0 ? -1 : 0 - translatedX,
+    //   0 - translatedY < 0 ? -1 : 0 - translatedY,
+    //   CANVAS_WIDTH - translatedX + OFFSET_X,
+    //   CANVAS_HEIGHT - translatedY + OFFSET_Y
+    // )
   }
 
   getWalls() {
