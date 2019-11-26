@@ -6,8 +6,16 @@ type P = [number, number]
 type Block4 = [P, P, P, P]
 type Block6 = [P, P, P, P, P, P]
 type Block8 = [P, P, P, P, P, P, P, P]
-type Wall = Block4 | Block6 | Block8
+// type Wall = Block4 | Block6 | Block8
+type W = [P, P]
+interface Wall {
+  coords: W
+  img: string
+}
 
+interface Walls {
+  [name: string]: Wall
+}
 interface Room {
   walls?: any[]
   a?: any
@@ -28,6 +36,7 @@ export default class Maze {
     this.groundImg = config.groundImg
     const g = this.createMazeGraph(width, height)
     const mst = g.mst()
+    const mst1 = g.mst1()
     this.rooms = []
     this.createRooms(mst, config.rw, config.d)
   }
@@ -38,18 +47,32 @@ export default class Maze {
 
     for (let i = 0; i < w; i++) {
       for (let j = 0; j < h; j++) {
-        if (i != w - 1)
+        if (i != w - 1) {
+          const w = rnd()
           g.addEdge({
             v1: `${i},${j}`,
             v2: `${i + 1},${j}`,
-            weight: rnd(),
+            weight: w,
           })
-        if (j < h - 1)
+          g.addEdge1({
+            v1: `${i},${j}`,
+            v2: `${i + 1},${j}`,
+            weight: w,
+          })
+        }
+        if (j < h - 1) {
+          const w = rnd()
           g.addEdge({
             v1: `${i},${j}`,
             v2: `${i},${j + 1}`,
-            weight: rnd(),
+            weight: w,
           })
+          g.addEdge1({
+            v1: `${i},${j}`,
+            v2: `${i},${j + 1}`,
+            weight: w,
+          })
+        }
       }
     }
 
@@ -77,25 +100,25 @@ export default class Maze {
       const y2 = (vy + 1) * rw // bottom Y
 
       if (!vertex.edges[Direction.up]) {
-        room.walls.push([[x1 + d, y1], [x2 - d, y1 + d]]) // top wall
+        room.walls.push([[x1 + d, y1], [x2, y1 + d]]) // top wall
       }
 
       if (!vertex.edges[Direction.down]) {
-        room.walls.push([[x1 + d, y2 - d], [x2 - d, y2]]) // down wall
+        room.walls.push([[x1 + d, y2], [x2, y2]]) // down wall
       }
 
       if (!vertex.edges[Direction.left]) {
-        room.walls.push([[x1, y1 + d], [x1 + d, y2 - d]]) // left wall
+        room.walls.push([[x1, y1 + d], [x1 + d, y2]]) // left wall
       }
 
       if (!vertex.edges[Direction.right]) {
-        room.walls.push([[x2 - d, y1 + d], [x2, y2 - d]]) // right wall
+        room.walls.push([[x2, y1 + d], [x2 + d, y2]]) // right wall
       }
 
       room.walls.push([[x1, y1], [x1 + d, y1 + d]])
-      room.walls.push([[x2 - d, y1], [x2, y1 + d]])
-      room.walls.push([[x1, y2 - d], [x1 + d, y2]])
-      room.walls.push([[x2 - d, y2 - d], [x2, y2]])
+      room.walls.push([[x2, y1], [x2 + d, y1 + d]])
+      room.walls.push([[x1, y2], [x1 + d, y2 + d]])
+      room.walls.push([[x2, y2], [x2 + d, y2 + d]])
 
       this.rooms[vertex.name] = room
     })
@@ -131,10 +154,6 @@ export default class Maze {
     const mx2 = CANVAS_WIDTH - translatedX + OFFSET_X
     const my2 = CANVAS_HEIGHT - translatedY + OFFSET_Y
     ctx.drawImage(this.groundImg, mx1, my1, mx2, my2, mx1, my1, mx2, my2)
-  }
-
-  getWalls() {
-    return this.walls
   }
 
   getRooms() {
