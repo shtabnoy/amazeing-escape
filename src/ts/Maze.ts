@@ -10,7 +10,7 @@ type P = [number, number]
 type W = [P, P]
 interface Wall {
   coords: W
-  img: string
+  img: string | HTMLImageElement
 }
 
 interface Walls {
@@ -26,6 +26,8 @@ interface Room {
 export default class Maze {
   private walls: Walls
   private groundImg: HTMLImageElement
+  private wallHorizontalImg: HTMLImageElement
+  private wallVerticalImg: HTMLImageElement
   private rooms: any
 
   constructor(
@@ -34,6 +36,8 @@ export default class Maze {
     config: any // TODO: Define the interface
   ) {
     this.groundImg = config.groundImg
+    this.wallHorizontalImg = config.wallHorizontalImg
+    this.wallVerticalImg = config.wallVerticalImg
     const g = this.createMazeGraph(width, height)
     // const mst = g.mst()
     const mst1 = g.mst1()
@@ -108,28 +112,28 @@ export default class Maze {
       if (!vertex[Direction.up] && !this.walls[uwall.toString()]) {
         this.walls[uwall.toString()] = {
           coords: uwall,
-          img: '',
+          img: this.wallHorizontalImg,
         }
       }
 
       if (!vertex[Direction.down] && !this.walls[dwall.toString()]) {
         this.walls[dwall.toString()] = {
           coords: dwall,
-          img: '',
+          img: this.wallHorizontalImg,
         }
       }
 
       if (!vertex[Direction.left] && !this.walls[lwall.toString()]) {
         this.walls[lwall.toString()] = {
           coords: lwall,
-          img: '',
+          img: this.wallVerticalImg,
         }
       }
 
       if (!vertex[Direction.right] && !this.walls[rwall.toString()]) {
         this.walls[rwall.toString()] = {
           coords: rwall,
-          img: '',
+          img: this.wallVerticalImg,
         }
       }
 
@@ -155,84 +159,29 @@ export default class Maze {
           img: '',
         }
     })
-    // g.vertices.forEach((vertex: Vertex) => {
-    //   const xy = vertex.name.split(',')
-    //   const vx = Number(xy[0])
-    //   const vy = Number(xy[1])
-    //   const room: Room = {
-    //     a: { x: vx * rw, y: vy * rw },
-    //     b: { x: (vx + 1) * rw, y: (vy + 1) * rw },
-    //     walls: [],
-    //   }
-
-    //   const x1 = vx * rw // left X
-    //   const x2 = (vx + 1) * rw // right X
-    //   const y1 = vy * rw // top Y
-    //   const y2 = (vy + 1) * rw // bottom Y
-
-    //   if (!vertex.edges[Direction.up]) {
-    //     room.walls.push([[x1 + d, y1], [x2, y1 + d]]) // top wall
-    //   }
-
-    //   if (!vertex.edges[Direction.down]) {
-    //     room.walls.push([[x1 + d, y2], [x2, y2]]) // down wall
-    //   }
-
-    //   if (!vertex.edges[Direction.left]) {
-    //     room.walls.push([[x1, y1 + d], [x1 + d, y2]]) // left wall
-    //   }
-
-    //   if (!vertex.edges[Direction.right]) {
-    //     room.walls.push([[x2, y1 + d], [x2 + d, y2]]) // right wall
-    //   }
-
-    //   room.walls.push([[x1, y1], [x1 + d, y1 + d]])
-    //   room.walls.push([[x2, y1], [x2 + d, y1 + d]])
-    //   room.walls.push([[x1, y2], [x1 + d, y2 + d]])
-    //   room.walls.push([[x2, y2], [x2 + d, y2 + d]])
-
-    //   this.rooms[vertex.name] = room
-    // })
   }
 
   drawWalls = (ctx: CanvasRenderingContext2D) => {
-    // Object.values(this.rooms).forEach((room: Room) => {
-    //   room.walls.forEach((wall: any) => {
-    //     ctx.strokeStyle = '#111'
-    //     ctx.fillStyle = '#6aa3e6'
-    //     ctx.lineWidth = 0
-    //     ctx.strokeRect(
-    //       wall[0][0],
-    //       wall[0][1],
-    //       wall[1][0] - wall[0][0],
-    //       wall[1][1] - wall[0][1]
-    //     )
-    //     ctx.fillRect(
-    //       wall[0][0],
-    //       wall[0][1],
-    //       wall[1][0] - wall[0][0],
-    //       wall[1][1] - wall[0][1]
-    //     )
-    //   })
-    // })
     Object.values(this.walls).forEach((wall: Wall) => {
-      // room.walls.forEach((wall: any) => {
-      ctx.strokeStyle = '#111'
-      ctx.fillStyle = '#6aa3e6'
-      ctx.lineWidth = 0
-      ctx.strokeRect(
-        wall.coords[0][0],
-        wall.coords[0][1],
-        wall.coords[1][0] - wall.coords[0][0],
-        wall.coords[1][1] - wall.coords[0][1]
-      )
-      ctx.fillRect(
-        wall.coords[0][0],
-        wall.coords[0][1],
-        wall.coords[1][0] - wall.coords[0][0],
-        wall.coords[1][1] - wall.coords[0][1]
-      )
-      // })
+      if (typeof wall.img === 'string') {
+        ctx.strokeStyle = '#111'
+        ctx.fillStyle = '#6aa3e6'
+        ctx.lineWidth = 0
+        ctx.strokeRect(
+          wall.coords[0][0],
+          wall.coords[0][1],
+          wall.coords[1][0] - wall.coords[0][0],
+          wall.coords[1][1] - wall.coords[0][1]
+        )
+        ctx.fillRect(
+          wall.coords[0][0],
+          wall.coords[0][1],
+          wall.coords[1][0] - wall.coords[0][0],
+          wall.coords[1][1] - wall.coords[0][1]
+        )
+      } else {
+        ctx.drawImage(wall.img, wall.coords[0][0], wall.coords[0][1])
+      }
     })
   }
 

@@ -307,11 +307,19 @@ export default class Renderer {
     this.addLayer('walls-and-hero')
     const heroImg = await loadImage('src/assets/hero/hero.png')
     const groundImg = await loadImage('src/assets/ground/floor.jpg')
+    const wallHorizontalImg = await loadImage(
+      'src/assets/walls/wall_horizontal.png'
+    )
+    const wallVerticalImg = await loadImage(
+      'src/assets/walls/wall_vertical.png'
+    )
     this.addMaze(
       new Maze(ROOMS_HORIZONTAL, ROOMS_VERTICAL, {
         rw: ROOM_WIDTH,
         d: WALL_DEPTH,
         groundImg,
+        wallHorizontalImg,
+        wallVerticalImg,
       })
     )
     this.addHero(new Hero(heroImg, { x: 65, y: 65 }))
