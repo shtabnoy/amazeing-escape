@@ -10,7 +10,11 @@ type P = [number, number]
 type W = [P, P]
 interface Wall {
   coords: W
-  img: string | HTMLImageElement
+  sx?: number
+  sy?: number
+  sw?: number
+  sh?: number
+  // img: string | HTMLImageElement
 }
 
 interface Walls {
@@ -25,9 +29,10 @@ interface Room {
 
 export default class Maze {
   private walls: Walls
-  private groundImg: HTMLImageElement
-  private wallHorizontalImg: HTMLImageElement
-  private wallVerticalImg: HTMLImageElement
+  private images: {
+    walls: HTMLImageElement
+    ground: HTMLImageElement
+  }
   private rooms: any
 
   constructor(
@@ -35,9 +40,11 @@ export default class Maze {
     height: number,
     config: any // TODO: Define the interface
   ) {
-    this.groundImg = config.groundImg
-    this.wallHorizontalImg = config.wallHorizontalImg
-    this.wallVerticalImg = config.wallVerticalImg
+    // this.groundImg = config.groundImg
+    // this.wallHorizontalImg = config.wallHorizontalImg
+    // this.wallVerticalImg = config.wallVerticalImg
+    // this.crossWallImg = config.crossWallImg
+    this.images = config.images
     const g = this.createMazeGraph(width, height)
     // const mst = g.mst()
     const mst1 = g.mst1()
@@ -109,61 +116,96 @@ export default class Maze {
       const urwall: W = [[x2, y1], [x2 + d, y1 + d]]
       const drwall: W = [[x2, y2], [x2 + d, y2 + d]]
 
-      if (!vertex[Direction.up] && !this.walls[uwall.toString()]) {
+      if (!vertex.up && !this.walls[uwall.toString()]) {
         this.walls[uwall.toString()] = {
           coords: uwall,
-          img: this.wallHorizontalImg,
+          sx: 0,
+          sy: 192,
+          sw: 192,
+          sh: 64,
         }
       }
 
-      if (!vertex[Direction.down] && !this.walls[dwall.toString()]) {
+      if (!vertex.down && !this.walls[dwall.toString()]) {
         this.walls[dwall.toString()] = {
           coords: dwall,
-          img: this.wallHorizontalImg,
+          sx: 0,
+          sy: 192,
+          sw: 192,
+          sh: 64,
         }
       }
 
-      if (!vertex[Direction.left] && !this.walls[lwall.toString()]) {
+      if (!vertex.left && !this.walls[lwall.toString()]) {
         this.walls[lwall.toString()] = {
           coords: lwall,
-          img: this.wallVerticalImg,
+          sx: 192,
+          sy: 0,
+          sw: 64,
+          sh: 192,
         }
       }
 
-      if (!vertex[Direction.right] && !this.walls[rwall.toString()]) {
+      if (!vertex.right && !this.walls[rwall.toString()]) {
         this.walls[rwall.toString()] = {
           coords: rwall,
-          img: this.wallVerticalImg,
+          sx: 192,
+          sy: 0,
+          sw: 64,
+          sh: 192,
         }
       }
 
+      const lv = g.vertices1[[vx - 1, vy].toString()]
+      const tlv = g.vertices1[[vx - 1, vy - 1].toString()]
+      const tv = g.vertices1[[vx, vy - 1].toString()]
+      const trv = g.vertices1[[vx + 1, vy - 1].toString()]
+      const rv = g.vertices1[[vx + 1, vy].toString()]
+      const brv = g.vertices1[[vx + 1, vy + 1].toString()]
+      const bv = g.vertices1[[vx, vy + 1].toString()]
+      const blv = g.vertices1[[vx - 1, vy + 1].toString()]
       // corner blocks (necessary for all rooms)
-      if (!this.walls[ulwall.toString()])
-        this.walls[ulwall.toString()] = {
-          coords: ulwall,
-          img: '',
+      if (!this.walls[ulwall.toString()]) {
+        if (
+          lv &&
+          tv &&
+          tlv &&
+          !lv.right &&
+          !tv.down &&
+          !tlv.right &&
+          !tlv.down
+        ) {
+          this.walls[ulwall.toString()] = {
+            coords: ulwall,
+            sx: 64,
+            sy: 64,
+            sw: 64,
+            sh: 64,
+          }
+        } else {
+          this.walls[ulwall.toString()] = {
+            coords: ulwall,
+          }
         }
+      }
       if (!this.walls[dlwall.toString()])
         this.walls[dlwall.toString()] = {
           coords: dlwall,
-          img: '',
         }
       if (!this.walls[urwall.toString()])
         this.walls[urwall.toString()] = {
           coords: urwall,
-          img: '',
         }
       if (!this.walls[drwall.toString()])
         this.walls[drwall.toString()] = {
           coords: drwall,
-          img: '',
         }
     })
   }
 
   drawWalls = (ctx: CanvasRenderingContext2D) => {
     Object.values(this.walls).forEach((wall: Wall) => {
-      if (typeof wall.img === 'string') {
+      if (wall.sx === undefined) {
         ctx.strokeStyle = '#111'
         ctx.fillStyle = '#6aa3e6'
         ctx.lineWidth = 0
@@ -180,7 +222,17 @@ export default class Maze {
           wall.coords[1][1] - wall.coords[0][1]
         )
       } else {
-        ctx.drawImage(wall.img, wall.coords[0][0], wall.coords[0][1])
+        ctx.drawImage(
+          this.images.walls,
+          wall.sx,
+          wall.sy,
+          wall.sw,
+          wall.sh,
+          wall.coords[0][0],
+          wall.coords[0][1],
+          wall.sw,
+          wall.sh
+        )
       }
     })
   }
@@ -192,7 +244,7 @@ export default class Maze {
     const my1 = 0 - translatedY < 0 ? -1 : 0 - translatedY
     const mx2 = CANVAS_WIDTH - translatedX + OFFSET_X
     const my2 = CANVAS_HEIGHT - translatedY + OFFSET_Y
-    ctx.drawImage(this.groundImg, mx1, my1, mx2, my2, mx1, my1, mx2, my2)
+    ctx.drawImage(this.images.ground, mx1, my1, mx2, my2, mx1, my1, mx2, my2)
   }
 
   getRooms() {

@@ -1,6 +1,6 @@
 import Maze from './Maze'
 import Hero from './Hero'
-import { Keys, ArrowKeys, Wall, AnimationControls } from './types'
+import { Keys, ArrowKeys, AnimationControls } from './types'
 import {
   FPS_INTERVAL,
   CAMERA_BORDER_X,
@@ -19,7 +19,7 @@ import {
   WALL_DEPTH,
 } from './constants'
 import { Direction } from './MazeGraph'
-import { loadImage } from './utils'
+import AssetLoader from './AssetLoader'
 
 type P = [number, number]
 type W = [P, P]
@@ -39,6 +39,7 @@ export default class Renderer {
     ArrowLeft: false,
     ArrowUp: false,
   }
+  private assetLoader: AssetLoader
 
   constructor() {
     document.addEventListener('keydown', e => {
@@ -302,27 +303,25 @@ export default class Renderer {
     this.hero = hero
   }
 
+  setAssetLoader(assetLoader: AssetLoader) {
+    this.assetLoader = assetLoader
+  }
+
   async render() {
     this.addLayer('ground')
     this.addLayer('walls-and-hero')
-    const heroImg = await loadImage('src/assets/hero/hero.png')
-    const groundImg = await loadImage('src/assets/ground/floor.jpg')
-    const wallHorizontalImg = await loadImage(
-      'src/assets/walls/wall_horizontal.png'
-    )
-    const wallVerticalImg = await loadImage(
-      'src/assets/walls/wall_vertical.png'
-    )
+
     this.addMaze(
       new Maze(ROOMS_HORIZONTAL, ROOMS_VERTICAL, {
         rw: ROOM_WIDTH,
         d: WALL_DEPTH,
-        groundImg,
-        wallHorizontalImg,
-        wallVerticalImg,
+        images: {
+          walls: this.assetLoader.getImage('walls'),
+          ground: this.assetLoader.getImage('ground'),
+        },
       })
     )
-    this.addHero(new Hero(heroImg, { x: 65, y: 65 }))
+    this.addHero(new Hero(this.assetLoader.getImage('hero'), { x: 65, y: 65 }))
     this.maze.drawGround(this.layers[0])
     this.maze.drawWalls(this.layers[1])
     this.hero.render(this.layers[1])
