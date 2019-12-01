@@ -165,40 +165,9 @@ export default class Renderer {
     }
   }
 
-  private getCollisionPotentials = () => {
-    const currentRoom = this.hero.getCurrentRoom()
-    const rooms = this.maze.getRooms()
-    const result = []
-    result.push(...rooms[currentRoom].walls)
-
-    const [x, y] = currentRoom.split(',').map(x => Number(x))
-    const lr = [x - 1, y].join(',')
-    const ltr = [x - 1, y - 1].join(',')
-    const tr = [x, y - 1].join(',')
-    const rtr = [x + 1, y - 1].join(',')
-    const rr = [x + 1, y].join(',')
-    const rbr = [x + 1, y + 1].join(',')
-    const br = [x, y + 1].join(',')
-    const lbr = [x - 1, y + 1].join(',')
-    if (rooms[lr]) result.push(...rooms[lr].walls)
-    if (rooms[ltr]) result.push(...rooms[ltr].walls)
-    if (rooms[tr]) result.push(...rooms[tr].walls)
-    if (rooms[rtr]) result.push(...rooms[rtr].walls)
-    if (rooms[rr]) result.push(...rooms[rr].walls)
-    if (rooms[rbr]) result.push(...rooms[rbr].walls)
-    if (rooms[br]) result.push(...rooms[br].walls)
-    if (rooms[lbr]) result.push(...rooms[lbr].walls)
-    return result
-  }
-
   private move = () => {
     const { x: x1, y: y1 } = this.hero.getCoords()
     const { x: x2, y: y2 } = this.hero.getBottomRightCoords()
-    // const rooms = this.maze.getRooms()
-    // const cr = this.hero.getCurrentRoom()
-    // const room = rooms[cr]
-    // const [x, y] = cr.split(',').map((x: string) => Number(x))
-    // const cp = this.getCollisionPotentials()
 
     const walls = this.maze.getWalls()
     const cp = Object.values(walls).map((wall: any) => wall.coords)
