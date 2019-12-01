@@ -1,4 +1,4 @@
-import MazeGraph, { Vertex1 } from './MazeGraph'
+import MazeGraph, { Vertex } from './MazeGraph'
 import { rnd } from './utils'
 import { CANVAS_WIDTH, CANVAS_HEIGHT, OFFSET_X, OFFSET_Y } from './constants'
 
@@ -30,7 +30,7 @@ export default class Maze {
   ) {
     this.images = config.images
     const g = this.createMazeGraph(width, height)
-    const mst1 = g.mst1()
+    const mst1 = g.mst()
     this.walls = {}
     this.createRooms(mst1, config.rw, config.d)
   }
@@ -42,29 +42,17 @@ export default class Maze {
     for (let i = 0; i < w; i++) {
       for (let j = 0; j < h; j++) {
         if (i != w - 1) {
-          const w = rnd()
           g.addEdge({
             v1: `${i},${j}`,
             v2: `${i + 1},${j}`,
-            weight: w,
-          })
-          g.addEdge1({
-            v1: `${i},${j}`,
-            v2: `${i + 1},${j}`,
-            weight: w,
+            weight: rnd(),
           })
         }
         if (j < h - 1) {
-          const w = rnd()
           g.addEdge({
             v1: `${i},${j}`,
             v2: `${i},${j + 1}`,
-            weight: w,
-          })
-          g.addEdge1({
-            v1: `${i},${j}`,
-            v2: `${i},${j + 1}`,
-            weight: w,
+            weight: rnd(),
           })
         }
       }
@@ -78,7 +66,7 @@ export default class Maze {
     rw: number, // room width
     d: number = 0 // depth
   ) {
-    Object.entries(g.vertices1).forEach(([name, vertex]: [string, Vertex1]) => {
+    Object.entries(g.vertices).forEach(([name, vertex]: [string, Vertex]) => {
       const xy = name.split(',')
       const vx = Number(xy[0])
       const vy = Number(xy[1])
@@ -137,10 +125,10 @@ export default class Maze {
         }
       }
 
-      const lv = g.vertices1[[vx - 1, vy].toString()]
-      const tv = g.vertices1[[vx, vy - 1].toString()]
-      const rv = g.vertices1[[vx + 1, vy].toString()]
-      const bv = g.vertices1[[vx, vy + 1].toString()]
+      const lv = g.vertices[[vx - 1, vy].toString()]
+      const tv = g.vertices[[vx, vy - 1].toString()]
+      const rv = g.vertices[[vx + 1, vy].toString()]
+      const bv = g.vertices[[vx, vy + 1].toString()]
 
       if (!lv && !tv) {
         this.walls[ulwall.toString()] = {
