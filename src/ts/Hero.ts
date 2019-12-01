@@ -12,6 +12,12 @@ export default class Hero {
   private frameIndex: number
   private spriteOffset: number
   private currentRoom: string
+  private shadow: {
+    xOffset: number
+    yOffset: number
+    xRadius: number
+    yRadius: number
+  }
 
   constructor(img: HTMLImageElement, coords?: Point) {
     this.img = img
@@ -22,6 +28,14 @@ export default class Hero {
     this.frameIndex = 0
     this.frame = FRAMES[this.frameIndex]
     this.spriteOffset = 0
+
+    // shadow init
+    this.shadow = {
+      xOffset: HERO_SIZE / 2 + 6,
+      yOffset: HERO_SIZE - 6,
+      xRadius: 25,
+      yRadius: 10,
+    }
   }
 
   clear(ctx: CanvasRenderingContext2D) {
@@ -67,7 +81,27 @@ export default class Hero {
     this.frame = FRAMES[this.frameIndex]
   }
 
+  renderShadow(ctx: CanvasRenderingContext2D) {
+    ctx.save()
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)'
+    ctx.filter = 'blur(3px)'
+    ctx.beginPath()
+    ctx.ellipse(
+      this.coords.x + this.shadow.xOffset,
+      this.coords.y + this.shadow.yOffset,
+      this.shadow.xRadius,
+      this.shadow.yRadius,
+      0,
+      0,
+      2 * Math.PI
+    )
+    ctx.fill()
+    ctx.restore()
+  }
+
   render(ctx: CanvasRenderingContext2D) {
+    this.renderShadow(ctx)
+
     ctx.drawImage(
       this.img,
       this.frame * SPRITE_SIZE + 1,

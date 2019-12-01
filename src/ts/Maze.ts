@@ -85,6 +85,11 @@ export default class Maze {
       const urwall: W = [[x2, y1], [x2 + d, y1 + d]]
       const drwall: W = [[x2, y2], [x2 + d, y2 + d]]
 
+      const lv = g.vertices[[vx - 1, vy].toString()]
+      const tv = g.vertices[[vx, vy - 1].toString()]
+      const rv = g.vertices[[vx + 1, vy].toString()]
+      const bv = g.vertices[[vx, vy + 1].toString()]
+
       if (!vertex.up && !this.walls[uwall.toString()]) {
         this.walls[uwall.toString()] = {
           coords: uwall,
@@ -124,11 +129,6 @@ export default class Maze {
           sh: 192,
         }
       }
-
-      const lv = g.vertices[[vx - 1, vy].toString()]
-      const tv = g.vertices[[vx, vy - 1].toString()]
-      const rv = g.vertices[[vx + 1, vy].toString()]
-      const bv = g.vertices[[vx, vy + 1].toString()]
 
       if (!lv && !tv) {
         this.walls[ulwall.toString()] = {
@@ -403,10 +403,6 @@ export default class Maze {
     const my2 = CANVAS_HEIGHT - translatedY + OFFSET_Y
     ctx.drawImage(this.images.ground, mx1, my1, mx2, my2, mx1, my1, mx2, my2)
   }
-
-  // getRooms() {
-  //   return this.rooms
-  // }
 
   getWalls() {
     return this.walls
