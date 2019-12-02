@@ -1,15 +1,12 @@
 import { Point } from './types'
 import { Direction } from './MazeGraph'
-import {
-  STEP,
-  SPRITE_SIZE,
-  HERO_SIZE,
-  HERO_WIDTH,
-  HERO_HEIGHT,
-} from './constants'
+import { STEP, HERO_WIDTH, HERO_HEIGHT } from './constants'
 
 const FRAMES = [1, 2, 3, 4]
 const NUMBER_OF_FRAMES = FRAMES.length
+
+const SHADOW_OX = 17
+const SHADOW_OY = 7
 
 export default class Hero {
   private img: HTMLImageElement
@@ -37,15 +34,20 @@ export default class Hero {
 
     // shadow init
     this.shadow = {
-      xOffset: HERO_SIZE / 2 + 6,
-      yOffset: HERO_SIZE - 6,
+      xOffset: HERO_WIDTH / 2 + 6,
+      yOffset: HERO_HEIGHT - 6,
       xRadius: 25,
       yRadius: 10,
     }
   }
 
   clear(ctx: CanvasRenderingContext2D) {
-    ctx.clearRect(this.coords.x, this.coords.y, HERO_WIDTH, HERO_HEIGHT)
+    ctx.clearRect(
+      this.coords.x - 2,
+      this.coords.y,
+      HERO_WIDTH + SHADOW_OX,
+      HERO_HEIGHT + SHADOW_OY
+    )
   }
 
   getCoords() {
@@ -54,8 +56,8 @@ export default class Hero {
 
   getBottomRightCoords() {
     return {
-      x: this.coords.x + HERO_WIDTH,
-      y: this.coords.y + HERO_HEIGHT,
+      x: this.coords.x + HERO_WIDTH + SHADOW_OX,
+      y: this.coords.y + HERO_HEIGHT + SHADOW_OY,
     }
   }
 
@@ -105,8 +107,8 @@ export default class Hero {
     ctx.restore()
   }
 
-  render(ctx: CanvasRenderingContext2D, dir?: Direction) {
-    // this.renderShadow(ctx)
+  render(ctx: CanvasRenderingContext2D) {
+    this.renderShadow(ctx)
 
     ctx.drawImage(
       this.img,
