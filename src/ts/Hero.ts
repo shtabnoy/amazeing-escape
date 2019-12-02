@@ -1,6 +1,12 @@
 import { Point } from './types'
 import { Direction } from './MazeGraph'
-import { STEP, SPRITE_SIZE, HERO_SIZE } from './constants'
+import {
+  STEP,
+  SPRITE_SIZE,
+  HERO_SIZE,
+  HERO_WIDTH,
+  HERO_HEIGHT,
+} from './constants'
 
 const FRAMES = [1, 2, 3, 4]
 const NUMBER_OF_FRAMES = FRAMES.length
@@ -39,7 +45,7 @@ export default class Hero {
   }
 
   clear(ctx: CanvasRenderingContext2D) {
-    ctx.clearRect(this.coords.x, this.coords.y, HERO_SIZE, HERO_SIZE)
+    ctx.clearRect(this.coords.x, this.coords.y, HERO_WIDTH, HERO_HEIGHT)
   }
 
   getCoords() {
@@ -48,8 +54,8 @@ export default class Hero {
 
   getBottomRightCoords() {
     return {
-      x: this.coords.x + HERO_SIZE,
-      y: this.coords.y + HERO_SIZE,
+      x: this.coords.x + HERO_WIDTH,
+      y: this.coords.y + HERO_HEIGHT,
     }
   }
 
@@ -60,15 +66,15 @@ export default class Hero {
         this.coords.x -= STEP
         break
       case Direction.right:
-        this.spriteOffset = SPRITE_SIZE + 1
+        this.spriteOffset = HERO_HEIGHT + 1
         this.coords.x += STEP
         break
       case Direction.up:
-        this.spriteOffset = SPRITE_SIZE * 2 + 1
+        this.spriteOffset = HERO_HEIGHT * 2 + 1
         this.coords.y -= STEP
         break
       case Direction.down:
-        this.spriteOffset = SPRITE_SIZE * 3 + 1
+        this.spriteOffset = HERO_HEIGHT * 3 + 1
         this.coords.y += STEP
         break
       default:
@@ -99,19 +105,19 @@ export default class Hero {
     ctx.restore()
   }
 
-  render(ctx: CanvasRenderingContext2D) {
-    this.renderShadow(ctx)
+  render(ctx: CanvasRenderingContext2D, dir?: Direction) {
+    // this.renderShadow(ctx)
 
     ctx.drawImage(
       this.img,
-      this.frame * SPRITE_SIZE + 1,
+      this.frame * HERO_WIDTH,
       this.spriteOffset,
-      SPRITE_SIZE,
-      SPRITE_SIZE,
+      HERO_WIDTH,
+      HERO_HEIGHT,
       this.coords.x,
       this.coords.y,
-      HERO_SIZE,
-      HERO_SIZE
+      HERO_WIDTH,
+      HERO_HEIGHT
     )
   }
 
