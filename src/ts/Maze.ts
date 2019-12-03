@@ -377,8 +377,8 @@ export default class Maze {
   }
 
   drawGround = (ctx: CanvasRenderingContext2D) => {
-    let translatedX = ctx.getTransform().e / 2
-    let translatedY = ctx.getTransform().f / 2
+    let translatedX = ctx.getTransform().e
+    let translatedY = ctx.getTransform().f
     const mx1 = 0 - translatedX < 0 ? -1 : 0 - translatedX
     const my1 = 0 - translatedY < 0 ? -1 : 0 - translatedY
     const mx2 = CANVAS_WIDTH - translatedX + OFFSET_X

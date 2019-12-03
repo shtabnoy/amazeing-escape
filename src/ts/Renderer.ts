@@ -114,8 +114,8 @@ export default class Renderer {
   private moveCamera(dir: Direction) {
     const { x: x1, y: y1 } = this.hero.getCoords()
     const { x: x2, y: y2 } = this.hero.getBottomRightCoords()
-    let translatedX = this.layers[1].getTransform().e / 2
-    let translatedY = this.layers[1].getTransform().f / 2
+    let translatedX = this.layers[1].getTransform().e
+    let translatedY = this.layers[1].getTransform().f
     let mx1 = 0 - translatedX
     let my1 = 0 - translatedY
     let mx2 = CANVAS_WIDTH - translatedX + OFFSET_X
