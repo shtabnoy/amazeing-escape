@@ -362,35 +362,17 @@ export default class Maze {
 
   drawWalls = (ctx: CanvasRenderingContext2D) => {
     Object.values(this.walls).forEach((wall: Wall) => {
-      if (wall.sx === undefined) {
-        ctx.strokeStyle = '#111'
-        ctx.fillStyle = '#6aa3e6'
-        ctx.lineWidth = 0
-        ctx.strokeRect(
-          wall.coords[0][0],
-          wall.coords[0][1],
-          wall.coords[1][0] - wall.coords[0][0],
-          wall.coords[1][1] - wall.coords[0][1]
-        )
-        ctx.fillRect(
-          wall.coords[0][0],
-          wall.coords[0][1],
-          wall.coords[1][0] - wall.coords[0][0],
-          wall.coords[1][1] - wall.coords[0][1]
-        )
-      } else {
-        ctx.drawImage(
-          this.images.walls,
-          wall.sx,
-          wall.sy,
-          wall.sw,
-          wall.sh,
-          wall.coords[0][0],
-          wall.coords[0][1],
-          wall.sw,
-          wall.sh
-        )
-      }
+      ctx.drawImage(
+        this.images.walls,
+        wall.sx,
+        wall.sy,
+        wall.sw,
+        wall.sh,
+        wall.coords[0][0],
+        wall.coords[0][1],
+        wall.sw,
+        wall.sh
+      )
     })
   }
 

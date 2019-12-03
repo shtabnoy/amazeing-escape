@@ -253,12 +253,14 @@ export default class Renderer {
     canvas.id = canvasId
     document.body.appendChild(canvas)
 
-    // retina adjustments
-    canvas.width = CANVAS_WIDTH * 2
-    canvas.height = CANVAS_HEIGHT * 2
+    canvas.width = CANVAS_WIDTH
+    canvas.height = CANVAS_HEIGHT
     canvas.style.width = `${CANVAS_WIDTH}px`
     canvas.style.height = `${CANVAS_HEIGHT}px`
-    ctx.scale(RATIO, RATIO)
+    // // retina adjustments
+    // ctx.scale(RATIO, RATIO)
+    // canvas.width = CANVAS_WIDTH
+    // canvas.height = CANVAS_HEIGHT
     ctx.translate(OFFSET_X, OFFSET_Y)
 
     this.layers.push(ctx)

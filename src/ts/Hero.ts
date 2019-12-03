@@ -5,6 +5,7 @@ import { STEP, HERO_WIDTH, HERO_HEIGHT } from './constants'
 const FRAMES = [1, 2, 3, 4]
 const NUMBER_OF_FRAMES = FRAMES.length
 
+// TODO: Use these number in this.shadow
 const SHADOW_OX = 17
 const SHADOW_OY = 7
 
@@ -92,7 +93,7 @@ export default class Hero {
   renderShadow(ctx: CanvasRenderingContext2D) {
     ctx.save()
     ctx.fillStyle = 'rgba(0, 0, 0, 0.5)'
-    ctx.filter = 'blur(3px)'
+    ctx.filter = 'blur(1px)'
     ctx.beginPath()
     ctx.ellipse(
       this.coords.x + this.shadow.xOffset,
