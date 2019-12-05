@@ -90,6 +90,7 @@ export default class Maze {
       const rv = g.vertices[[vx + 1, vy].toString()]
       const bv = g.vertices[[vx, vy + 1].toString()]
 
+      // TODO: Remove dups (only up and left is enough)
       if (!vertex.up && !this.walls[uwall.toString()]) {
         this.walls[uwall.toString()] = {
           coords: uwall,
@@ -373,6 +374,17 @@ export default class Maze {
         wall.sw,
         wall.sh
       )
+      // if (wall.sw === 192 || (wall.sx === 256 && wall.sy === 64)) {
+      //   ctx.save()
+      //   ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'
+      //   ctx.fillRect(
+      //     wall.coords[0][0],
+      //     wall.coords[0][1] + wall.sh,
+      //     wall.sw,
+      //     64
+      //   )
+      //   ctx.restore()
+      // }
     })
   }
 
