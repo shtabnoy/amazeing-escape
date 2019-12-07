@@ -25,7 +25,9 @@ type P = [number, number]
 type W = [P, P]
 
 export default class Renderer {
-  private layers: CanvasRenderingContext2D[]
+  private layers: {
+    [name: string]: CanvasRenderingContext2D
+  }
   private maze: Maze
   private hero: Hero
   private animCtrl: AnimationControls = {
@@ -48,7 +50,7 @@ export default class Renderer {
     document.addEventListener('keyup', e => {
       if (e.key in ArrowKeys) this.keys[e.key as ArrowKeys] = false
     })
-    this.layers = []
+    this.layers = {}
   }
 
   private collisionRight = (
@@ -114,8 +116,8 @@ export default class Renderer {
   private moveCamera(dir: Direction) {
     const { x: x1, y: y1 } = this.hero.getCoords()
     const { x: x2, y: y2 } = this.hero.getBottomRightCoords()
-    let translatedX = this.layers[1].getTransform().e
-    let translatedY = this.layers[1].getTransform().f
+    let translatedX = this.layers['walls-below'].getTransform().e
+    let translatedY = this.layers['walls-below'].getTransform().f
     let mx1 = 0 - translatedX
     let my1 = 0 - translatedY
     let mx2 = CANVAS_WIDTH - translatedX + OFFSET_X
@@ -124,42 +126,84 @@ export default class Renderer {
     switch (dir) {
       case Direction.left:
         if (x1 < CAMERA_BORDER_X - translatedX) {
-          this.layers[1].clearRect(mx1, my1, mx2, my2)
-          this.layers[1].translate(translatedX < 0 ? STEP : 0, 0)
-          this.maze.drawWalls(this.layers[1])
-          this.layers[0].clearRect(mx1, my1, mx2, my2)
-          this.layers[0].translate(translatedX < 0 ? STEP : 0, 0)
-          this.maze.drawGround(this.layers[0])
+          // TODO: move all the clearance and translate into
+          // Walls and Ground class method (like hero and maze)
+          this.layers['walls-below'].clearRect(mx1, my1, mx2, my2)
+          this.layers['walls-below'].translate(translatedX < 0 ? STEP : 0, 0)
+          this.maze.drawWalls(this.layers['walls-below'])
+          this.layers['walls-above'].clearRect(mx1, my1, mx2, my2)
+          this.layers['walls-above'].translate(translatedX < 0 ? STEP : 0, 0)
+          this.maze.drawWalls(this.layers['walls-above'])
+          this.layers['ground'].clearRect(mx1, my1, mx2, my2)
+          this.layers['ground'].translate(translatedX < 0 ? STEP : 0, 0)
+          this.maze.drawGround(this.layers['ground'])
+          this.layers['hero'].translate(translatedX < 0 ? STEP : 0, 0)
         }
         break
       case Direction.right:
         if (x2 > CANVAS_WIDTH - translatedX - CAMERA_BORDER_X) {
-          this.layers[1].clearRect(mx1, my1, mx2, my2)
-          this.layers[1].translate(-translatedX > RIGHT_BORDER ? 0 : -STEP, 0)
-          this.maze.drawWalls(this.layers[1])
-          this.layers[0].clearRect(mx1, my1, mx2, my2)
-          this.layers[0].translate(-translatedX > RIGHT_BORDER ? 0 : -STEP, 0)
-          this.maze.drawGround(this.layers[0])
+          this.layers['walls-below'].clearRect(mx1, my1, mx2, my2)
+          this.layers['walls-below'].translate(
+            -translatedX > RIGHT_BORDER ? 0 : -STEP,
+            0
+          )
+          this.maze.drawWalls(this.layers['walls-below'])
+          this.layers['walls-above'].clearRect(mx1, my1, mx2, my2)
+          this.layers['walls-above'].translate(
+            -translatedX > RIGHT_BORDER ? 0 : -STEP,
+            0
+          )
+          this.maze.drawWalls(this.layers['walls-above'])
+          this.layers['ground'].clearRect(mx1, my1, mx2, my2)
+          this.layers['ground'].translate(
+            -translatedX > RIGHT_BORDER ? 0 : -STEP,
+            0
+          )
+          this.maze.drawGround(this.layers['ground'])
+          this.layers['hero'].translate(
+            -translatedX > RIGHT_BORDER ? 0 : -STEP,
+            0
+          )
         }
         break
       case Direction.up:
         if (y1 < CAMERA_BORDER_Y - translatedY) {
-          this.layers[1].clearRect(mx1, my1, mx2, my2)
-          this.layers[1].translate(0, translatedY < 0 ? STEP : 0)
-          this.maze.drawWalls(this.layers[1])
-          this.layers[0].clearRect(mx1, my1, mx2, my2)
-          this.layers[0].translate(0, translatedY < 0 ? STEP : 0)
-          this.maze.drawGround(this.layers[0])
+          this.layers['walls-below'].clearRect(mx1, my1, mx2, my2)
+          this.layers['walls-below'].translate(0, translatedY < 0 ? STEP : 0)
+          this.maze.drawWalls(this.layers['walls-below'])
+          this.layers['walls-above'].clearRect(mx1, my1, mx2, my2)
+          this.layers['walls-above'].translate(0, translatedY < 0 ? STEP : 0)
+          this.maze.drawWalls(this.layers['walls-above'])
+          this.layers['ground'].clearRect(mx1, my1, mx2, my2)
+          this.layers['ground'].translate(0, translatedY < 0 ? STEP : 0)
+          this.maze.drawGround(this.layers['ground'])
+          this.layers['hero'].translate(0, translatedY < 0 ? STEP : 0)
         }
         break
       case Direction.down:
         if (y2 > CANVAS_HEIGHT - translatedY - CAMERA_BORDER_Y) {
-          this.layers[1].clearRect(mx1, my1, mx2, my2)
-          this.layers[1].translate(0, -translatedY > BOTTOM_BORDER ? 0 : -STEP)
-          this.maze.drawWalls(this.layers[1])
-          this.layers[0].clearRect(mx1, my1, mx2, my2)
-          this.layers[0].translate(0, -translatedY > BOTTOM_BORDER ? 0 : -STEP)
-          this.maze.drawGround(this.layers[0])
+          this.layers['walls-below'].clearRect(mx1, my1, mx2, my2)
+          this.layers['walls-below'].translate(
+            0,
+            -translatedY > BOTTOM_BORDER ? 0 : -STEP
+          )
+          this.maze.drawWalls(this.layers['walls-below'])
+          this.layers['walls-above'].clearRect(mx1, my1, mx2, my2)
+          this.layers['walls-above'].translate(
+            0,
+            -translatedY > BOTTOM_BORDER ? 0 : -STEP
+          )
+          this.maze.drawWalls(this.layers['walls-above'])
+          this.layers['ground'].clearRect(mx1, my1, mx2, my2)
+          this.layers['ground'].translate(
+            0,
+            -translatedY > BOTTOM_BORDER ? 0 : -STEP
+          )
+          this.maze.drawGround(this.layers['ground'])
+          this.layers['hero'].translate(
+            0,
+            -translatedY > BOTTOM_BORDER ? 0 : -STEP
+          )
         }
         break
     }
@@ -176,54 +220,34 @@ export default class Renderer {
       this.keys[ArrowKeys.ArrowRight] &&
       !this.collisionRight(cp, x1, y1, x2, y2)
     ) {
-      // if (x2 + STEP < room.b.x) {
-      this.hero.clear(this.layers[1])
+      this.hero.clear(this.layers['hero'])
       this.hero.move(Direction.right)
       this.moveCamera(Direction.right)
-      this.hero.render(this.layers[1])
-      // } else {
-      // this.hero.setCurrentRoom([x + 1, y].join(','))
-      // console.log('you are in the room ' + this.hero.getCurrentRoom())
-      // }
+      this.hero.render(this.layers['hero'])
     }
     if (
       this.keys[ArrowKeys.ArrowLeft] &&
       !this.collisionLeft(cp, x1, y1, x2, y2)
     ) {
-      // if (x1 - STEP > room.a.x) {
-      this.hero.clear(this.layers[1])
+      this.hero.clear(this.layers['hero'])
       this.hero.move(Direction.left)
       this.moveCamera(Direction.left)
-      this.hero.render(this.layers[1])
-      // } else {
-      // this.hero.setCurrentRoom([x - 1, y].join(','))
-      // console.log('you are in the room ' + this.hero.getCurrentRoom())
-      // }
+      this.hero.render(this.layers['hero'])
     }
     if (
       this.keys[ArrowKeys.ArrowDown] &&
       !this.collisionDown(cp, x1, y1, x2, y2)
     ) {
-      // if (y2 + STEP < room.b.y) {
-      this.hero.clear(this.layers[1])
+      this.hero.clear(this.layers['hero'])
       this.hero.move(Direction.down)
       this.moveCamera(Direction.down)
-      this.hero.render(this.layers[1])
-      // } else {
-      // this.hero.setCurrentRoom([x, y + 1].join(','))
-      // console.log('you are in the room ' + this.hero.getCurrentRoom())
-      // }
+      this.hero.render(this.layers['hero'])
     }
     if (this.keys[ArrowKeys.ArrowUp] && !this.collisionUp(cp, x1, y1, x2, y2)) {
-      // if (y1 - STEP > room.a.y) {
-      this.hero.clear(this.layers[1])
+      this.hero.clear(this.layers['hero'])
       this.hero.move(Direction.up)
       this.moveCamera(Direction.up)
-      this.hero.render(this.layers[1])
-      // } else {
-      // this.hero.setCurrentRoom([x, y - 1].join(','))
-      // console.log('you are in the room ' + this.hero.getCurrentRoom())
-      // }
+      this.hero.render(this.layers['hero'])
     }
 
     this.updateFrame()
@@ -263,7 +287,7 @@ export default class Renderer {
     // canvas.height = CANVAS_HEIGHT
     ctx.translate(OFFSET_X, OFFSET_Y)
 
-    this.layers.push(ctx)
+    this.layers[canvasId] = ctx
   }
 
   addMaze(maze: Maze) {
@@ -280,7 +304,9 @@ export default class Renderer {
 
   async render() {
     this.addLayer('ground')
-    this.addLayer('walls-and-hero')
+    this.addLayer('walls-below')
+    this.addLayer('hero')
+    this.addLayer('walls-above')
 
     this.addMaze(
       new Maze(ROOMS_HORIZONTAL, ROOMS_VERTICAL, {
@@ -293,9 +319,10 @@ export default class Renderer {
       })
     )
     this.addHero(new Hero(this.assetLoader.getImage('hero'), { x: 65, y: 65 }))
-    this.maze.drawGround(this.layers[0])
-    this.maze.drawWalls(this.layers[1])
-    this.hero.render(this.layers[1])
+    this.maze.drawGround(this.layers['ground'])
+    this.maze.drawWalls(this.layers['walls-below'])
+    this.hero.render(this.layers['hero'])
+    this.maze.drawWalls(this.layers['walls-above'])
     this.hero.setCurrentRoom('0,0')
     this.startAnimationLoop()
   }
