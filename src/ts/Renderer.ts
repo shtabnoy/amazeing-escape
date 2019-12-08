@@ -59,26 +59,40 @@ export default class Renderer {
     y1: number,
     x2: number,
     y2: number,
-    yCorr?: number
+    yCorr: number
   ) => {
-    if (yCorr) {
-      return walls.some(
-        (wall: W) =>
-          x1 + STEP <= wall[0][0] &&
-          x2 + STEP >= wall[0][0] &&
-          y1 <= wall[1][1] - yCorr &&
-          y2 >= wall[0][1]
-      )
-    } else {
-      return walls.some(
-        (wall: W) =>
-          x1 + STEP <= wall[0][0] &&
-          x2 + STEP >= wall[0][0] &&
-          y1 <= wall[1][1] &&
-          y2 >= wall[0][1]
-      )
-    }
+    return walls.some(
+      (wall: W) =>
+        x1 + STEP <= wall[0][0] &&
+        x2 + STEP >= wall[0][0] &&
+        y1 <= wall[1][1] - yCorr &&
+        y2 >= wall[0][1]
+    )
   }
+  private collisionRight0 = (
+    walls: W[],
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+    yCorr: number
+  ) => {
+    return walls.some(
+      (wall: W) =>
+        x1 + STEP <= wall[0][0] &&
+        x2 + STEP >= wall[0][0] &&
+        y1 <= wall[1][1] &&
+        y2 >= wall[0][1] + yCorr
+    )
+  }
+
+  // return walls.some(
+  //   (wall: W) =>
+  //     x1 + STEP <= wall[0][0] &&
+  //     x2 + STEP >= wall[0][0] &&
+  //     y1 <= wall[1][1] &&
+  //     y2 >= wall[0][1]
+  // )
 
   private collisionLeft = (
     walls: W[],
@@ -88,24 +102,38 @@ export default class Renderer {
     y2: number,
     yCorr?: number
   ) => {
-    if (yCorr) {
-      return walls.some(
-        (wall: W) =>
-          x1 - STEP <= wall[1][0] &&
-          x2 - STEP >= wall[1][0] &&
-          y1 <= wall[1][1] - yCorr &&
-          y2 >= wall[0][1]
-      )
-    } else {
-      return walls.some(
-        (wall: W) =>
-          x1 - STEP <= wall[1][0] &&
-          x2 - STEP >= wall[1][0] &&
-          y1 <= wall[1][1] &&
-          y2 >= wall[0][1]
-      )
-    }
+    return walls.some(
+      (wall: W) =>
+        x1 - STEP <= wall[1][0] &&
+        x2 - STEP >= wall[1][0] &&
+        y1 <= wall[1][1] - yCorr &&
+        y2 >= wall[0][1]
+    )
   }
+
+  private collisionLeft0 = (
+    walls: W[],
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+    yCorr?: number
+  ) => {
+    return walls.some(
+      (wall: W) =>
+        x1 - STEP <= wall[1][0] &&
+        x2 - STEP >= wall[1][0] &&
+        y1 <= wall[1][1] &&
+        y2 >= wall[0][1] + yCorr
+    )
+  }
+  // return walls.some(
+  //   (wall: W) =>
+  //     x1 - STEP <= wall[1][0] &&
+  //     x2 - STEP >= wall[1][0] &&
+  //     y1 <= wall[1][1] &&
+  //     y2 >= wall[0][1]
+  // )
 
   private collisionUp = (
     walls: W[],
@@ -130,7 +158,7 @@ export default class Renderer {
           x1 <= wall[1][0] &&
           x2 >= wall[0][0] &&
           y1 - STEP <= wall[1][1] &&
-          y1 >= wall[1][1]
+          y2 - STEP >= wall[1][1]
       )
     }
   }
@@ -253,8 +281,10 @@ export default class Renderer {
     const yCorr = 64
 
     if (
-      this.keys[ArrowKeys.ArrowRight] &&
-      !this.collisionRight(cp, x1, y1, x2, y2, yCorr)
+      (this.keys[ArrowKeys.ArrowRight] &&
+        !this.collisionRight(cp, x1, y1, x2, y2, yCorr)) ||
+      (this.keys[ArrowKeys.ArrowRight] &&
+        !this.collisionRight0(cp, x1, y1, x2, y2, yCorr))
     ) {
       this.hero.clear(this.layers['hero'])
       this.hero.move(Direction.right)
@@ -262,8 +292,10 @@ export default class Renderer {
       this.hero.render(this.layers['hero'])
     }
     if (
-      this.keys[ArrowKeys.ArrowLeft] &&
-      !this.collisionLeft(cp, x1, y1, x2, y2, yCorr)
+      (this.keys[ArrowKeys.ArrowLeft] &&
+        !this.collisionLeft(cp, x1, y1, x2, y2, yCorr)) ||
+      (this.keys[ArrowKeys.ArrowLeft] &&
+        !this.collisionLeft0(cp, x1, y1, x2, y2, yCorr))
     ) {
       this.hero.clear(this.layers['hero'])
       this.hero.move(Direction.left)
