@@ -162,84 +162,70 @@ export default class Renderer {
     switch (dir) {
       case Direction.left:
         if (x1 < CAMERA_BORDER_X - translatedX) {
-          // TODO: move all the clearance and translate into
-          // Walls and Ground class method (like hero and maze)
-          this.layers['walls-below'].clearRect(mx1, my1, mx2, my2)
-          this.layers['walls-below'].translate(translatedX < 0 ? STEP : 0, 0)
+          this.maze.clearCanvas(this.layers['walls-below'])
+          this.maze.moveCanvas(this.layers['walls-below'], Direction.left)
           this.maze.drawWalls(this.layers['walls-below'])
-          // this.layers['walls-above'].clearRect(mx1, my1, mx2, my2)
-          // this.layers['walls-above'].translate(translatedX < 0 ? STEP : 0, 0)
-          // this.maze.drawWalls(this.layers['walls-above'])
-          this.layers['ground'].clearRect(mx1, my1, mx2, my2)
-          this.layers['ground'].translate(translatedX < 0 ? STEP : 0, 0)
+
+          this.maze.clearCanvas(this.layers['walls-above'])
+          this.maze.moveCanvas(this.layers['walls-above'], Direction.left)
+          this.maze.drawWalls(this.layers['walls-above'])
+
+          this.maze.clearCanvas(this.layers['ground'])
+          this.maze.moveCanvas(this.layers['ground'], Direction.left)
           this.maze.drawGround(this.layers['ground'])
-          this.layers['hero'].translate(translatedX < 0 ? STEP : 0, 0)
+
+          this.maze.moveCanvas(this.layers['hero'], Direction.left)
         }
         break
       case Direction.right:
         if (x2 > CANVAS_WIDTH - translatedX - CAMERA_BORDER_X) {
-          this.layers['walls-below'].clearRect(mx1, my1, mx2, my2)
-          this.layers['walls-below'].translate(
-            -translatedX > RIGHT_BORDER ? 0 : -STEP,
-            0
-          )
+          this.maze.clearCanvas(this.layers['walls-below'])
+          this.maze.moveCanvas(this.layers['walls-below'], Direction.right)
           this.maze.drawWalls(this.layers['walls-below'])
-          // this.layers['walls-above'].clearRect(mx1, my1, mx2, my2)
-          // this.layers['walls-above'].translate(
-          //   -translatedX > RIGHT_BORDER ? 0 : -STEP,
-          //   0
-          // )
-          // this.maze.drawWalls(this.layers['walls-above'])
-          this.layers['ground'].clearRect(mx1, my1, mx2, my2)
-          this.layers['ground'].translate(
-            -translatedX > RIGHT_BORDER ? 0 : -STEP,
-            0
-          )
+
+          this.maze.clearCanvas(this.layers['walls-above'])
+          this.maze.moveCanvas(this.layers['walls-above'], Direction.right)
+          this.maze.drawWalls(this.layers['walls-above'])
+
+          this.maze.clearCanvas(this.layers['ground'])
+          this.maze.moveCanvas(this.layers['ground'], Direction.right)
           this.maze.drawGround(this.layers['ground'])
-          this.layers['hero'].translate(
-            -translatedX > RIGHT_BORDER ? 0 : -STEP,
-            0
-          )
+
+          this.maze.moveCanvas(this.layers['hero'], Direction.right)
         }
         break
       case Direction.up:
         if (y1 < CAMERA_BORDER_Y - translatedY) {
-          this.layers['walls-below'].clearRect(mx1, my1, mx2, my2)
-          this.layers['walls-below'].translate(0, translatedY < 0 ? STEP : 0)
+          this.maze.clearCanvas(this.layers['walls-below'])
+          this.maze.moveCanvas(this.layers['walls-below'], Direction.up)
           this.maze.drawWalls(this.layers['walls-below'])
-          // this.layers['walls-above'].clearRect(mx1, my1, mx2, my2)
-          // this.layers['walls-above'].translate(0, translatedY < 0 ? STEP : 0)
-          // this.maze.drawWalls(this.layers['walls-above'])
-          this.layers['ground'].clearRect(mx1, my1, mx2, my2)
-          this.layers['ground'].translate(0, translatedY < 0 ? STEP : 0)
+
+          this.maze.clearCanvas(this.layers['walls-above'])
+          this.maze.moveCanvas(this.layers['walls-above'], Direction.up)
+          this.maze.drawWalls(this.layers['walls-above'])
+
+          this.maze.clearCanvas(this.layers['ground'])
+          this.maze.moveCanvas(this.layers['ground'], Direction.up)
           this.maze.drawGround(this.layers['ground'])
-          this.layers['hero'].translate(0, translatedY < 0 ? STEP : 0)
+
+          this.maze.moveCanvas(this.layers['hero'], Direction.up)
         }
         break
       case Direction.down:
         if (y2 > CANVAS_HEIGHT - translatedY - CAMERA_BORDER_Y) {
-          this.layers['walls-below'].clearRect(mx1, my1, mx2, my2)
-          this.layers['walls-below'].translate(
-            0,
-            -translatedY > BOTTOM_BORDER ? 0 : -STEP
-          )
+          this.maze.clearCanvas(this.layers['walls-below'])
+          this.maze.moveCanvas(this.layers['walls-below'], Direction.down)
           this.maze.drawWalls(this.layers['walls-below'])
-          // this.layers['walls-above'].clearRect(mx1, my1, mx2, my2)
-          // this.layers['walls-above'].translate(
-          //   0,
-          //   -translatedY > BOTTOM_BORDER ? 0 : -STEP
-          // )
-          // this.maze.drawWalls(this.layers['walls-above'])
-          this.layers['ground'].clearRect(mx1, my1, mx2, my2)
-          this.layers['ground'].translate(
-            0,
-            -translatedY > BOTTOM_BORDER ? 0 : -STEP
-          )
+
+          this.maze.clearCanvas(this.layers['walls-above'])
+          this.maze.moveCanvas(this.layers['walls-above'], Direction.down)
+          this.maze.drawWalls(this.layers['walls-above'])
+
+          this.maze.clearCanvas(this.layers['ground'])
+          this.maze.moveCanvas(this.layers['ground'], Direction.down)
           this.maze.drawGround(this.layers['ground'])
-          this.layers['hero'].translate(
-            0,
-            -translatedY > BOTTOM_BORDER ? 0 : -STEP
-          )
+
+          this.maze.moveCanvas(this.layers['hero'], Direction.down)
         }
         break
     }
@@ -346,12 +332,12 @@ export default class Renderer {
     this.addLayer('ground')
     this.addLayer('walls-below')
     this.addLayer('hero')
-    // this.addLayer('walls-above')
+    this.addLayer('walls-above')
 
     this.addMaze(
       new Maze(ROOMS_HORIZONTAL, ROOMS_VERTICAL, {
-        rw: ROOM_WIDTH,
-        d: WALL_DEPTH,
+        // rw: ROOM_WIDTH,
+        // d: WALL_DEPTH,
         images: {
           walls: this.assetLoader.getImage('walls'),
           ground: this.assetLoader.getImage('ground'),
@@ -362,7 +348,7 @@ export default class Renderer {
     this.maze.drawGround(this.layers['ground'])
     this.maze.drawWalls(this.layers['walls-below'])
     this.hero.render(this.layers['hero'])
-    // this.maze.drawWalls(this.layers['walls-above'])
+    this.maze.drawWalls(this.layers['walls-above'])
     this.hero.setCurrentRoom('0,0')
     this.startAnimationLoop()
   }

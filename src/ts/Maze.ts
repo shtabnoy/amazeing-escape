@@ -1,6 +1,15 @@
-import MazeGraph, { Vertex } from './MazeGraph'
+import MazeGraph, { Vertex, Direction } from './MazeGraph'
 import { rnd } from './utils'
-import { CANVAS_WIDTH, CANVAS_HEIGHT, OFFSET_X, OFFSET_Y } from './constants'
+import {
+  CANVAS_WIDTH,
+  CANVAS_HEIGHT,
+  OFFSET_X,
+  OFFSET_Y,
+  ROOM_WIDTH,
+  STEP,
+  RIGHT_BORDER,
+  BOTTOM_BORDER,
+} from './constants'
 
 type P = [number, number]
 type W = [P, P]
@@ -32,7 +41,7 @@ export default class Maze {
     const g = this.createMazeGraph(width, height)
     const mst1 = g.mst()
     this.walls = {}
-    this.createRooms(mst1, config.rw, config.d)
+    this.createRooms(mst1, ROOM_WIDTH)
   }
 
   private createMazeGraph = (w: number, h: number): MazeGraph => {
@@ -63,8 +72,7 @@ export default class Maze {
 
   private createRooms(
     g: MazeGraph,
-    rw: number, // room width
-    d: number = 0 // depth
+    rw: number // room width
   ) {
     Object.entries(g.vertices).forEach(([name, vertex]: [string, Vertex]) => {
       const xy = name.split(',')
@@ -75,39 +83,6 @@ export default class Maze {
       const x2 = (vx + 1) * rw // right X
       const y1 = vy * rw // top Y
       const y2 = (vy + 1) * rw // bottom Y
-
-      // const uwall: W = [
-      //   [x1 + d, y1],
-      //   [x2, y1 + d],
-      // ]
-      // const dwall: W = [
-      //   [x1 + d, y2],
-      //   [x2, y2],
-      // ]
-      // const lwall: W = [
-      //   [x1, y1 + d],
-      //   [x1 + d, y2],
-      // ]
-      // const rwall: W = [
-      //   [x2, y1 + d],
-      //   [x2 + d, y2],
-      // ]
-      // const ulwall: W = [
-      //   [x1, y1],
-      //   [x1 + d, y1 + d],
-      // ]
-      // const dlwall: W = [
-      //   [x1, y2],
-      //   [x1 + d, y2 + d],
-      // ]
-      // const urwall: W = [
-      //   [x2, y1],
-      //   [x2 + d, y1 + d],
-      // ]
-      // const drwall: W = [
-      //   [x2, y2],
-      //   [x2 + d, y2 + d],
-      // ]
 
       const lv = g.vertices[[vx - 1, vy].toString()]
       const tv = g.vertices[[vx, vy - 1].toString()]
@@ -392,11 +367,6 @@ export default class Maze {
           sh: 128,
         }
       }
-      // else {
-      //   this.walls[ulwall.toString()] = {
-      //     coords: ulwall,
-      //   }
-      // }
 
       // right upper corner
       if (!rv && !tv) {
@@ -486,18 +456,38 @@ export default class Maze {
         wall.sw,
         wall.sh
       )
-      // if (wall.sw === 192 || (wall.sx === 256 && wall.sy === 64)) {
-      //   ctx.save()
-      //   ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'
-      //   ctx.fillRect(
-      //     wall.coords[0][0],
-      //     wall.coords[0][1] + wall.sh,
-      //     wall.sw,
-      //     64
-      //   )
-      //   ctx.restore()
-      // }
     })
+  }
+
+  clearCanvas = (ctx: CanvasRenderingContext2D) => {
+    let translatedX = ctx.getTransform().e
+    let translatedY = ctx.getTransform().f
+    let mx1 = 0 - translatedX
+    let my1 = 0 - translatedY
+    let mx2 = CANVAS_WIDTH - translatedX + OFFSET_X
+    let my2 = CANVAS_HEIGHT - translatedY + OFFSET_Y
+    ctx.clearRect(mx1, my1, mx2, my2)
+  }
+
+  moveCanvas = (ctx: CanvasRenderingContext2D, dir: Direction) => {
+    let translatedX = ctx.getTransform().e
+    let translatedY = ctx.getTransform().f
+    switch (dir) {
+      case Direction.left:
+        ctx.translate(translatedX < 0 ? STEP : 0, 0)
+        break
+      case Direction.right:
+        ctx.translate(-translatedX > RIGHT_BORDER ? 0 : -STEP, 0)
+        break
+      case Direction.up:
+        ctx.translate(0, translatedY < 0 ? STEP : 0)
+        break
+      case Direction.down:
+        ctx.translate(0, -translatedY > BOTTOM_BORDER ? 0 : -STEP)
+        break
+      default:
+        break
+    }
   }
 
   drawGround = (ctx: CanvasRenderingContext2D) => {
