@@ -58,45 +58,81 @@ export default class Renderer {
     x1: number,
     y1: number,
     x2: number,
-    y2: number
-  ) =>
-    walls.some(
-      (wall: W) =>
-        x1 + STEP <= wall[0][0] &&
-        x2 + STEP >= wall[0][0] &&
-        y1 <= wall[1][1] &&
-        y2 >= wall[0][1]
-    )
+    y2: number,
+    yCorr?: number
+  ) => {
+    if (yCorr) {
+      return walls.some(
+        (wall: W) =>
+          x1 + STEP <= wall[0][0] &&
+          x2 + STEP >= wall[0][0] &&
+          y1 <= wall[1][1] - yCorr &&
+          y2 >= wall[0][1]
+      )
+    } else {
+      return walls.some(
+        (wall: W) =>
+          x1 + STEP <= wall[0][0] &&
+          x2 + STEP >= wall[0][0] &&
+          y1 <= wall[1][1] &&
+          y2 >= wall[0][1]
+      )
+    }
+  }
 
   private collisionLeft = (
     walls: W[],
     x1: number,
     y1: number,
     x2: number,
-    y2: number
-  ) =>
-    walls.some(
-      (wall: W) =>
-        x1 - STEP <= wall[1][0] &&
-        x2 - STEP >= wall[1][0] &&
-        y1 <= wall[1][1] &&
-        y2 >= wall[0][1]
-    )
+    y2: number,
+    yCorr?: number
+  ) => {
+    if (yCorr) {
+      return walls.some(
+        (wall: W) =>
+          x1 - STEP <= wall[1][0] &&
+          x2 - STEP >= wall[1][0] &&
+          y1 <= wall[1][1] - yCorr &&
+          y2 >= wall[0][1]
+      )
+    } else {
+      return walls.some(
+        (wall: W) =>
+          x1 - STEP <= wall[1][0] &&
+          x2 - STEP >= wall[1][0] &&
+          y1 <= wall[1][1] &&
+          y2 >= wall[0][1]
+      )
+    }
+  }
 
   private collisionUp = (
     walls: W[],
     x1: number,
     y1: number,
     x2: number,
-    y2: number
-  ) =>
-    walls.some(
-      (wall: W) =>
-        x1 <= wall[1][0] &&
-        x2 >= wall[0][0] &&
-        y1 - STEP <= wall[1][1] &&
-        y2 - STEP >= wall[1][1]
-    )
+    y2: number,
+    yCorr?: number
+  ) => {
+    if (yCorr) {
+      return walls.some(
+        (wall: W) =>
+          x1 <= wall[1][0] &&
+          x2 >= wall[0][0] &&
+          y1 - STEP <= wall[1][1] - yCorr &&
+          y2 - STEP >= wall[1][1]
+      )
+    } else {
+      return walls.some(
+        (wall: W) =>
+          x1 <= wall[1][0] &&
+          x2 >= wall[0][0] &&
+          y1 - STEP <= wall[1][1] &&
+          y2 - STEP >= wall[1][1]
+      )
+    }
+  }
 
   private collisionDown = (
     walls: W[],
@@ -131,9 +167,9 @@ export default class Renderer {
           this.layers['walls-below'].clearRect(mx1, my1, mx2, my2)
           this.layers['walls-below'].translate(translatedX < 0 ? STEP : 0, 0)
           this.maze.drawWalls(this.layers['walls-below'])
-          this.layers['walls-above'].clearRect(mx1, my1, mx2, my2)
-          this.layers['walls-above'].translate(translatedX < 0 ? STEP : 0, 0)
-          this.maze.drawWalls(this.layers['walls-above'])
+          // this.layers['walls-above'].clearRect(mx1, my1, mx2, my2)
+          // this.layers['walls-above'].translate(translatedX < 0 ? STEP : 0, 0)
+          // this.maze.drawWalls(this.layers['walls-above'])
           this.layers['ground'].clearRect(mx1, my1, mx2, my2)
           this.layers['ground'].translate(translatedX < 0 ? STEP : 0, 0)
           this.maze.drawGround(this.layers['ground'])
@@ -148,12 +184,12 @@ export default class Renderer {
             0
           )
           this.maze.drawWalls(this.layers['walls-below'])
-          this.layers['walls-above'].clearRect(mx1, my1, mx2, my2)
-          this.layers['walls-above'].translate(
-            -translatedX > RIGHT_BORDER ? 0 : -STEP,
-            0
-          )
-          this.maze.drawWalls(this.layers['walls-above'])
+          // this.layers['walls-above'].clearRect(mx1, my1, mx2, my2)
+          // this.layers['walls-above'].translate(
+          //   -translatedX > RIGHT_BORDER ? 0 : -STEP,
+          //   0
+          // )
+          // this.maze.drawWalls(this.layers['walls-above'])
           this.layers['ground'].clearRect(mx1, my1, mx2, my2)
           this.layers['ground'].translate(
             -translatedX > RIGHT_BORDER ? 0 : -STEP,
@@ -171,9 +207,9 @@ export default class Renderer {
           this.layers['walls-below'].clearRect(mx1, my1, mx2, my2)
           this.layers['walls-below'].translate(0, translatedY < 0 ? STEP : 0)
           this.maze.drawWalls(this.layers['walls-below'])
-          this.layers['walls-above'].clearRect(mx1, my1, mx2, my2)
-          this.layers['walls-above'].translate(0, translatedY < 0 ? STEP : 0)
-          this.maze.drawWalls(this.layers['walls-above'])
+          // this.layers['walls-above'].clearRect(mx1, my1, mx2, my2)
+          // this.layers['walls-above'].translate(0, translatedY < 0 ? STEP : 0)
+          // this.maze.drawWalls(this.layers['walls-above'])
           this.layers['ground'].clearRect(mx1, my1, mx2, my2)
           this.layers['ground'].translate(0, translatedY < 0 ? STEP : 0)
           this.maze.drawGround(this.layers['ground'])
@@ -188,12 +224,12 @@ export default class Renderer {
             -translatedY > BOTTOM_BORDER ? 0 : -STEP
           )
           this.maze.drawWalls(this.layers['walls-below'])
-          this.layers['walls-above'].clearRect(mx1, my1, mx2, my2)
-          this.layers['walls-above'].translate(
-            0,
-            -translatedY > BOTTOM_BORDER ? 0 : -STEP
-          )
-          this.maze.drawWalls(this.layers['walls-above'])
+          // this.layers['walls-above'].clearRect(mx1, my1, mx2, my2)
+          // this.layers['walls-above'].translate(
+          //   0,
+          //   -translatedY > BOTTOM_BORDER ? 0 : -STEP
+          // )
+          // this.maze.drawWalls(this.layers['walls-above'])
           this.layers['ground'].clearRect(mx1, my1, mx2, my2)
           this.layers['ground'].translate(
             0,
@@ -215,10 +251,11 @@ export default class Renderer {
 
     const walls = this.maze.getWalls()
     const cp = Object.values(walls).map((wall: any) => wall.coords)
+    const yCorr = 64
 
     if (
       this.keys[ArrowKeys.ArrowRight] &&
-      !this.collisionRight(cp, x1, y1, x2, y2)
+      !this.collisionRight(cp, x1, y1, x2, y2, yCorr)
     ) {
       this.hero.clear(this.layers['hero'])
       this.hero.move(Direction.right)
@@ -227,7 +264,7 @@ export default class Renderer {
     }
     if (
       this.keys[ArrowKeys.ArrowLeft] &&
-      !this.collisionLeft(cp, x1, y1, x2, y2)
+      !this.collisionLeft(cp, x1, y1, x2, y2, yCorr)
     ) {
       this.hero.clear(this.layers['hero'])
       this.hero.move(Direction.left)
@@ -243,7 +280,10 @@ export default class Renderer {
       this.moveCamera(Direction.down)
       this.hero.render(this.layers['hero'])
     }
-    if (this.keys[ArrowKeys.ArrowUp] && !this.collisionUp(cp, x1, y1, x2, y2)) {
+    if (
+      this.keys[ArrowKeys.ArrowUp] &&
+      !this.collisionUp(cp, x1, y1, x2, y2, yCorr)
+    ) {
       this.hero.clear(this.layers['hero'])
       this.hero.move(Direction.up)
       this.moveCamera(Direction.up)
@@ -306,7 +346,7 @@ export default class Renderer {
     this.addLayer('ground')
     this.addLayer('walls-below')
     this.addLayer('hero')
-    this.addLayer('walls-above')
+    // this.addLayer('walls-above')
 
     this.addMaze(
       new Maze(ROOMS_HORIZONTAL, ROOMS_VERTICAL, {
@@ -322,7 +362,7 @@ export default class Renderer {
     this.maze.drawGround(this.layers['ground'])
     this.maze.drawWalls(this.layers['walls-below'])
     this.hero.render(this.layers['hero'])
-    this.maze.drawWalls(this.layers['walls-above'])
+    // this.maze.drawWalls(this.layers['walls-above'])
     this.hero.setCurrentRoom('0,0')
     this.startAnimationLoop()
   }
