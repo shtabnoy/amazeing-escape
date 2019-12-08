@@ -318,7 +318,7 @@ export default class Renderer {
         },
       })
     )
-    this.addHero(new Hero(this.assetLoader.getImage('hero'), { x: 65, y: 65 }))
+    this.addHero(new Hero(this.assetLoader.getImage('hero'), { x: 70, y: 140 }))
     this.maze.drawGround(this.layers['ground'])
     this.maze.drawWalls(this.layers['walls-below'])
     this.hero.render(this.layers['hero'])
