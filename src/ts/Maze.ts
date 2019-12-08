@@ -76,14 +76,38 @@ export default class Maze {
       const y1 = vy * rw // top Y
       const y2 = (vy + 1) * rw // bottom Y
 
-      const uwall: W = [[x1 + d, y1], [x2, y1 + d]]
-      const dwall: W = [[x1 + d, y2], [x2, y2]]
-      const lwall: W = [[x1, y1 + d], [x1 + d, y2]]
-      const rwall: W = [[x2, y1 + d], [x2 + d, y2]]
-      const ulwall: W = [[x1, y1], [x1 + d, y1 + d]]
-      const dlwall: W = [[x1, y2], [x1 + d, y2 + d]]
-      const urwall: W = [[x2, y1], [x2 + d, y1 + d]]
-      const drwall: W = [[x2, y2], [x2 + d, y2 + d]]
+      // const uwall: W = [
+      //   [x1 + d, y1],
+      //   [x2, y1 + d],
+      // ]
+      // const dwall: W = [
+      //   [x1 + d, y2],
+      //   [x2, y2],
+      // ]
+      // const lwall: W = [
+      //   [x1, y1 + d],
+      //   [x1 + d, y2],
+      // ]
+      // const rwall: W = [
+      //   [x2, y1 + d],
+      //   [x2 + d, y2],
+      // ]
+      // const ulwall: W = [
+      //   [x1, y1],
+      //   [x1 + d, y1 + d],
+      // ]
+      // const dlwall: W = [
+      //   [x1, y2],
+      //   [x1 + d, y2 + d],
+      // ]
+      // const urwall: W = [
+      //   [x2, y1],
+      //   [x2 + d, y1 + d],
+      // ]
+      // const drwall: W = [
+      //   [x2, y2],
+      //   [x2 + d, y2 + d],
+      // ]
 
       const lv = g.vertices[[vx - 1, vy].toString()]
       const tv = g.vertices[[vx, vy - 1].toString()]
@@ -91,31 +115,47 @@ export default class Maze {
       const bv = g.vertices[[vx, vy + 1].toString()]
 
       // TODO: Remove dups (only up and left is enough)
+      const uwall: W = [
+        [x1 + 64, y1],
+        [x2, y1 + 128],
+      ]
+      const dwall: W = [
+        [x1 + 64, y2],
+        [x2, y2],
+      ]
       if (!vertex.up && !this.walls[uwall.toString()]) {
         this.walls[uwall.toString()] = {
           coords: uwall,
-          sx: 0,
-          sy: 192,
+          sx: 64,
+          sy: 384,
           sw: 192,
-          sh: 64,
+          sh: 128,
         }
       }
 
       if (!vertex.down && !this.walls[dwall.toString()]) {
         this.walls[dwall.toString()] = {
           coords: dwall,
-          sx: 0,
-          sy: 192,
+          sx: 64,
+          sy: 384,
           sw: 192,
-          sh: 64,
+          sh: 128,
         }
       }
 
+      const lwall: W = [
+        [x1, y1 + 64],
+        [x1 + 64, y2],
+      ]
+      const rwall: W = [
+        [x2, y1 + 64],
+        [x2 + 64, y2],
+      ]
       if (!vertex.left && !this.walls[lwall.toString()]) {
         this.walls[lwall.toString()] = {
           coords: lwall,
-          sx: 192,
-          sy: 0,
+          sx: 256,
+          sy: 192,
           sw: 64,
           sh: 192,
         }
@@ -124,46 +164,72 @@ export default class Maze {
       if (!vertex.right && !this.walls[rwall.toString()]) {
         this.walls[rwall.toString()] = {
           coords: rwall,
-          sx: 192,
-          sy: 0,
+          sx: 256,
+          sy: 192,
           sw: 64,
           sh: 192,
         }
       }
 
+      const ulwall: W = [
+        [x1, y1],
+        [x1 + 64, y1 + 128],
+      ]
+      const dlwall: W = [
+        [x1, y2],
+        [x1 + d, y2 + d],
+      ]
+      const urwall: W = [
+        [x2, y1],
+        [x2 + d, y1 + d],
+      ]
+      const drwall: W = [
+        [x2, y2],
+        [x2 + d, y2 + d],
+      ]
+
+      // 1
       if (!lv && !tv) {
         this.walls[ulwall.toString()] = {
           coords: ulwall,
           sx: 0,
-          sy: 0,
+          sy: 256,
           sw: 64,
-          sh: 64,
+          sh: 128,
         }
-      } else if (lv && !tv && !lv.right) {
+      }
+      // 2
+      else if (lv && !tv && !lv.right) {
         this.walls[ulwall.toString()] = {
           coords: ulwall,
           sx: 64,
           sy: 0,
           sw: 64,
-          sh: 64,
+          sh: 128,
         }
-      } else if (lv && !tv && lv.right) {
+      }
+      // 5
+      else if (lv && !tv && lv.right) {
         this.walls[ulwall.toString()] = {
           coords: ulwall,
           sx: 256,
           sy: 64,
           sw: 64,
-          sh: 64,
+          sh: 128,
         }
-      } else if (!lv && tv && !tv.down) {
+      }
+      // 4
+      else if (!lv && tv && !tv.down) {
         this.walls[ulwall.toString()] = {
           coords: ulwall,
           sx: 0,
-          sy: 64,
+          sy: 0,
           sw: 64,
-          sh: 64,
+          sh: 128,
         }
-      } else if (!lv && tv && tv.down) {
+      }
+      // 3
+      else if (!lv && tv && tv.down) {
         this.walls[ulwall.toString()] = {
           coords: ulwall,
           sx: 256,
@@ -171,31 +237,39 @@ export default class Maze {
           sw: 64,
           sh: 64,
         }
-      } else if (lv && tv && !lv.right && lv.up && !tv.down && tv.left) {
+      }
+      // 1
+      else if (lv && tv && !lv.right && lv.up && !tv.down && tv.left) {
         this.walls[ulwall.toString()] = {
           coords: ulwall,
           sx: 0,
-          sy: 0,
+          sy: 256,
           sw: 64,
-          sh: 64,
+          sh: 128,
         }
-      } else if (lv && tv && !lv.right && !lv.up && !tv.down && tv.left) {
+      }
+      // 2
+      else if (lv && tv && !lv.right && !lv.up && !tv.down && tv.left) {
         this.walls[ulwall.toString()] = {
           coords: ulwall,
           sx: 64,
           sy: 0,
           sw: 64,
-          sh: 64,
+          sh: 128,
         }
-      } else if (lv && tv && !lv.right && !lv.up && tv.down && tv.left) {
+      }
+      // the same as right upper corner
+      else if (lv && tv && !lv.right && !lv.up && tv.down && tv.left) {
         this.walls[ulwall.toString()] = {
           coords: ulwall,
-          sx: 128,
-          sy: 0,
+          sx: 64,
+          sy: 256,
           sw: 64,
-          sh: 64,
+          sh: 128,
         }
-      } else if (lv && tv && !lv.right && lv.up && tv.down && !tv.left) {
+      }
+      // 3
+      else if (lv && tv && !lv.right && lv.up && tv.down && !tv.left) {
         this.walls[ulwall.toString()] = {
           coords: ulwall,
           sx: 256,
@@ -206,158 +280,180 @@ export default class Maze {
       } else if (lv && tv && lv.right && lv.up && !tv.down && tv.left) {
         this.walls[ulwall.toString()] = {
           coords: ulwall,
-          sx: 320,
+          sx: 192,
           sy: 0,
           sw: 64,
-          sh: 64,
+          sh: 128,
         }
-      } else if (lv && tv && !lv.right && lv.up && !tv.down && !tv.left) {
+      }
+      // 4
+      else if (lv && tv && !lv.right && lv.up && !tv.down && !tv.left) {
         this.walls[ulwall.toString()] = {
           coords: ulwall,
           sx: 0,
-          sy: 64,
+          sy: 0,
           sw: 64,
-          sh: 64,
+          sh: 128,
         }
-      } else if (lv && tv && !lv.right && !lv.up && !tv.down && !tv.left) {
-        this.walls[ulwall.toString()] = {
-          coords: ulwall,
-          sx: 64,
-          sy: 64,
-          sw: 64,
-          sh: 64,
-        }
-      } else if (lv && tv && !lv.right && !lv.up && tv.down && !tv.left) {
-        this.walls[ulwall.toString()] = {
-          coords: ulwall,
-          sx: 128,
-          sy: 64,
-          sw: 64,
-          sh: 64,
-        }
-      } else if (lv && tv && lv.right && !lv.up && !tv.down && tv.left) {
-        this.walls[ulwall.toString()] = {
-          coords: ulwall,
-          sx: 256,
-          sy: 64,
-          sw: 64,
-          sh: 64,
-        }
-      } else if (lv && tv && lv.right && lv.up && !tv.down && !tv.left) {
+      }
+      // cross
+      else if (lv && tv && !lv.right && !lv.up && !tv.down && !tv.left) {
         this.walls[ulwall.toString()] = {
           coords: ulwall,
           sx: 0,
           sy: 128,
           sw: 64,
-          sh: 64,
+          sh: 128,
         }
-      } else if (lv && tv && lv.right && !lv.up && !tv.down && !tv.left) {
+      }
+      // right-T
+      else if (lv && tv && !lv.right && !lv.up && tv.down && !tv.left) {
+        this.walls[ulwall.toString()] = {
+          coords: ulwall,
+          sx: 128,
+          sy: 0,
+          sw: 64,
+          sh: 128,
+        }
+      }
+      // vertical short wall
+      // 5
+      else if (lv && tv && lv.right && !lv.up && !tv.down && tv.left) {
+        this.walls[ulwall.toString()] = {
+          coords: ulwall,
+          sx: 256,
+          sy: 64,
+          sw: 64,
+          sh: 128,
+        }
+      }
+      // left lower corner
+      else if (lv && tv && lv.right && lv.up && !tv.down && !tv.left) {
+        this.walls[ulwall.toString()] = {
+          coords: ulwall,
+          sx: 128,
+          sy: 256,
+          sw: 64,
+          sh: 128,
+        }
+      }
+      // bottom-T
+      else if (lv && tv && lv.right && !lv.up && !tv.down && !tv.left) {
         this.walls[ulwall.toString()] = {
           coords: ulwall,
           sx: 64,
           sy: 128,
           sw: 64,
-          sh: 64,
+          sh: 128,
         }
-      } else if (lv && tv && lv.right && !lv.up && tv.down && !tv.left) {
-        this.walls[ulwall.toString()] = {
-          coords: ulwall,
-          sx: 128,
-          sy: 128,
-          sw: 64,
-          sh: 64,
-        }
-      } else if (lv && tv && lv.right && lv.up && tv.down && !tv.left) {
-        this.walls[ulwall.toString()] = {
-          coords: ulwall,
-          sx: 256,
-          sy: 128,
-          sw: 64,
-          sh: 64,
-        }
-      } else if (lv && tv && !lv.right && lv.up && tv.down && tv.left) {
+      }
+      // lower right corner
+      else if (lv && tv && lv.right && !lv.up && tv.down && !tv.left) {
         this.walls[ulwall.toString()] = {
           coords: ulwall,
           sx: 192,
-          sy: 192,
+          sy: 256,
           sw: 64,
-          sh: 64,
-        }
-      } else if (lv && tv && lv.right && !lv.up && tv.down && tv.left) {
-        this.walls[ulwall.toString()] = {
-          coords: ulwall,
-          sx: 256,
-          sy: 192,
-          sw: 64,
-          sh: 64,
-        }
-      } else {
-        this.walls[ulwall.toString()] = {
-          coords: ulwall,
+          sh: 128,
         }
       }
-
-      if (!rv && !tv) {
-        this.walls[urwall.toString()] = {
-          coords: urwall,
-          sx: 128,
-          sy: 0,
+      // bottom end
+      else if (lv && tv && lv.right && lv.up && tv.down && !tv.left) {
+        this.walls[ulwall.toString()] = {
+          coords: ulwall,
+          sx: 192,
+          sy: 128,
           sw: 64,
-          sh: 64,
-        }
-      } else if (!rv && tv && !tv.down) {
-        this.walls[urwall.toString()] = {
-          coords: urwall,
-          sx: 128,
-          sy: 64,
-          sw: 64,
-          sh: 64,
-        }
-      } else if (!rv && tv && tv.down) {
-        this.walls[urwall.toString()] = {
-          coords: urwall,
-          sx: 256,
-          sy: 0,
-          sw: 64,
-          sh: 64,
+          sh: 128,
         }
       }
-
-      if (!lv && !bv) {
-        this.walls[dlwall.toString()] = {
-          coords: dlwall,
+      // top end
+      else if (lv && tv && !lv.right && lv.up && tv.down && tv.left) {
+        this.walls[ulwall.toString()] = {
+          coords: ulwall,
+          sx: 128,
+          sy: 128,
+          sw: 64,
+          sh: 128,
+        }
+      }
+      // right end
+      else if (lv && tv && lv.right && !lv.up && tv.down && tv.left) {
+        this.walls[ulwall.toString()] = {
+          coords: ulwall,
           sx: 0,
-          sy: 128,
+          sy: 384,
           sw: 64,
-          sh: 64,
-        }
-      } else if (lv && !bv && !lv.right) {
-        this.walls[dlwall.toString()] = {
-          coords: dlwall,
-          sx: 64,
-          sy: 128,
-          sw: 64,
-          sh: 64,
-        }
-      } else if (lv && !bv && lv.right) {
-        this.walls[dlwall.toString()] = {
-          coords: dlwall,
-          sx: 256,
-          sy: 64,
-          sw: 64,
-          sh: 64,
+          sh: 128,
         }
       }
+      // else {
+      //   this.walls[ulwall.toString()] = {
+      //     coords: ulwall,
+      //   }
+      // }
 
-      if (!rv && !bv) {
-        this.walls[drwall.toString()] = {
-          coords: drwall,
-          sx: 128,
-          sy: 128,
-          sw: 64,
-          sh: 64,
-        }
-      }
+      // if (!rv && !tv) {
+      //   this.walls[urwall.toString()] = {
+      //     coords: urwall,
+      //     sx: 128,
+      //     sy: 0,
+      //     sw: 64,
+      //     sh: 64,
+      //   }
+      // } else if (!rv && tv && !tv.down) {
+      //   this.walls[urwall.toString()] = {
+      //     coords: urwall,
+      //     sx: 128,
+      //     sy: 64,
+      //     sw: 64,
+      //     sh: 64,
+      //   }
+      // } else if (!rv && tv && tv.down) {
+      //   this.walls[urwall.toString()] = {
+      //     coords: urwall,
+      //     sx: 256,
+      //     sy: 0,
+      //     sw: 64,
+      //     sh: 64,
+      //   }
+      // }
+
+      // if (!lv && !bv) {
+      //   this.walls[dlwall.toString()] = {
+      //     coords: dlwall,
+      //     sx: 0,
+      //     sy: 128,
+      //     sw: 64,
+      //     sh: 64,
+      //   }
+      // } else if (lv && !bv && !lv.right) {
+      //   this.walls[dlwall.toString()] = {
+      //     coords: dlwall,
+      //     sx: 64,
+      //     sy: 128,
+      //     sw: 64,
+      //     sh: 64,
+      //   }
+      // } else if (lv && !bv && lv.right) {
+      //   this.walls[dlwall.toString()] = {
+      //     coords: dlwall,
+      //     sx: 256,
+      //     sy: 64,
+      //     sw: 64,
+      //     sh: 64,
+      //   }
+      // }
+
+      // if (!rv && !bv) {
+      //   this.walls[drwall.toString()] = {
+      //     coords: drwall,
+      //     sx: 128,
+      //     sy: 128,
+      //     sw: 64,
+      //     sh: 64,
+      //   }
+      // }
     })
   }
 

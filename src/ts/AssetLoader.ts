@@ -8,7 +8,7 @@ const loadImage = (src: string): Promise<HTMLImageElement> => {
 }
 
 const imageMap = {
-  walls: 'walls/walls.png',
+  walls: 'walls/wallsLong.png',
   hero: 'hero/hero.png',
   ground: 'ground/ground.jpg',
 }
