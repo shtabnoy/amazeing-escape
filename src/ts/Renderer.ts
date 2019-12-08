@@ -116,20 +116,21 @@ export default class Renderer {
     yCorr?: number
   ) => {
     if (yCorr) {
-      return walls.some(
-        (wall: W) =>
+      return walls.some((wall: W) => {
+        return (
           x1 <= wall[1][0] &&
           x2 >= wall[0][0] &&
           y1 - STEP <= wall[1][1] - yCorr &&
           y2 - STEP >= wall[1][1]
-      )
+        )
+      })
     } else {
       return walls.some(
         (wall: W) =>
           x1 <= wall[1][0] &&
           x2 >= wall[0][0] &&
           y1 - STEP <= wall[1][1] &&
-          y2 - STEP >= wall[1][1]
+          y1 >= wall[1][1]
       )
     }
   }
@@ -139,15 +140,27 @@ export default class Renderer {
     x1: number,
     y1: number,
     x2: number,
-    y2: number
-  ) =>
-    walls.some(
-      (wall: W) =>
-        x1 <= wall[1][0] &&
-        x2 >= wall[0][0] &&
-        y1 + STEP <= wall[0][1] &&
-        y2 + STEP >= wall[0][1]
-    )
+    y2: number,
+    yCorr?: number
+  ) => {
+    if (yCorr) {
+      return walls.some(
+        (wall: W) =>
+          x1 <= wall[1][0] &&
+          x2 >= wall[0][0] &&
+          y1 + STEP <= wall[0][1] &&
+          y2 + STEP >= wall[0][1] + yCorr
+      )
+    } else {
+      return walls.some(
+        (wall: W) =>
+          x1 <= wall[1][0] &&
+          x2 >= wall[0][0] &&
+          y1 + STEP <= wall[0][1] &&
+          y2 + STEP >= wall[0][1]
+      )
+    }
+  }
 
   private moveCamera(dir: Direction) {
     const { x: x1, y: y1 } = this.hero.getCoords()
@@ -166,9 +179,9 @@ export default class Renderer {
           this.maze.moveCanvas(this.layers['walls-below'], Direction.left)
           this.maze.drawWalls(this.layers['walls-below'])
 
-          this.maze.clearCanvas(this.layers['walls-above'])
-          this.maze.moveCanvas(this.layers['walls-above'], Direction.left)
-          this.maze.drawWalls(this.layers['walls-above'])
+          // this.maze.clearCanvas(this.layers['walls-above'])
+          // this.maze.moveCanvas(this.layers['walls-above'], Direction.left)
+          // this.maze.drawWalls(this.layers['walls-above'])
 
           this.maze.clearCanvas(this.layers['ground'])
           this.maze.moveCanvas(this.layers['ground'], Direction.left)
@@ -183,9 +196,9 @@ export default class Renderer {
           this.maze.moveCanvas(this.layers['walls-below'], Direction.right)
           this.maze.drawWalls(this.layers['walls-below'])
 
-          this.maze.clearCanvas(this.layers['walls-above'])
-          this.maze.moveCanvas(this.layers['walls-above'], Direction.right)
-          this.maze.drawWalls(this.layers['walls-above'])
+          // this.maze.clearCanvas(this.layers['walls-above'])
+          // this.maze.moveCanvas(this.layers['walls-above'], Direction.right)
+          // this.maze.drawWalls(this.layers['walls-above'])
 
           this.maze.clearCanvas(this.layers['ground'])
           this.maze.moveCanvas(this.layers['ground'], Direction.right)
@@ -200,9 +213,9 @@ export default class Renderer {
           this.maze.moveCanvas(this.layers['walls-below'], Direction.up)
           this.maze.drawWalls(this.layers['walls-below'])
 
-          this.maze.clearCanvas(this.layers['walls-above'])
-          this.maze.moveCanvas(this.layers['walls-above'], Direction.up)
-          this.maze.drawWalls(this.layers['walls-above'])
+          // this.maze.clearCanvas(this.layers['walls-above'])
+          // this.maze.moveCanvas(this.layers['walls-above'], Direction.up)
+          // this.maze.drawWalls(this.layers['walls-above'])
 
           this.maze.clearCanvas(this.layers['ground'])
           this.maze.moveCanvas(this.layers['ground'], Direction.up)
@@ -217,9 +230,9 @@ export default class Renderer {
           this.maze.moveCanvas(this.layers['walls-below'], Direction.down)
           this.maze.drawWalls(this.layers['walls-below'])
 
-          this.maze.clearCanvas(this.layers['walls-above'])
-          this.maze.moveCanvas(this.layers['walls-above'], Direction.down)
-          this.maze.drawWalls(this.layers['walls-above'])
+          // this.maze.clearCanvas(this.layers['walls-above'])
+          // this.maze.moveCanvas(this.layers['walls-above'], Direction.down)
+          // this.maze.drawWalls(this.layers['walls-above'])
 
           this.maze.clearCanvas(this.layers['ground'])
           this.maze.moveCanvas(this.layers['ground'], Direction.down)
@@ -257,23 +270,29 @@ export default class Renderer {
       this.moveCamera(Direction.left)
       this.hero.render(this.layers['hero'])
     }
-    if (
-      this.keys[ArrowKeys.ArrowDown] &&
-      !this.collisionDown(cp, x1, y1, x2, y2)
-    ) {
-      this.hero.clear(this.layers['hero'])
-      this.hero.move(Direction.down)
-      this.moveCamera(Direction.down)
-      this.hero.render(this.layers['hero'])
+    if (this.keys[ArrowKeys.ArrowDown]) {
+      if (this.collisionDown(cp, x1, y1, x2, y2)) {
+        this.maze.clearCanvas(this.layers['walls-below'])
+        this.maze.drawWalls(this.layers['walls-above'])
+      }
+      if (!this.collisionDown(cp, x1, y1, x2, y2, yCorr)) {
+        this.hero.clear(this.layers['hero'])
+        this.hero.move(Direction.down)
+        this.moveCamera(Direction.down)
+        this.hero.render(this.layers['hero'])
+      }
     }
-    if (
-      this.keys[ArrowKeys.ArrowUp] &&
-      !this.collisionUp(cp, x1, y1, x2, y2, yCorr)
-    ) {
-      this.hero.clear(this.layers['hero'])
-      this.hero.move(Direction.up)
-      this.moveCamera(Direction.up)
-      this.hero.render(this.layers['hero'])
+    if (this.keys[ArrowKeys.ArrowUp]) {
+      if (this.collisionUp(cp, x1, y1, x2, y2)) {
+        this.maze.clearCanvas(this.layers['walls-above'])
+        this.maze.drawWalls(this.layers['walls-below'])
+      }
+      if (!this.collisionUp(cp, x1, y1, x2, y2, yCorr)) {
+        this.hero.clear(this.layers['hero'])
+        this.hero.move(Direction.up)
+        this.moveCamera(Direction.up)
+        this.hero.render(this.layers['hero'])
+      }
     }
 
     this.updateFrame()
@@ -348,7 +367,7 @@ export default class Renderer {
     this.maze.drawGround(this.layers['ground'])
     this.maze.drawWalls(this.layers['walls-below'])
     this.hero.render(this.layers['hero'])
-    this.maze.drawWalls(this.layers['walls-above'])
+    // this.maze.drawWalls(this.layers['walls-above'])
     this.hero.setCurrentRoom('0,0')
     this.startAnimationLoop()
   }

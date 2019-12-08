@@ -96,7 +96,7 @@ export default class Maze {
       ]
       const dwall: W = [
         [x1 + 64, y2],
-        [x2, y2],
+        [x2, y2 + 128],
       ]
       if (!vertex.up && !this.walls[uwall.toString()]) {
         this.walls[uwall.toString()] = {
