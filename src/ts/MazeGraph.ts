@@ -5,6 +5,8 @@ export enum Direction {
   right = 'right',
 }
 
+export type Dir = 'up' | 'down' | 'left' | 'right'
+
 export interface Edge {
   v1: string
   v2: string

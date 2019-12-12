@@ -1,4 +1,4 @@
-import Maze from './Maze'
+import Maze, { Walls, Wall } from './Maze'
 import Hero from './Hero'
 import { Keys, ArrowKeys, AnimationControls } from './types'
 import {
@@ -16,7 +16,6 @@ import {
   ROOMS_HORIZONTAL,
   ROOMS_VERTICAL,
   ROOM_WIDTH,
-  WALL_DEPTH,
 } from './constants'
 import { Direction } from './MazeGraph'
 import AssetLoader from './AssetLoader'
@@ -54,140 +53,70 @@ export default class Renderer {
   }
 
   private collisionRight = (
-    walls: W[],
+    walls: Wall[],
     x1: number,
     y1: number,
     x2: number,
-    y2: number,
-    yCorr: number
+    y2: number
   ) => {
     return walls.some(
-      (wall: W) =>
-        x1 + STEP <= wall[0][0] &&
-        x2 + STEP >= wall[0][0] &&
-        y1 <= wall[1][1] - yCorr &&
-        y2 >= wall[0][1]
+      (wall: Wall) =>
+        x1 + STEP <= wall.coords[0][0] &&
+        x2 + STEP >= wall.coords[0][0] &&
+        y1 <= wall.coords[1][1] - wall.collisionZone.down &&
+        y2 >= wall.coords[0][1] + wall.collisionZone.up
     )
   }
-  private collisionRight0 = (
-    walls: W[],
-    x1: number,
-    y1: number,
-    x2: number,
-    y2: number,
-    yCorr: number
-  ) => {
-    return walls.some(
-      (wall: W) =>
-        x1 + STEP <= wall[0][0] &&
-        x2 + STEP >= wall[0][0] &&
-        y1 <= wall[1][1] &&
-        y2 >= wall[0][1] + yCorr
-    )
-  }
-
-  // return walls.some(
-  //   (wall: W) =>
-  //     x1 + STEP <= wall[0][0] &&
-  //     x2 + STEP >= wall[0][0] &&
-  //     y1 <= wall[1][1] &&
-  //     y2 >= wall[0][1]
-  // )
 
   private collisionLeft = (
-    walls: W[],
+    walls: Wall[],
     x1: number,
     y1: number,
     x2: number,
-    y2: number,
-    yCorr?: number
+    y2: number
   ) => {
     return walls.some(
-      (wall: W) =>
-        x1 - STEP <= wall[1][0] &&
-        x2 - STEP >= wall[1][0] &&
-        y1 <= wall[1][1] - yCorr &&
-        y2 >= wall[0][1]
+      (wall: Wall) =>
+        x1 - STEP <= wall.coords[1][0] &&
+        x2 - STEP >= wall.coords[1][0] &&
+        y1 <= wall.coords[1][1] - wall.collisionZone.down &&
+        y2 >= wall.coords[0][1] + wall.collisionZone.up
     )
   }
-
-  private collisionLeft0 = (
-    walls: W[],
-    x1: number,
-    y1: number,
-    x2: number,
-    y2: number,
-    yCorr?: number
-  ) => {
-    return walls.some(
-      (wall: W) =>
-        x1 - STEP <= wall[1][0] &&
-        x2 - STEP >= wall[1][0] &&
-        y1 <= wall[1][1] &&
-        y2 >= wall[0][1] + yCorr
-    )
-  }
-  // return walls.some(
-  //   (wall: W) =>
-  //     x1 - STEP <= wall[1][0] &&
-  //     x2 - STEP >= wall[1][0] &&
-  //     y1 <= wall[1][1] &&
-  //     y2 >= wall[0][1]
-  // )
 
   private collisionUp = (
-    walls: W[],
+    walls: Wall[],
     x1: number,
     y1: number,
     x2: number,
     y2: number,
-    yCorr?: number
+    withCZ?: boolean
   ) => {
-    if (yCorr) {
-      return walls.some((wall: W) => {
-        return (
-          x1 <= wall[1][0] &&
-          x2 >= wall[0][0] &&
-          y1 - STEP <= wall[1][1] - yCorr &&
-          y2 - STEP >= wall[1][1]
-        )
-      })
-    } else {
-      return walls.some(
-        (wall: W) =>
-          x1 <= wall[1][0] &&
-          x2 >= wall[0][0] &&
-          y1 - STEP <= wall[1][1] &&
-          y2 - STEP >= wall[1][1]
-      )
-    }
+    return walls.some(
+      (wall: Wall) =>
+        x1 <= wall.coords[1][0] &&
+        x2 >= wall.coords[0][0] &&
+        y1 - STEP <=
+          wall.coords[1][1] - (withCZ ? wall.collisionZone.down : 0) &&
+        y2 - STEP >= wall.coords[1][1] - (withCZ ? wall.collisionZone.down : 0)
+    )
   }
 
   private collisionDown = (
-    walls: W[],
+    walls: Wall[],
     x1: number,
     y1: number,
     x2: number,
     y2: number,
-    yCorr?: number
+    withCZ?: boolean
   ) => {
-    if (yCorr) {
-      return walls.some(
-        (wall: W) =>
-          x1 <= wall[1][0] &&
-          x2 >= wall[0][0] &&
-          y1 + STEP <= wall[0][1] &&
-          y2 + STEP >= wall[0][1] + yCorr
-      )
-    } else {
-      return walls.some(
-        (wall: W) =>
-          x1 <= wall[1][0] &&
-          x2 >= wall[0][0] &&
-          y1 + STEP <= wall[0][1] &&
-          y2 + STEP >= wall[0][1]
-      )
-    }
+    return walls.some(
+      (wall: Wall) =>
+        x1 <= wall.coords[1][0] &&
+        x2 >= wall.coords[0][0] &&
+        y1 + STEP <= wall.coords[0][1] + (withCZ ? wall.collisionZone.up : 0) &&
+        y2 + STEP >= wall.coords[0][1] + (withCZ ? wall.collisionZone.up : 0)
+    )
   }
 
   private moveCamera(dir: Direction) {
@@ -276,38 +205,79 @@ export default class Renderer {
     const { x: x1, y: y1 } = this.hero.getCoords()
     const { x: x2, y: y2 } = this.hero.getBottomRightCoords()
 
-    const walls = this.maze.getWalls()
-    const cp = Object.values(walls).map((wall: any) => wall.coords)
-    const yCorr = 64
+    const walls = Object.values(this.maze.getWalls())
 
-    if (
-      (this.keys[ArrowKeys.ArrowRight] &&
-        !this.collisionRight(cp, x1, y1, x2, y2, yCorr)) ||
-      (this.keys[ArrowKeys.ArrowRight] &&
-        !this.collisionRight0(cp, x1, y1, x2, y2, yCorr))
-    ) {
-      this.hero.clear(this.layers['hero'])
-      this.hero.move(Direction.right)
-      this.moveCamera(Direction.right)
-      this.hero.render(this.layers['hero'])
-    }
-    if (
-      (this.keys[ArrowKeys.ArrowLeft] &&
-        !this.collisionLeft(cp, x1, y1, x2, y2, yCorr)) ||
-      (this.keys[ArrowKeys.ArrowLeft] &&
-        !this.collisionLeft0(cp, x1, y1, x2, y2, yCorr))
-    ) {
-      this.hero.clear(this.layers['hero'])
-      this.hero.move(Direction.left)
-      this.moveCamera(Direction.left)
-      this.hero.render(this.layers['hero'])
-    }
-    if (this.keys[ArrowKeys.ArrowDown]) {
-      if (this.collisionDown(cp, x1, y1, x2, y2)) {
+    // TODO: Simplify
+    if (this.keys[ArrowKeys.ArrowRight]) {
+      if (
+        walls.some(
+          (wall: Wall) =>
+            x1 + STEP <= wall.coords[0][0] &&
+            x2 + STEP >= wall.coords[0][0] &&
+            y2 >= wall.coords[0][1] &&
+            y2 <= wall.coords[0][1] + wall.collisionZone.up
+        )
+      ) {
         this.maze.clearCanvas(this.layers['walls-below'])
         this.maze.drawWalls(this.layers['walls-above'])
       }
-      if (!this.collisionDown(cp, x1, y1, x2, y2, yCorr)) {
+      if (
+        walls.some(
+          (wall: Wall) =>
+            x1 + STEP <= wall.coords[0][0] &&
+            x2 + STEP >= wall.coords[0][0] &&
+            y1 >= wall.coords[1][1] - wall.collisionZone.down &&
+            y1 <= wall.coords[1][1]
+        )
+      ) {
+        this.maze.clearCanvas(this.layers['walls-above'])
+        this.maze.drawWalls(this.layers['walls-below'])
+      }
+      if (!this.collisionRight(walls, x1, y1, x2, y2)) {
+        this.hero.clear(this.layers['hero'])
+        this.hero.move(Direction.right)
+        this.moveCamera(Direction.right)
+        this.hero.render(this.layers['hero'])
+      }
+    }
+    if (this.keys[ArrowKeys.ArrowLeft]) {
+      if (
+        walls.some(
+          (wall: Wall) =>
+            x1 - STEP <= wall.coords[1][0] &&
+            x2 - STEP >= wall.coords[1][0] &&
+            y2 >= wall.coords[0][1] &&
+            y2 <= wall.coords[0][1] + wall.collisionZone.up
+        )
+      ) {
+        this.maze.clearCanvas(this.layers['walls-below'])
+        this.maze.drawWalls(this.layers['walls-above'])
+      }
+      if (
+        walls.some(
+          (wall: Wall) =>
+            x1 - STEP <= wall.coords[1][0] &&
+            x2 - STEP >= wall.coords[1][0] &&
+            y1 >= wall.coords[1][1] - wall.collisionZone.down &&
+            y1 <= wall.coords[1][1]
+        )
+      ) {
+        this.maze.clearCanvas(this.layers['walls-above'])
+        this.maze.drawWalls(this.layers['walls-below'])
+      }
+      if (!this.collisionLeft(walls, x1, y1, x2, y2)) {
+        this.hero.clear(this.layers['hero'])
+        this.hero.move(Direction.left)
+        this.moveCamera(Direction.left)
+        this.hero.render(this.layers['hero'])
+      }
+    }
+    if (this.keys[ArrowKeys.ArrowDown]) {
+      if (this.collisionDown(walls, x1, y1, x2, y2)) {
+        this.maze.clearCanvas(this.layers['walls-below'])
+        this.maze.drawWalls(this.layers['walls-above'])
+      }
+      if (!this.collisionDown(walls, x1, y1, x2, y2, true)) {
         this.hero.clear(this.layers['hero'])
         this.hero.move(Direction.down)
         this.moveCamera(Direction.down)
@@ -315,11 +285,11 @@ export default class Renderer {
       }
     }
     if (this.keys[ArrowKeys.ArrowUp]) {
-      if (this.collisionUp(cp, x1, y1, x2, y2)) {
+      if (this.collisionUp(walls, x1, y1, x2, y2)) {
         this.maze.clearCanvas(this.layers['walls-above'])
         this.maze.drawWalls(this.layers['walls-below'])
       }
-      if (!this.collisionUp(cp, x1, y1, x2, y2, yCorr)) {
+      if (!this.collisionUp(walls, x1, y1, x2, y2, true)) {
         this.hero.clear(this.layers['hero'])
         this.hero.move(Direction.up)
         this.moveCamera(Direction.up)
