@@ -207,263 +207,209 @@ export default class Maze {
           { up: CZ, down: 0, left: 0, right: 0 }
         )
       }
-      // // 5
-      // // horizontal short wall
-      // else if (lv && !tv && lv.right) {
-      //   this.walls[ulwall.toString()] = {
-      //     coords: ulwall,
-      //     sx: 256,
-      //     sy: 64,
-      //     sw: 64,
-      //     sh: 128,
-      //   }
-      // }
-      // // 4
-      // // left T
-      // else if (!lv && tv && !tv.down) {
-      //   this.walls[ulwall.toString()] = {
-      //     coords: ulwall,
-      //     sx: 0,
-      //     sy: 0,
-      //     sw: 64,
-      //     sh: 128,
-      //   }
-      // }
-      // // 3
-      // // vertical short wall
-      // else if (!lv && tv && tv.down) {
-      //   this.walls[ulwall.toString()] = {
-      //     coords: ulwall,
-      //     sx: 256,
-      //     sy: 192,
-      //     sw: 64,
-      //     sh: 128,
-      //   }
-      // }
-      // // 1
-      // else if (lv && tv && !lv.right && lv.up && !tv.down && tv.left) {
-      //   this.walls[ulwall.toString()] = {
-      //     coords: ulwall,
-      //     sx: 0,
-      //     sy: 256,
-      //     sw: 64,
-      //     sh: 128,
-      //   }
-      // }
-      // // 2
-      // else if (lv && tv && !lv.right && !lv.up && !tv.down && tv.left) {
-      //   this.walls[ulwall.toString()] = {
-      //     coords: ulwall,
-      //     sx: 64,
-      //     sy: 0,
-      //     sw: 64,
-      //     sh: 128,
-      //   }
-      // }
-      // // right upper corner
-      // else if (lv && tv && !lv.right && !lv.up && tv.down && tv.left) {
-      //   this.walls[ulwall.toString()] = {
-      //     coords: ulwall,
-      //     sx: 64,
-      //     sy: 256,
-      //     sw: 64,
-      //     sh: 128,
-      //   }
-      // }
-      // // 3
-      // // vertical short wall
-      // else if (lv && tv && !lv.right && lv.up && tv.down && !tv.left) {
-      //   this.walls[ulwall.toString()] = {
-      //     coords: ulwall,
-      //     sx: 256,
-      //     sy: 192,
-      //     sw: 64,
-      //     sh: 128,
-      //   }
-      // } else if (lv && tv && lv.right && lv.up && !tv.down && tv.left) {
-      //   this.walls[ulwall.toString()] = {
-      //     coords: ulwall,
-      //     sx: 192,
-      //     sy: 0,
-      //     sw: 64,
-      //     sh: 128,
-      //   }
-      // }
-      // // 4
-      // // left T
-      // else if (lv && tv && !lv.right && lv.up && !tv.down && !tv.left) {
-      //   this.walls[ulwall.toString()] = {
-      //     coords: ulwall,
-      //     sx: 0,
-      //     sy: 0,
-      //     sw: 64,
-      //     sh: 128,
-      //   }
-      // }
-      // // cross
-      // else if (lv && tv && !lv.right && !lv.up && !tv.down && !tv.left) {
-      //   this.walls[ulwall.toString()] = {
-      //     coords: ulwall,
-      //     sx: 0,
-      //     sy: 128,
-      //     sw: 64,
-      //     sh: 128,
-      //   }
-      // }
-      // // right T
-      // else if (lv && tv && !lv.right && !lv.up && tv.down && !tv.left) {
-      //   this.walls[ulwall.toString()] = {
-      //     coords: ulwall,
-      //     sx: 128,
-      //     sy: 0,
-      //     sw: 64,
-      //     sh: 128,
-      //   }
-      // }
-      // // horizontal short wall
-      // // 5
-      // else if (lv && tv && lv.right && !lv.up && !tv.down && tv.left) {
-      //   this.walls[ulwall.toString()] = {
-      //     coords: ulwall,
-      //     sx: 256,
-      //     sy: 64,
-      //     sw: 64,
-      //     sh: 128,
-      //   }
-      // }
-      // // bottom left corner
-      // else if (lv && tv && lv.right && lv.up && !tv.down && !tv.left) {
-      //   this.walls[ulwall.toString()] = {
-      //     coords: ulwall,
-      //     sx: 128,
-      //     sy: 256,
-      //     sw: 64,
-      //     sh: 128,
-      //   }
-      // }
-      // // bottom T
-      // else if (lv && tv && lv.right && !lv.up && !tv.down && !tv.left) {
-      //   this.walls[ulwall.toString()] = {
-      //     coords: ulwall,
-      //     sx: 64,
-      //     sy: 128,
-      //     sw: 64,
-      //     sh: 128,
-      //   }
-      // }
-      // // bottom right corner
-      // else if (lv && tv && lv.right && !lv.up && tv.down && !tv.left) {
-      //   this.walls[ulwall.toString()] = {
-      //     coords: ulwall,
-      //     sx: 192,
-      //     sy: 256,
-      //     sw: 64,
-      //     sh: 128,
-      //   }
-      // }
-      // // bottom end
-      // else if (lv && tv && lv.right && lv.up && tv.down && !tv.left) {
-      //   this.walls[ulwall.toString()] = {
-      //     coords: ulwall,
-      //     sx: 192,
-      //     sy: 128,
-      //     sw: 64,
-      //     sh: 128,
-      //   }
-      // }
-      // // top end
-      // else if (lv && tv && !lv.right && lv.up && tv.down && tv.left) {
-      //   this.walls[ulwall.toString()] = {
-      //     coords: ulwall,
-      //     sx: 128,
-      //     sy: 128,
-      //     sw: 64,
-      //     sh: 128,
-      //   }
-      // }
-      // // right end
-      // else if (lv && tv && lv.right && !lv.up && tv.down && tv.left) {
-      //   this.walls[ulwall.toString()] = {
-      //     coords: ulwall,
-      //     sx: 0,
-      //     sy: 384,
-      //     sw: 64,
-      //     sh: 128,
-      //   }
-      // }
+      // horizontal short wall
+      else if (lv && !tv && lv.right) {
+        this.addWall(
+          ulwall,
+          { sx: 256, sy: 64, sw: 64, sh: 128 },
+          { up: CZ, down: CZ, left: 0, right: 0 }
+        )
+      }
+      // left T
+      else if (!lv && tv && !tv.down) {
+        this.addWall(
+          ulwall,
+          { sx: 0, sy: 0, sw: 64, sh: 128 },
+          { up: 0, down: 0, left: 0, right: 0 }
+        )
+      }
+      // vertical short wall
+      else if (!lv && tv && tv.down) {
+        this.addWall(
+          ulwall,
+          { sx: 256, sy: 192, sw: 64, sh: 128 },
+          { up: 0, down: 0, left: 0, right: 0 }
+        )
+      }
+      // top left corner
+      else if (lv && tv && !lv.right && lv.up && !tv.down && tv.left) {
+        this.addWall(
+          ulwall,
+          { sx: 0, sy: 256, sw: 64, sh: 128 },
+          { up: CZ, down: 0, left: 0, right: 0 }
+        )
+      }
+      // top T
+      else if (lv && tv && !lv.right && !lv.up && !tv.down && tv.left) {
+        this.addWall(
+          ulwall,
+          { sx: 64, sy: 0, sw: 64, sh: 128 },
+          { up: CZ, down: 0, left: 0, right: 0 }
+        )
+      }
+      // top right corner
+      else if (lv && tv && !lv.right && !lv.up && tv.down && tv.left) {
+        this.addWall(
+          ulwall,
+          { sx: 64, sy: 256, sw: 64, sh: 128 },
+          { up: CZ, down: 0, left: 0, right: 0 }
+        )
+      }
+      // vertical short wall
+      else if (lv && tv && !lv.right && lv.up && tv.down && !tv.left) {
+        this.addWall(
+          ulwall,
+          { sx: 256, sy: 192, sw: 64, sh: 128 },
+          { up: 0, down: 0, left: 0, right: 0 }
+        )
+      }
+      // left end
+      else if (lv && tv && lv.right && lv.up && !tv.down && tv.left) {
+        this.addWall(
+          ulwall,
+          { sx: 192, sy: 0, sw: 64, sh: 128 },
+          { up: CZ, down: CZ, left: 0, right: 0 }
+        )
+      }
+      // left T
+      else if (lv && tv && !lv.right && lv.up && !tv.down && !tv.left) {
+        this.addWall(
+          ulwall,
+          { sx: 0, sy: 0, sw: 64, sh: 128 },
+          { up: 0, down: 0, left: 0, right: 0 }
+        )
+      }
+      // cross
+      else if (lv && tv && !lv.right && !lv.up && !tv.down && !tv.left) {
+        this.addWall(
+          ulwall,
+          { sx: 0, sy: 128, sw: 64, sh: 128 },
+          { up: 0, down: 0, left: 0, right: 0 }
+        )
+      }
+      // right T
+      else if (lv && tv && !lv.right && !lv.up && tv.down && !tv.left) {
+        this.addWall(
+          ulwall,
+          { sx: 128, sy: 0, sw: 64, sh: 128 },
+          { up: 0, down: 0, left: 0, right: 0 }
+        )
+      }
+      // horizontal short wall
+      else if (lv && tv && lv.right && !lv.up && !tv.down && tv.left) {
+        this.addWall(
+          ulwall,
+          { sx: 256, sy: 64, sw: 64, sh: 128 },
+          { up: CZ, down: CZ, left: 0, right: 0 }
+        )
+      }
+      // bottom left corner
+      else if (lv && tv && lv.right && lv.up && !tv.down && !tv.left) {
+        this.addWall(
+          ulwall,
+          { sx: 128, sy: 256, sw: 64, sh: 128 },
+          { up: 0, down: CZ, left: 0, right: 0 }
+        )
+      }
+      // bottom T
+      else if (lv && tv && lv.right && !lv.up && !tv.down && !tv.left) {
+        this.addWall(
+          ulwall,
+          { sx: 64, sy: 128, sw: 64, sh: 128 },
+          { up: 0, down: CZ, left: 0, right: 0 }
+        )
+      }
+      // bottom right corner
+      else if (lv && tv && lv.right && !lv.up && tv.down && !tv.left) {
+        this.addWall(
+          ulwall,
+          { sx: 192, sy: 256, sw: 64, sh: 128 },
+          { up: 0, down: CZ, left: 0, right: 0 }
+        )
+      }
+      // bottom end
+      else if (lv && tv && lv.right && lv.up && tv.down && !tv.left) {
+        this.addWall(
+          ulwall,
+          { sx: 192, sy: 128, sw: 64, sh: 128 },
+          { up: 0, down: CZ, left: 0, right: 0 }
+        )
+      }
+      // top end
+      else if (lv && tv && !lv.right && lv.up && tv.down && tv.left) {
+        this.addWall(
+          ulwall,
+          { sx: 128, sy: 128, sw: 64, sh: 128 },
+          { up: CZ, down: 0, left: 0, right: 0 }
+        )
+      }
+      // right end
+      else if (lv && tv && lv.right && !lv.up && tv.down && tv.left) {
+        this.addWall(
+          ulwall,
+          { sx: 0, sy: 384, sw: 64, sh: 128 },
+          { up: CZ, down: CZ, left: 0, right: 0 }
+        )
+      }
 
-      // // right upper corner
-      // if (!rv && !tv) {
-      //   this.walls[urwall.toString()] = {
-      //     coords: urwall,
-      //     sx: 64,
-      //     sy: 256,
-      //     sw: 64,
-      //     sh: 128,
-      //   }
-      // }
-      // // right T
-      // else if (!rv && tv && !tv.down) {
-      //   this.walls[urwall.toString()] = {
-      //     coords: urwall,
-      //     sx: 128,
-      //     sy: 0,
-      //     sw: 64,
-      //     sh: 128,
-      //   }
-      // }
-      // // vertical short wall
-      // else if (!rv && tv && tv.down) {
-      //   this.walls[urwall.toString()] = {
-      //     coords: urwall,
-      //     sx: 256,
-      //     sy: 192,
-      //     sw: 64,
-      //     sh: 128,
-      //   }
-      // }
+      // right upper corner
+      if (!rv && !tv) {
+        this.addWall(
+          urwall,
+          { sx: 64, sy: 256, sw: 64, sh: 128 },
+          { up: CZ, down: 0, left: 0, right: 0 }
+        )
+      }
+      // right T
+      else if (!rv && tv && !tv.down) {
+        this.addWall(
+          urwall,
+          { sx: 128, sy: 0, sw: 64, sh: 128 },
+          { up: 0, down: 0, left: 0, right: 0 }
+        )
+      }
+      // vertical short wall
+      else if (!rv && tv && tv.down) {
+        this.addWall(
+          urwall,
+          { sx: 256, sy: 192, sw: 64, sh: 128 },
+          { up: 0, down: 0, left: 0, right: 0 }
+        )
+      }
 
-      // // bottom left corner
-      // if (!lv && !bv) {
-      //   this.walls[dlwall.toString()] = {
-      //     coords: dlwall,
-      //     sx: 128,
-      //     sy: 256,
-      //     sw: 64,
-      //     sh: 128,
-      //   }
-      // }
-      // // bottom T
-      // else if (lv && !bv && !lv.right) {
-      //   this.walls[dlwall.toString()] = {
-      //     coords: dlwall,
-      //     sx: 64,
-      //     sy: 128,
-      //     sw: 64,
-      //     sh: 128,
-      //   }
-      // }
-      // // horizontal short wall
-      // else if (lv && !bv && lv.right) {
-      //   this.walls[dlwall.toString()] = {
-      //     coords: dlwall,
-      //     sx: 256,
-      //     sy: 64,
-      //     sw: 64,
-      //     sh: 128,
-      //   }
-      // }
+      // bottom left corner
+      if (!lv && !bv) {
+        this.addWall(
+          dlwall,
+          { sx: 128, sy: 256, sw: 64, sh: 128 },
+          { up: 0, down: CZ, left: 0, right: 0 }
+        )
+      }
+      // bottom T
+      else if (lv && !bv && !lv.right) {
+        this.addWall(
+          dlwall,
+          { sx: 64, sy: 128, sw: 64, sh: 128 },
+          { up: 0, down: CZ, left: 0, right: 0 }
+        )
+      }
+      // horizontal short wall
+      else if (lv && !bv && lv.right) {
+        this.addWall(
+          dlwall,
+          { sx: 256, sy: 64, sw: 64, sh: 128 },
+          { up: CZ, down: CZ, left: 0, right: 0 }
+        )
+      }
 
-      // // bottom right corner
-      // if (!rv && !bv) {
-      //   this.walls[drwall.toString()] = {
-      //     coords: drwall,
-      //     sx: 192,
-      //     sy: 256,
-      //     sw: 64,
-      //     sh: 128,
-      //   }
-      // }
+      // bottom right corner
+      if (!rv && !bv) {
+        this.addWall(
+          drwall,
+          { sx: 192, sy: 256, sw: 64, sh: 128 },
+          { up: 0, down: CZ, left: 0, right: 0 }
+        )
+      }
     })
   }
 
