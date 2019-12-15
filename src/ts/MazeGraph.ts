@@ -14,10 +14,13 @@ export interface Edge {
 }
 
 export interface Vertex {
-  [Direction.up]?: Edge
-  [Direction.down]?: Edge
-  [Direction.left]?: Edge
-  [Direction.right]?: Edge
+  edges?: {
+    [Direction.up]?: Edge
+    [Direction.down]?: Edge
+    [Direction.left]?: Edge
+    [Direction.right]?: Edge
+  }
+  dist?: number
 }
 
 export default class MazeGraph {
@@ -32,17 +35,18 @@ export default class MazeGraph {
   }
 
   mst() {
+    console.log('starting mst')
     const result = new MazeGraph()
     let vName = Object.keys(this.vertices)[0]
     let v = this.vertices[vName]
-    let heap: Edge[] = Object.values(v)
+    let heap: Edge[] = Object.values(v.edges)
     let min: Edge = null
     while (heap.length > 0) {
       min = heap.reduce((p, c) => (p.weight <= c.weight ? p : c))
       ;[v, vName] = [vName, ...Object.keys(result.vertices)].includes(min.v1)
         ? [this.vertices[min.v2], min.v2]
         : [this.vertices[min.v1], min.v1]
-      heap.push(...Object.values(v))
+      heap.push(...Object.values(v.edges))
       heap = heap.filter((e, i, a) => a.indexOf(e) === a.lastIndexOf(e))
       result.addEdge(min)
     }
@@ -73,20 +77,36 @@ export default class MazeGraph {
     const v1 = this.vertices[edge.v1]
     const v2 = this.vertices[edge.v2]
     const dir = this.getDir(edge.v1, edge.v2)
+    // checking the farthest point
+    let dist1 = 0
+    let dist2 = 0
+    if (!v1 && !v2) {
+      dist2 = 1
+    } else if (!v1) {
+      dist1 = v2.dist + 1
+    } else if (!v2) {
+      dist2 = v1.dist + 1
+    }
     // add v1 to the graph if it doesn't exist
     if (v1) {
-      v1[dir] = edge
+      v1.edges[dir] = edge
     } else {
       this.vertices[edge.v1] = {
-        [dir]: edge,
+        edges: {
+          [dir]: edge,
+        },
+        dist: dist1,
       }
     }
     // add v2 to the graph if it doesn't exist
     if (v2) {
-      v2[this.getOppositeDir(dir)] = edge
+      v2.edges[this.getOppositeDir(dir)] = edge
     } else {
       this.vertices[edge.v2] = {
-        [this.getOppositeDir(dir)]: edge,
+        edges: {
+          [this.getOppositeDir(dir)]: edge,
+        },
+        dist: dist2,
       }
     }
   }

@@ -66,6 +66,7 @@ export default class Maze {
     this.images = config.images
     const g = this.createMazeGraph(width, height)
     const mst1 = g.mst()
+    console.log(mst1)
     this.walls = {}
     this.createRooms(mst1, ROOM_WIDTH)
   }
@@ -123,9 +124,17 @@ export default class Maze {
       const y2 = (vy + 1) * rw // bottom Y
 
       const lv = g.vertices[[vx - 1, vy].toString()]
+        ? g.vertices[[vx - 1, vy].toString()].edges
+        : null
       const tv = g.vertices[[vx, vy - 1].toString()]
+        ? g.vertices[[vx, vy - 1].toString()].edges
+        : null
       const rv = g.vertices[[vx + 1, vy].toString()]
+        ? g.vertices[[vx + 1, vy].toString()].edges
+        : null
       const bv = g.vertices[[vx, vy + 1].toString()]
+        ? g.vertices[[vx, vy + 1].toString()].edges
+        : null
 
       // TODO: Remove dups (only up and left is enough)
       const uwall: W = [
@@ -136,14 +145,14 @@ export default class Maze {
         [x1 + 64, y2],
         [x2, y2 + 128],
       ]
-      if (!vertex.up && !this.walls[uwall.toString()]) {
+      if (!vertex.edges.up && !this.walls[uwall.toString()]) {
         this.addWall(
           uwall,
           { sx: 64, sy: 384, sw: 192, sh: 128 },
           { up: CZ, down: CZ, left: 0, right: 0 }
         )
       }
-      if (!vertex.down && !this.walls[dwall.toString()]) {
+      if (!vertex.edges.down && !this.walls[dwall.toString()]) {
         this.addWall(
           dwall,
           { sx: 64, sy: 384, sw: 192, sh: 128 },
@@ -159,14 +168,14 @@ export default class Maze {
         [x2, y1 + 128],
         [x2 + 64, y2],
       ]
-      if (!vertex.left && !this.walls[lwall.toString()]) {
+      if (!vertex.edges.left && !this.walls[lwall.toString()]) {
         this.addWall(
           lwall,
           { sx: 256, sy: 192, sw: 64, sh: 128 },
           { up: 0, down: 0, left: 0, right: 0 }
         )
       }
-      if (!vertex.right && !this.walls[rwall.toString()]) {
+      if (!vertex.edges.right && !this.walls[rwall.toString()]) {
         this.addWall(
           rwall,
           { sx: 256, sy: 192, sw: 64, sh: 128 },
