@@ -5,8 +5,6 @@ export enum Direction {
   right = 'right',
 }
 
-export type Dir = 'up' | 'down' | 'left' | 'right'
-
 export interface Edge {
   v1: string
   v2: string
@@ -20,7 +18,7 @@ export interface Vertex {
     [Direction.left]?: Edge
     [Direction.right]?: Edge
   }
-  dist?: number
+  dist?: number // distance from the root point (0, 0)
 }
 
 export default class MazeGraph {
@@ -35,7 +33,6 @@ export default class MazeGraph {
   }
 
   mst() {
-    console.log('starting mst')
     const result = new MazeGraph()
     let vName = Object.keys(this.vertices)[0]
     let v = this.vertices[vName]
@@ -77,16 +74,7 @@ export default class MazeGraph {
     const v1 = this.vertices[edge.v1]
     const v2 = this.vertices[edge.v2]
     const dir = this.getDir(edge.v1, edge.v2)
-    // checking the farthest point
-    let dist1 = 0
-    let dist2 = 0
-    if (!v1 && !v2) {
-      dist2 = 1
-    } else if (!v1) {
-      dist1 = v2.dist + 1
-    } else if (!v2) {
-      dist2 = v1.dist + 1
-    }
+
     // add v1 to the graph if it doesn't exist
     if (v1) {
       v1.edges[dir] = edge
@@ -95,7 +83,7 @@ export default class MazeGraph {
         edges: {
           [dir]: edge,
         },
-        dist: dist1,
+        dist: v2 ? v2.dist + 1 : 0,
       }
     }
     // add v2 to the graph if it doesn't exist
@@ -106,7 +94,7 @@ export default class MazeGraph {
         edges: {
           [this.getOppositeDir(dir)]: edge,
         },
-        dist: dist2,
+        dist: v1 ? v1.dist + 1 : 1,
       }
     }
   }

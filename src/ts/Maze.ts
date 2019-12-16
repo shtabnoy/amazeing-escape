@@ -1,4 +1,4 @@
-import MazeGraph, { Vertex, Direction, Dir } from './MazeGraph'
+import MazeGraph, { Vertex, Direction } from './MazeGraph'
 import { rnd } from './utils'
 import {
   CANVAS_WIDTH,
