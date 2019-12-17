@@ -35,6 +35,13 @@ export default class Renderer {
     then: 0,
     elapsed: 0,
   }
+  private portalAnim: AnimationControls = {
+    now: 0,
+    then: 0,
+    elapsed: 0,
+  }
+  private portaFrame: number
+  private maxPortalFrame: number
   private keys: Keys = {
     ArrowRight: false,
     ArrowDown: false,
@@ -51,6 +58,8 @@ export default class Renderer {
       if (e.key in ArrowKeys) this.keys[e.key as ArrowKeys] = false
     })
     this.layers = {}
+    this.portaFrame = 0
+    this.maxPortalFrame = 13
   }
 
   private collisionRight = (
@@ -321,6 +330,7 @@ export default class Renderer {
     }
 
     this.updateFrame()
+    this.updatePortalFrame()
 
     requestAnimationFrame(this.move)
   }
@@ -333,6 +343,36 @@ export default class Renderer {
       this.animCtrl.then =
         this.animCtrl.now - (this.animCtrl.elapsed % FPS_INTERVAL)
       this.hero.updateFrame()
+    }
+  }
+
+  private updatePortalFrame() {
+    // console.log('yeeea')
+    const frameWidth = 54
+    const frameHeight = 112
+    const x = 100
+    const y = 90
+    this.portalAnim.now = Date.now()
+    this.portalAnim.elapsed = this.portalAnim.now - this.portalAnim.then
+    if (
+      this.portalAnim.elapsed > 80 &&
+      this.portaFrame <= this.maxPortalFrame
+    ) {
+      // adjust fpsInterval not being a multiple of RAF's interval (16.7ms)
+      this.portalAnim.then =
+        this.portalAnim.now - (this.portalAnim.elapsed % 80)
+      this.layers['hero'].drawImage(
+        this.assetLoader.getImage('portal'),
+        this.portaFrame * frameWidth,
+        0,
+        frameWidth,
+        frameHeight,
+        x,
+        y,
+        frameWidth,
+        frameHeight
+      )
+      this.portaFrame += 1
     }
   }
 
@@ -380,8 +420,6 @@ export default class Renderer {
 
     this.addMaze(
       new Maze(ROOMS_HORIZONTAL, ROOMS_VERTICAL, {
-        // rw: ROOM_WIDTH,
-        // d: WALL_DEPTH,
         images: {
           walls: this.assetLoader.getImage('walls'),
           ground: this.assetLoader.getImage('ground'),
@@ -392,8 +430,9 @@ export default class Renderer {
     this.maze.drawGround(this.layers['ground'])
     this.activeWallsLayer = 'walls-below'
     this.maze.drawWalls(this.layers['walls-below'])
-    this.hero.render(this.layers['hero'])
-    this.hero.setCurrentRoom('0,0')
+    // this.hero.render(this.layers['hero'])
+    // this.hero.setCurrentRoom('0,0')
+
     this.startAnimationLoop()
   }
 }

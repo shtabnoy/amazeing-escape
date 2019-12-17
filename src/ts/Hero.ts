@@ -30,8 +30,9 @@ export default class Hero {
       y: coords.y || 0,
     }
     this.frameIndex = 0
-    this.frame = FRAMES[this.frameIndex]
-    this.spriteOffset = 0
+    // this.frame = FRAMES[this.frameIndex]
+    this.frame = 0
+    this.spriteOffset = HERO_HEIGHT
 
     // shadow init
     this.shadow = {
