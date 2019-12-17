@@ -354,6 +354,7 @@ export default class Renderer {
     const y = 90
     this.portalAnim.now = Date.now()
     this.portalAnim.elapsed = this.portalAnim.now - this.portalAnim.then
+    console.log(this.portaFrame)
     if (
       this.portalAnim.elapsed > 80 &&
       this.portaFrame <= this.maxPortalFrame
@@ -361,6 +362,7 @@ export default class Renderer {
       // adjust fpsInterval not being a multiple of RAF's interval (16.7ms)
       this.portalAnim.then =
         this.portalAnim.now - (this.portalAnim.elapsed % 80)
+      this.layers['hero'].clearRect(x, y, frameWidth, frameHeight)
       this.layers['hero'].drawImage(
         this.assetLoader.getImage('portal'),
         this.portaFrame * frameWidth,
