@@ -91,6 +91,10 @@ export default class Hero {
     this.frame = FRAMES[this.frameIndex]
   }
 
+  resetFrame = () => {
+    this.frame = 0
+  }
+
   renderShadow(ctx: CanvasRenderingContext2D) {
     ctx.save()
     ctx.fillStyle = 'rgba(0, 0, 0, 0.5)'

@@ -135,10 +135,10 @@ export default class Renderer {
     const { x: x2, y: y2 } = this.hero.getBottomRightCoords()
     let translatedX = this.layers['walls-below'].getTransform().e
     let translatedY = this.layers['walls-below'].getTransform().f
-    let mx1 = 0 - translatedX
-    let my1 = 0 - translatedY
-    let mx2 = CANVAS_WIDTH - translatedX + OFFSET_X
-    let my2 = CANVAS_HEIGHT - translatedY + OFFSET_Y
+    // let mx1 = 0 - translatedX
+    // let my1 = 0 - translatedY
+    // let mx2 = CANVAS_WIDTH - translatedX + OFFSET_X
+    // let my2 = CANVAS_HEIGHT - translatedY + OFFSET_Y
 
     switch (dir) {
       case Direction.left:
@@ -226,6 +226,8 @@ export default class Renderer {
         }
         break
     }
+
+    this.renderPortal()
   }
 
   private move = () => {
@@ -447,7 +449,7 @@ export default class Renderer {
       })
     )
     this.addHero(
-      new Hero(this.assetLoader.getImage('hero'), { x: 100, y: 110 })
+      new Hero(this.assetLoader.getImage('hero'), { x: 104, y: 110 })
     )
     this.maze.drawGround(this.layers['ground'])
     this.activeWallsLayer = 'walls-below'
