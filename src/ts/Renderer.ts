@@ -347,14 +347,12 @@ export default class Renderer {
   }
 
   private updatePortalFrame() {
-    // console.log('yeeea')
     const frameWidth = 54
     const frameHeight = 112
     const x = 100
     const y = 90
     this.portalAnim.now = Date.now()
     this.portalAnim.elapsed = this.portalAnim.now - this.portalAnim.then
-    console.log(this.portaFrame)
     if (
       this.portalAnim.elapsed > 80 &&
       this.portaFrame <= this.maxPortalFrame
@@ -364,7 +362,7 @@ export default class Renderer {
         this.portalAnim.now - (this.portalAnim.elapsed % 80)
       this.layers['hero'].clearRect(x, y, frameWidth, frameHeight)
       this.layers['hero'].drawImage(
-        this.assetLoader.getImage('portal'),
+        this.assetLoader.getImage('intro'),
         this.portaFrame * frameWidth,
         0,
         frameWidth,

@@ -31,16 +31,6 @@ interface ImageCoords {
   sh: number
 }
 
-// Coords is a 2x2 matrix
-// [[ x1, y1 ],
-//  [ x2, y2 ]]
-// Image coords is a 2x2 matrix
-// [[ sx, sy ],
-//  [ sw, sh ]]
-// Collision zone is a 2x2 matrix
-// [[ up,   down  ],
-//  [ left, right ]]
-
 export interface Wall {
   coords: M2x2
   imageCoords: ImageCoords
@@ -66,7 +56,6 @@ export default class Maze {
     this.images = config.images
     const g = this.createMazeGraph(width, height)
     const mst1 = g.mst()
-    console.log(mst1)
     this.walls = {}
     this.createRooms(mst1, ROOM_WIDTH)
   }

@@ -11,6 +11,7 @@ const imageMap = {
   walls: 'walls/wallsLong.png',
   hero: 'hero/hero.png',
   ground: 'ground/ground.jpg',
+  intro: 'portal/intro.png',
   portal: 'portal/portal.png',
 }
 
