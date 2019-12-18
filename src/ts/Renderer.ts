@@ -35,7 +35,8 @@ export default class Renderer {
     then: 0,
     elapsed: 0,
   }
-  private portalAnim: AnimationControls = {
+  private portalAnim: AnimationControls & { ref: number | null } = {
+    ref: null,
     now: 0,
     then: 0,
     elapsed: 0,
@@ -328,14 +329,15 @@ export default class Renderer {
         this.hero.render(this.layers['hero'])
       }
     }
-
-    this.updateFrame()
-    this.updatePortalFrame()
+    // update character animation only when any key is pressed
+    if (Object.values(this.keys).some(key => key)) {
+      this.updateFrame()
+    }
 
     requestAnimationFrame(this.move)
   }
 
-  private updateFrame() {
+  private updateFrame = () => {
     this.animCtrl.now = Date.now()
     this.animCtrl.elapsed = this.animCtrl.now - this.animCtrl.then
     if (this.animCtrl.elapsed > FPS_INTERVAL) {
@@ -346,7 +348,7 @@ export default class Renderer {
     }
   }
 
-  private updatePortalFrame() {
+  private updatePortalFrame = () => {
     const frameWidth = 54
     const frameHeight = 112
     const x = 100
@@ -374,14 +376,32 @@ export default class Renderer {
       )
       this.portaFrame += 1
     }
+    this.portalAnim.ref = requestAnimationFrame(this.updatePortalFrame)
+    if (this.portaFrame > this.maxPortalFrame) {
+      this.layers['hero'].clearRect(x, y, frameWidth, frameHeight)
+      this.renderPortal()
+      this.hero.render(this.layers['hero'])
+      cancelAnimationFrame(this.portalAnim.ref)
+    }
   }
 
-  private startAnimationLoop() {
+  private startAnimationLoop = () => {
     this.animCtrl.then = Date.now()
     requestAnimationFrame(this.move)
+    requestAnimationFrame(this.updatePortalFrame)
   }
 
-  addLayer(canvasId: string) {
+  renderPortal = () => {
+    this.layers['ground'].drawImage(
+      this.assetLoader.getImage('portal'),
+      101,
+      182,
+      52,
+      20
+    )
+  }
+
+  addLayer = (canvasId: string) => {
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
     canvas.id = canvasId
@@ -426,12 +446,12 @@ export default class Renderer {
         },
       })
     )
-    this.addHero(new Hero(this.assetLoader.getImage('hero'), { x: 70, y: 140 }))
+    this.addHero(
+      new Hero(this.assetLoader.getImage('hero'), { x: 100, y: 110 })
+    )
     this.maze.drawGround(this.layers['ground'])
     this.activeWallsLayer = 'walls-below'
     this.maze.drawWalls(this.layers['walls-below'])
-    // this.hero.render(this.layers['hero'])
-    // this.hero.setCurrentRoom('0,0')
 
     this.startAnimationLoop()
   }

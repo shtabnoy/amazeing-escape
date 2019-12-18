@@ -111,7 +111,6 @@ export default class Hero {
 
   render(ctx: CanvasRenderingContext2D) {
     this.renderShadow(ctx)
-
     ctx.drawImage(
       this.img,
       this.frame * HERO_WIDTH,
