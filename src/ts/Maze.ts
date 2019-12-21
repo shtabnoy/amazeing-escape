@@ -46,6 +46,14 @@ export default class Maze {
   private images: {
     walls: HTMLImageElement
     ground: HTMLImageElement
+    portal: HTMLImageElement
+  }
+  private portals: {
+    entrance: { x: number; y: number }
+    exit: { x: number; y: number }
+  } = {
+    entrance: { x: ROOM_WIDTH / 2 + 5, y: ROOM_WIDTH / 2 + CZ + 22 },
+    exit: { x: 0, y: 0 },
   }
 
   constructor(
@@ -55,9 +63,10 @@ export default class Maze {
   ) {
     this.images = config.images
     const g = this.createMazeGraph(width, height)
-    const mst1 = g.mst()
+    const mst = g.mst()
     this.walls = {}
-    this.createRooms(mst1, ROOM_WIDTH)
+    this.createRooms(mst, ROOM_WIDTH)
+    this.createExit(mst)
   }
 
   private createMazeGraph = (w: number, h: number): MazeGraph => {
@@ -84,6 +93,20 @@ export default class Maze {
     }
 
     return g
+  }
+
+  private createExit = (g: MazeGraph) => {
+    // get farthest room (dist -> max)
+    const dists = Object.values(g.vertices).map(v => v.dist)
+    const i = dists.indexOf(Math.max(...dists))
+    const exit = Object.keys(g.vertices)[i]
+    const xy = exit.split(',')
+    const vx = Number(xy[0])
+    const vy = Number(xy[1])
+    this.portals.exit = {
+      x: vx * ROOM_WIDTH + ROOM_WIDTH / 2 + 5,
+      y: vy * ROOM_WIDTH + ROOM_WIDTH / 2 + CZ + 22,
+    }
   }
 
   private addWall = (
@@ -466,6 +489,23 @@ export default class Maze {
     const mx2 = CANVAS_WIDTH - translatedX + OFFSET_X
     const my2 = CANVAS_HEIGHT - translatedY + OFFSET_Y
     ctx.drawImage(this.images.ground, mx1, my1, mx2, my2, mx1, my1, mx2, my2)
+  }
+
+  drawPortals = (ctx: CanvasRenderingContext2D) => {
+    ctx.drawImage(
+      this.images.portal,
+      this.portals.entrance.x,
+      this.portals.entrance.y,
+      52,
+      20
+    )
+    ctx.drawImage(
+      this.images.portal,
+      this.portals.exit.x,
+      this.portals.exit.y,
+      52,
+      20
+    )
   }
 
   getWalls() {

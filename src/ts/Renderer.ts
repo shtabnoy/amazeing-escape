@@ -16,6 +16,7 @@ import {
   ROOMS_HORIZONTAL,
   ROOMS_VERTICAL,
   ROOM_WIDTH,
+  CZ,
 } from './constants'
 import { Direction } from './MazeGraph'
 import AssetLoader from './AssetLoader'
@@ -227,7 +228,7 @@ export default class Renderer {
         break
     }
 
-    this.renderPortal()
+    this.maze.drawPortals(this.layers['ground'])
   }
 
   private move = () => {
@@ -353,8 +354,8 @@ export default class Renderer {
   private updatePortalFrame = () => {
     const frameWidth = 54
     const frameHeight = 112
-    const x = 100
-    const y = 90
+    const x = ROOM_WIDTH / 2 + 4
+    const y = ROOM_WIDTH / 2 - 6
     this.portalAnim.now = Date.now()
     this.portalAnim.elapsed = this.portalAnim.now - this.portalAnim.then
     if (
@@ -381,26 +382,16 @@ export default class Renderer {
     this.portalAnim.ref = requestAnimationFrame(this.updatePortalFrame)
     if (this.portaFrame > this.maxPortalFrame) {
       this.layers['hero'].clearRect(x, y, frameWidth, frameHeight)
-      this.renderPortal()
+      this.maze.drawPortals(this.layers['ground'])
       this.hero.render(this.layers['hero'])
       cancelAnimationFrame(this.portalAnim.ref)
+      requestAnimationFrame(this.move)
     }
   }
 
   private startAnimationLoop = () => {
     this.animCtrl.then = Date.now()
-    requestAnimationFrame(this.move)
     requestAnimationFrame(this.updatePortalFrame)
-  }
-
-  renderPortal = () => {
-    this.layers['ground'].drawImage(
-      this.assetLoader.getImage('portal'),
-      101,
-      182,
-      52,
-      20
-    )
   }
 
   addLayer = (canvasId: string) => {
@@ -445,11 +436,15 @@ export default class Renderer {
         images: {
           walls: this.assetLoader.getImage('walls'),
           ground: this.assetLoader.getImage('ground'),
+          portal: this.assetLoader.getImage('portal'),
         },
       })
     )
     this.addHero(
-      new Hero(this.assetLoader.getImage('hero'), { x: 104, y: 110 })
+      new Hero(this.assetLoader.getImage('hero'), {
+        x: ROOM_WIDTH / 2 + 8,
+        y: ROOM_WIDTH / 2 + 14,
+      })
     )
     this.maze.drawGround(this.layers['ground'])
     this.activeWallsLayer = 'walls-below'
