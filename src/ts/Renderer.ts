@@ -136,10 +136,6 @@ export default class Renderer {
     const { x: x2, y: y2 } = this.hero.getBottomRightCoords()
     let translatedX = this.layers['walls-below'].getTransform().e
     let translatedY = this.layers['walls-below'].getTransform().f
-    // let mx1 = 0 - translatedX
-    // let my1 = 0 - translatedY
-    // let mx2 = CANVAS_WIDTH - translatedX + OFFSET_X
-    // let my2 = CANVAS_HEIGHT - translatedY + OFFSET_Y
 
     switch (dir) {
       case Direction.left:
@@ -234,6 +230,7 @@ export default class Renderer {
   private move = () => {
     const { x: x1, y: y1 } = this.hero.getCoords()
     const { x: x2, y: y2 } = this.hero.getBottomRightCoords()
+    const { x1: ex1, x2: ex2, y1: ey1, y2: ey2 } = this.maze.getExit()
 
     const walls = Object.values(this.maze.getWalls())
 
@@ -332,9 +329,20 @@ export default class Renderer {
         this.hero.render(this.layers['hero'])
       }
     }
+
     // update character animation only when any key is pressed
     if (Object.values(this.keys).some(key => key)) {
       this.updateFrame()
+    }
+
+    // check for exit
+    if (
+      (x2 >= ex1 && x1 <= ex1 && y1 <= ey2 && y2 >= ey1) ||
+      (x1 <= ex2 && x2 >= ex2 && y1 <= ey2 && y2 >= ey1) ||
+      (y2 >= ey1 && y1 <= ey1 && x1 <= ex2 && x2 >= ex1) ||
+      (y1 <= ey1 && y2 >= ey2 && x1 <= ex2 && x2 >= ex1)
+    ) {
+      console.log('EXIT')
     }
 
     requestAnimationFrame(this.move)

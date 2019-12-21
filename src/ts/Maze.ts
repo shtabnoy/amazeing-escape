@@ -41,6 +41,9 @@ export interface Walls {
   [name: string]: Wall
 }
 
+const PORTAL_WIDTH = 52
+const PORTAL_HEIGHT = 20
+
 export default class Maze {
   private walls: Walls
   private images: {
@@ -49,11 +52,16 @@ export default class Maze {
     portal: HTMLImageElement
   }
   private portals: {
-    entrance: { x: number; y: number }
-    exit: { x: number; y: number }
+    entrance: { x: number; y: number; w: number; h: number }
+    exit: { x: number; y: number; w: number; h: number }
   } = {
-    entrance: { x: ROOM_WIDTH / 2 + 5, y: ROOM_WIDTH / 2 + CZ + 22 },
-    exit: { x: 0, y: 0 },
+    entrance: {
+      x: ROOM_WIDTH / 2 + 5,
+      y: ROOM_WIDTH / 2 + CZ + 22,
+      w: PORTAL_WIDTH,
+      h: PORTAL_HEIGHT,
+    },
+    exit: { x: 0, y: 0, w: PORTAL_WIDTH, h: PORTAL_HEIGHT },
   }
 
   constructor(
@@ -103,10 +111,8 @@ export default class Maze {
     const xy = exit.split(',')
     const vx = Number(xy[0])
     const vy = Number(xy[1])
-    this.portals.exit = {
-      x: vx * ROOM_WIDTH + ROOM_WIDTH / 2 + 5,
-      y: vy * ROOM_WIDTH + ROOM_WIDTH / 2 + CZ + 22,
-    }
+    this.portals.exit.x = vx * ROOM_WIDTH + ROOM_WIDTH / 2 + 5
+    this.portals.exit.y = vy * ROOM_WIDTH + ROOM_WIDTH / 2 + CZ + 22
   }
 
   private addWall = (
@@ -496,19 +502,26 @@ export default class Maze {
       this.images.portal,
       this.portals.entrance.x,
       this.portals.entrance.y,
-      52,
-      20
+      PORTAL_WIDTH,
+      PORTAL_HEIGHT
     )
     ctx.drawImage(
       this.images.portal,
       this.portals.exit.x,
       this.portals.exit.y,
-      52,
-      20
+      PORTAL_WIDTH,
+      PORTAL_HEIGHT
     )
   }
 
-  getWalls() {
-    return this.walls
+  getWalls = () => this.walls
+
+  getExit = () => {
+    return {
+      x1: this.portals.exit.x,
+      y1: this.portals.exit.y,
+      x2: this.portals.exit.x + this.portals.exit.w,
+      y2: this.portals.exit.y + this.portals.exit.h,
+    }
   }
 }
