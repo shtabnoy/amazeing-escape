@@ -95,10 +95,10 @@ export default class Hero {
     this.frame = 0
   }
 
-  renderShadow(ctx: CanvasRenderingContext2D) {
+  private renderShadow = (ctx: CanvasRenderingContext2D) => {
     ctx.save()
     ctx.fillStyle = 'rgba(0, 0, 0, 0.5)'
-    ctx.filter = 'blur(1px)'
+    ctx.filter = ctx.filter + ' ' + 'blur(1px)'
     ctx.beginPath()
     ctx.ellipse(
       this.coords.x + this.shadow.xOffset,

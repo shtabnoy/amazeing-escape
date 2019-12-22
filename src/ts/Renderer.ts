@@ -7,22 +7,15 @@ import {
   CAMERA_BORDER_Y,
   STEP,
   CANVAS_HEIGHT,
-  BOTTOM_BORDER,
   CANVAS_WIDTH,
-  RIGHT_BORDER,
   OFFSET_X,
   OFFSET_Y,
-  RATIO,
   ROOMS_HORIZONTAL,
   ROOMS_VERTICAL,
   ROOM_WIDTH,
-  CZ,
 } from './constants'
 import { Direction } from './MazeGraph'
 import AssetLoader from './AssetLoader'
-
-type P = [number, number]
-type W = [P, P]
 
 export default class Renderer {
   private layers: {
@@ -32,11 +25,18 @@ export default class Renderer {
   private maze: Maze
   private hero: Hero
   private animCtrl: AnimationControls = {
+    ref: null,
     now: 0,
     then: 0,
     elapsed: 0,
   }
-  private portalAnim: AnimationControls & { ref: number | null } = {
+  private portalAnim: AnimationControls = {
+    ref: null,
+    now: 0,
+    then: 0,
+    elapsed: 0,
+  }
+  private exitAnim: AnimationControls = {
     ref: null,
     now: 0,
     then: 0,
@@ -342,10 +342,12 @@ export default class Renderer {
       (y2 >= ey1 && y1 <= ey1 && x1 <= ex2 && x2 >= ex1) ||
       (y1 <= ey1 && y2 >= ey2 && x1 <= ex2 && x2 >= ex1)
     ) {
-      console.log('EXIT')
+      cancelAnimationFrame(this.animCtrl.ref)
+      requestAnimationFrame(this.updateExitFrame)
+      return
     }
 
-    requestAnimationFrame(this.move)
+    this.animCtrl.ref = requestAnimationFrame(this.move)
   }
 
   private updateFrame = () => {
@@ -356,6 +358,25 @@ export default class Renderer {
       this.animCtrl.then =
         this.animCtrl.now - (this.animCtrl.elapsed % FPS_INTERVAL)
       this.hero.updateFrame()
+    }
+  }
+
+  private opacity: number = 100
+  private updateExitFrame = () => {
+    this.exitAnim.now = Date.now()
+    this.exitAnim.elapsed = this.exitAnim.now - this.exitAnim.then
+    if (this.exitAnim.elapsed > 80) {
+      this.exitAnim.then = this.exitAnim.now - (this.exitAnim.elapsed % 80)
+
+      this.opacity -= 5
+      this.hero.clear(this.layers['hero'])
+      this.layers['hero'].filter = `opacity(${this.opacity}%)`
+      this.hero.render(this.layers['hero'])
+    }
+    this.exitAnim.ref = requestAnimationFrame(this.updateExitFrame)
+    if (this.opacity <= 0) {
+      console.log('FINALE')
+      cancelAnimationFrame(this.exitAnim.ref)
     }
   }
 
@@ -370,7 +391,6 @@ export default class Renderer {
       this.portalAnim.elapsed > 80 &&
       this.portaFrame <= this.maxPortalFrame
     ) {
-      // adjust fpsInterval not being a multiple of RAF's interval (16.7ms)
       this.portalAnim.then =
         this.portalAnim.now - (this.portalAnim.elapsed % 80)
       this.layers['hero'].clearRect(x, y, frameWidth, frameHeight)
@@ -393,7 +413,7 @@ export default class Renderer {
       this.maze.drawPortals(this.layers['ground'])
       this.hero.render(this.layers['hero'])
       cancelAnimationFrame(this.portalAnim.ref)
-      requestAnimationFrame(this.move)
+      this.animCtrl.ref = requestAnimationFrame(this.move)
     }
   }
 

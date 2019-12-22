@@ -30,4 +30,5 @@ export interface AnimationControls {
   now: number
   then: number
   elapsed: number
+  ref?: number
 }
