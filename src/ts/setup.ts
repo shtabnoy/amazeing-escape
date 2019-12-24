@@ -3,7 +3,8 @@ import AssetLoader from './AssetLoader'
 import '../styles/global.scss'
 
 document.addEventListener('DOMContentLoaded', () => {
-  const startGameBtn = document.getElementById('start-game')
+  const startGameBtn = document.getElementById('start')
+  const resumeGameBtn = document.getElementById('resume')
   startGameBtn.addEventListener('click', async () => {
     // preload all the images
     const al = new AssetLoader()
@@ -27,5 +28,25 @@ document.addEventListener('DOMContentLoaded', () => {
     //       console.log('Autoplay was rejected. Show a button')
     //     })
     // }
+  })
+
+  resumeGameBtn.addEventListener('click', async () => {
+    const canvases = document.querySelectorAll('canvas')
+    canvases.forEach(canvas => {
+      canvas.style.display = 'block'
+    })
+    startGameBtn.style.display = 'block'
+    resumeGameBtn.style.display = 'none'
+  })
+
+  document.addEventListener('keyup', e => {
+    if (e.key === 'Escape') {
+      const canvases = document.querySelectorAll('canvas')
+      canvases.forEach(canvas => {
+        canvas.style.display = 'none'
+      })
+      startGameBtn.style.display = 'none'
+      resumeGameBtn.style.display = 'block'
+    }
   })
 })

@@ -39,4 +39,12 @@ button {
   border-radius: 80px;
   cursor: pointer;
   outline: none;
+
+  &#start {
+    margin-bottom: 24px;
+  }
+
+  &#resume {
+    display: none;
+  }
 }
