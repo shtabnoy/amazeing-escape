@@ -3,9 +3,9 @@ import AssetLoader from './AssetLoader'
 import '../styles/global.scss'
 
 document.addEventListener('DOMContentLoaded', () => {
-  const startGameBtn = document.getElementById('start')
+  const newGameBtn = document.getElementById('new')
   const resumeGameBtn = document.getElementById('resume')
-  startGameBtn.addEventListener('click', async () => {
+  newGameBtn.addEventListener('click', async () => {
     // preload all the images
     const al = new AssetLoader()
     await al.loagImages()
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     canvases.forEach(canvas => {
       canvas.style.display = 'block'
     })
-    startGameBtn.style.display = 'block'
+    newGameBtn.style.display = 'block'
     resumeGameBtn.style.display = 'none'
   })
 
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
       canvases.forEach(canvas => {
         canvas.style.display = 'none'
       })
-      startGameBtn.style.display = 'none'
+      newGameBtn.style.display = 'none'
       resumeGameBtn.style.display = 'block'
     }
   })

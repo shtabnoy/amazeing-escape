@@ -28,22 +28,24 @@ canvas {
 button {
   font-family: 'Orbitron', sans-serif;
   text-transform: uppercase;
-  font-size: 48px;
-  background-color: rgba(50, 197, 255, 0.5);
+  font-size: 32px;
+  background-color: rgba(66, 64, 91, 0.5);
   color: white;
   position: relative;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  padding: 48px 96px;
+  padding: 24px 96px;
   border-radius: 80px;
   cursor: pointer;
   outline: none;
 
-  &#start {
+  &:hover {
+    background-color: rgba(50, 197, 255, 0.5);
+  }
+  &#new {
     margin-bottom: 24px;
   }
-
   &#resume {
     display: none;
   }
