@@ -50,14 +50,21 @@ export default class Renderer {
     ArrowLeft: false,
     ArrowUp: false,
   }
+  private key: ArrowKeys
   private assetLoader: AssetLoader
 
   constructor() {
     document.addEventListener('keydown', e => {
       if (e.key in ArrowKeys) this.keys[e.key as ArrowKeys] = true
+      // if (e.key in ArrowKeys) {
+      //   this.key = e.key as ArrowKeys
+      // }
     })
     document.addEventListener('keyup', e => {
       if (e.key in ArrowKeys) this.keys[e.key as ArrowKeys] = false
+      // if (e.key in ArrowKeys) {
+      //   this.key = null
+      // }
     })
     this.layers = {}
     this.portaFrame = 0
@@ -69,14 +76,15 @@ export default class Renderer {
     x1: number,
     y1: number,
     x2: number,
-    y2: number
+    y2: number,
+    withCZ?: boolean
   ) => {
     return walls.some(
       (wall: Wall) =>
         x1 + STEP <= wall.coords[0][0] &&
         x2 + STEP >= wall.coords[0][0] &&
-        y1 <= wall.coords[1][1] - wall.collisionZone.down &&
-        y2 >= wall.coords[0][1] + wall.collisionZone.up
+        y1 <= wall.coords[1][1] - (withCZ ? wall.collisionZone.down : 0) &&
+        y2 >= wall.coords[0][1] + (withCZ ? wall.collisionZone.up : 0)
     )
   }
 
@@ -85,14 +93,15 @@ export default class Renderer {
     x1: number,
     y1: number,
     x2: number,
-    y2: number
+    y2: number,
+    withCZ?: boolean
   ) => {
     return walls.some(
       (wall: Wall) =>
         x1 - STEP <= wall.coords[1][0] &&
         x2 - STEP >= wall.coords[1][0] &&
-        y1 <= wall.coords[1][1] - wall.collisionZone.down &&
-        y2 >= wall.coords[0][1] + wall.collisionZone.up
+        y1 <= wall.coords[1][1] - (withCZ ? wall.collisionZone.down : 0) &&
+        y2 >= wall.coords[0][1] + (withCZ ? wall.collisionZone.up : 0)
     )
   }
 
@@ -235,33 +244,35 @@ export default class Renderer {
     const walls = Object.values(this.maze.getWalls())
 
     // TODO: Simplify
+    // console.log(this.keys)
     if (this.keys[ArrowKeys.ArrowRight]) {
-      if (
-        walls.some(
-          (wall: Wall) =>
-            x1 + STEP <= wall.coords[0][0] &&
-            x2 + STEP >= wall.coords[0][0] &&
-            y2 >= wall.coords[0][1] &&
-            y2 <= wall.coords[0][1] + wall.collisionZone.up
-        )
-      ) {
-        this.activeWallsLayer = 'walls-above'
-        this.maze.clearCanvas(this.layers['walls-below'])
-        this.maze.drawWalls(this.layers['walls-above'])
-      }
-      if (
-        walls.some(
-          (wall: Wall) =>
-            x1 + STEP <= wall.coords[0][0] &&
-            x2 + STEP >= wall.coords[0][0] &&
-            y1 >= wall.coords[1][1] - wall.collisionZone.down &&
-            y1 <= wall.coords[1][1]
-        )
-      ) {
-        this.activeWallsLayer = 'walls-below'
-        this.maze.clearCanvas(this.layers['walls-above'])
-        this.maze.drawWalls(this.layers['walls-below'])
-      }
+      // if (this.key === ArrowKeys.ArrowRight) {
+      // if (
+      //   walls.some(
+      //     (wall: Wall) =>
+      //       x1 + STEP <= wall.coords[0][0] &&
+      //       x2 + STEP >= wall.coords[0][0] &&
+      //       y2 >= wall.coords[0][1] &&
+      //       y2 <= wall.coords[0][1] + wall.collisionZone.up
+      //   )
+      // ) {
+      //   this.activeWallsLayer = 'walls-above'
+      //   this.maze.clearCanvas(this.layers['walls-below'])
+      //   this.maze.drawWalls(this.layers['walls-above'])
+      // }
+      // if (
+      //   walls.some(
+      //     (wall: Wall) =>
+      //       x1 + STEP <= wall.coords[0][0] &&
+      //       x2 + STEP >= wall.coords[0][0] &&
+      //       y1 >= wall.coords[1][1] - wall.collisionZone.down &&
+      //       y1 <= wall.coords[1][1]
+      //   )
+      // ) {
+      //   this.activeWallsLayer = 'walls-below'
+      //   this.maze.clearCanvas(this.layers['walls-above'])
+      //   this.maze.drawWalls(this.layers['walls-below'])
+      // }
       if (!this.collisionRight(walls, x1, y1, x2, y2)) {
         this.hero.clear(this.layers['hero'])
         this.hero.move(Direction.right)
@@ -269,33 +280,35 @@ export default class Renderer {
         this.hero.render(this.layers['hero'])
       }
     }
+
     if (this.keys[ArrowKeys.ArrowLeft]) {
-      if (
-        walls.some(
-          (wall: Wall) =>
-            x1 - STEP <= wall.coords[1][0] &&
-            x2 - STEP >= wall.coords[1][0] &&
-            y2 >= wall.coords[0][1] &&
-            y2 <= wall.coords[0][1] + wall.collisionZone.up
-        )
-      ) {
-        this.activeWallsLayer = 'walls-above'
-        this.maze.clearCanvas(this.layers['walls-below'])
-        this.maze.drawWalls(this.layers['walls-above'])
-      }
-      if (
-        walls.some(
-          (wall: Wall) =>
-            x1 - STEP <= wall.coords[1][0] &&
-            x2 - STEP >= wall.coords[1][0] &&
-            y1 >= wall.coords[1][1] - wall.collisionZone.down &&
-            y1 <= wall.coords[1][1]
-        )
-      ) {
-        this.activeWallsLayer = 'walls-below'
-        this.maze.clearCanvas(this.layers['walls-above'])
-        this.maze.drawWalls(this.layers['walls-below'])
-      }
+      // else if (this.key === ArrowKeys.ArrowLeft) {
+      // if (
+      //   walls.some(
+      //     (wall: Wall) =>
+      //       x1 - STEP <= wall.coords[1][0] &&
+      //       x2 - STEP >= wall.coords[1][0] &&
+      //       y2 >= wall.coords[0][1] &&
+      //       y2 <= wall.coords[0][1] + wall.collisionZone.up
+      //   )
+      // ) {
+      //   this.activeWallsLayer = 'walls-above'
+      //   this.maze.clearCanvas(this.layers['walls-below'])
+      //   this.maze.drawWalls(this.layers['walls-above'])
+      // }
+      // if (
+      //   walls.some(
+      //     (wall: Wall) =>
+      //       x1 - STEP <= wall.coords[1][0] &&
+      //       x2 - STEP >= wall.coords[1][0] &&
+      //       y1 >= wall.coords[1][1] - wall.collisionZone.down &&
+      //       y1 <= wall.coords[1][1]
+      //   )
+      // ) {
+      //   this.activeWallsLayer = 'walls-below'
+      //   this.maze.clearCanvas(this.layers['walls-above'])
+      //   this.maze.drawWalls(this.layers['walls-below'])
+      // }
       if (!this.collisionLeft(walls, x1, y1, x2, y2)) {
         this.hero.clear(this.layers['hero'])
         this.hero.move(Direction.left)
@@ -303,26 +316,30 @@ export default class Renderer {
         this.hero.render(this.layers['hero'])
       }
     }
+
     if (this.keys[ArrowKeys.ArrowDown]) {
-      if (this.collisionDown(walls, x1, y1, x2, y2)) {
-        this.activeWallsLayer = 'walls-above'
-        this.maze.clearCanvas(this.layers['walls-below'])
-        this.maze.drawWalls(this.layers['walls-above'])
-      }
-      if (!this.collisionDown(walls, x1, y1, x2, y2, true)) {
+      // else if (this.key === ArrowKeys.ArrowDown) {
+      // if (this.collisionDown(walls, x1, y1, x2, y2)) {
+      //   this.activeWallsLayer = 'walls-above'
+      //   this.maze.clearCanvas(this.layers['walls-below'])
+      //   this.maze.drawWalls(this.layers['walls-above'])
+      // }
+      if (!this.collisionDown(walls, x1, y1, x2, y2)) {
         this.hero.clear(this.layers['hero'])
         this.hero.move(Direction.down)
         this.moveCamera(Direction.down)
         this.hero.render(this.layers['hero'])
       }
     }
+
     if (this.keys[ArrowKeys.ArrowUp]) {
-      if (this.collisionUp(walls, x1, y1, x2, y2)) {
-        this.activeWallsLayer = 'walls-below'
-        this.maze.clearCanvas(this.layers['walls-above'])
-        this.maze.drawWalls(this.layers['walls-below'])
-      }
-      if (!this.collisionUp(walls, x1, y1, x2, y2, true)) {
+      // else if (this.key === ArrowKeys.ArrowUp) {
+      // if (this.collisionUp(walls, x1, y1, x2, y2)) {
+      //   this.activeWallsLayer = 'walls-below'
+      //   this.maze.clearCanvas(this.layers['walls-above'])
+      //   this.maze.drawWalls(this.layers['walls-below'])
+      // }
+      if (!this.collisionUp(walls, x1, y1, x2, y2)) {
         this.hero.clear(this.layers['hero'])
         this.hero.move(Direction.up)
         this.moveCamera(Direction.up)
@@ -334,6 +351,7 @@ export default class Renderer {
     if (Object.values(this.keys).some(key => key)) {
       this.updateFrame()
     }
+    // if (this.key) this.updateFrame()
 
     // check for exit
     if (
