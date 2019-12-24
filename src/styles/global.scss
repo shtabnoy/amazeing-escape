@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Orbitron&display=swap');
+
 html,
 body {
   margin: 0;
@@ -13,11 +15,28 @@ canvas {
   top: 0;
 }
 
-.bg {
-  position: absolute;
+.menu {
+  position: relative;
   width: 100%;
   height: 100%;
   top: 0;
   left: 0;
   background-image: url('../assets/background.png');
+  background-size: cover;
+}
+
+button {
+  font-family: 'Orbitron', sans-serif;
+  text-transform: uppercase;
+  font-size: 48px;
+  background-color: rgba(50, 197, 255, 0.5);
+  color: white;
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 48px 96px;
+  border-radius: 80px;
+  cursor: pointer;
+  outline: none;
 }
