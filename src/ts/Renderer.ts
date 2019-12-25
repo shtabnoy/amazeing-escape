@@ -50,8 +50,9 @@ export default class Renderer {
     ArrowUp: false,
   }
   private assetLoader: AssetLoader
+  private onFinish: () => void
 
-  constructor() {
+  constructor(onFinish: () => void) {
     document.addEventListener('keydown', e => {
       if (e.key in ArrowKeys) this.keys[e.key as ArrowKeys] = true
     })
@@ -61,6 +62,7 @@ export default class Renderer {
     this.layers = {}
     this.portaFrame = 0
     this.maxPortalFrame = 13
+    this.onFinish = onFinish
   }
 
   private collisionRight = (
@@ -334,8 +336,8 @@ export default class Renderer {
     }
     this.exitAnim.ref = requestAnimationFrame(this.updateExitFrame)
     if (this.opacity <= 0) {
-      console.log('FINALE')
       cancelAnimationFrame(this.exitAnim.ref)
+      this.onFinish()
     }
   }
 
