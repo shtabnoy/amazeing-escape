@@ -7,6 +7,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const resumeGameBtn = document.getElementById('resume')
   const timeBlock = document.getElementById('time')
 
+  // load the background audio
+  const audio = new Audio('src/assets/audio/game_music_2.mp3')
+  audio.loop = true
+
   let startTime = 0
   // TODO: finishTime should exclude final fade out animation
   let finishTime = 0
@@ -36,6 +40,9 @@ document.addEventListener('DOMContentLoaded', () => {
     newGameBtn.style.display = 'block'
 
     renderTime(finishTime, startTime)
+
+    audio.pause()
+    audio.currentTime = 0
   }
 
   newGameBtn.addEventListener('click', async () => {
@@ -57,36 +64,39 @@ document.addEventListener('DOMContentLoaded', () => {
     r.setAssetLoader(al)
     r.render()
 
-    // load the background audio
-    // const audio = new Audio('src/assets/audio/game_music_2.mp3')
-    // audio.loop = true
-    // const audioPromise = audio.play()
-    // if (audioPromise !== undefined) {
-    //   audioPromise
-    //     .then(_ => {
-    //       console.log('Autoplay started!')
-    //     })
-    //     .catch(error => {
-    //       console.log('Autoplay was rejected. Show a button')
-    //     })
-    // }
+    // start audio
+    audio.currentTime = 0
+    const audioPromise = audio.play()
+    if (audioPromise !== undefined) {
+      audioPromise
+        .then(_ => {
+          console.log('Autoplay started!')
+        })
+        .catch(error => {
+          console.log('Autoplay was rejected. Show a button')
+        })
+    }
   })
 
   resumeGameBtn.addEventListener('click', () => {
+    // audio.play()
     const canvases = document.querySelectorAll('canvas')
     canvases.forEach(canvas => {
       canvas.style.display = 'block'
     })
+    timeBlock.style.display = 'none'
     newGameBtn.style.display = 'none'
     resumeGameBtn.style.display = 'none'
   })
 
   document.addEventListener('keyup', e => {
     if (e.key === 'Escape') {
+      // audio.pause()
       const canvases = document.querySelectorAll('canvas')
       canvases.forEach(canvas => {
         canvas.style.display = 'none'
       })
+      timeBlock.style.display = 'none'
       newGameBtn.style.display = 'block'
       resumeGameBtn.style.display = 'block'
     }
