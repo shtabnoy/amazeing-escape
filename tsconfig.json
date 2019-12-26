@@ -7,7 +7,8 @@
     "target": "es5",
     "lib": ["es5", "es6", "es2017", "dom"],
     "jsx": "react",
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "esModuleInterop": true
   },
   "include": ["./src/**/*"]
 }
