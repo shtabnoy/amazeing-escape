@@ -5,14 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "start": "webpack-dev-server --open --mode development",
-    "server": "nodemon src/server"
+    "start": "webpack-dev-server --open --mode development"
   },
   "author": "shtabnoy",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1",
-    "nodemon": "^1.19.1",
     "typescript": "^3.5.2",
     "webpack-dev-server": "^3.7.1"
   },
