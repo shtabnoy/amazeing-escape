@@ -16,6 +16,7 @@ import {
 } from './constants'
 import { Direction } from './MazeGraph'
 import AssetLoader from './AssetLoader'
+import PortalOutro from '../assets/audio/portalOutro.mp3'
 
 export default class Renderer {
   private layers: {
@@ -306,7 +307,7 @@ export default class Renderer {
       cancelAnimationFrame(this.animCtrl.ref)
 
       // TODO: All audios should be handled in one place
-      const portalOutro = new Audio('src/assets/audio/portalOutro.mp3')
+      const portalOutro = new Audio(PortalOutro)
       portalOutro.play()
 
       requestAnimationFrame(this.updateExitFrame)

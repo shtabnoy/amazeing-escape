@@ -1,5 +1,7 @@
 import Renderer from './components/Renderer'
 import AssetLoader from './components/AssetLoader'
+import GameMusic from './assets/audio/gameMusic.mp3'
+import PortalIntro from './assets/audio/portalIntro.wav'
 import './styles/global.scss'
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -8,8 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const timeBlock = document.getElementById('time')
 
   // load all audios
-  const mainTheme = new Audio('src/assets/audio/gameMusic.mp3')
-  const portalIntro = new Audio('src/assets/audio/portalIntro.wav')
+  const mainTheme = new Audio(GameMusic)
+  const portalIntro = new Audio(PortalIntro)
 
   mainTheme.loop = true
 
