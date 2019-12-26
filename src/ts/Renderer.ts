@@ -306,7 +306,7 @@ export default class Renderer {
       cancelAnimationFrame(this.animCtrl.ref)
 
       // TODO: All audios should be handled in one place
-      const portalOutro = new Audio('src/assets/audio/portalOutro.wav')
+      const portalOutro = new Audio('src/assets/audio/portalOutro.mp3')
       portalOutro.play()
 
       requestAnimationFrame(this.updateExitFrame)
