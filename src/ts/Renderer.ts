@@ -304,6 +304,11 @@ export default class Renderer {
       (y1 <= ey1 && y2 >= ey2 && x1 <= ex2 && x2 >= ex1)
     ) {
       cancelAnimationFrame(this.animCtrl.ref)
+
+      // TODO: All audios should be handled in one place
+      const portalOutro = new Audio('src/assets/audio/portalOutro.wav')
+      portalOutro.play()
+
       requestAnimationFrame(this.updateExitFrame)
       return
     }
