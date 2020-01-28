@@ -5,7 +5,7 @@ import PortalIntro from './assets/audio/portalIntro.wav'
 import './styles/global.scss'
 
 document.addEventListener('DOMContentLoaded', () => {
-  const newGameBtn = document.getElementById('new')
+  const newGameBtn = document.getElementById('new') as HTMLButtonElement
   const resumeGameBtn = document.getElementById('resume')
   const timeBlock = document.getElementById('time')
 
@@ -50,6 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   newGameBtn.addEventListener('click', async () => {
+    newGameBtn.disabled = true
+
     // setup current time as start time
     startTime = new Date().getTime()
 
@@ -72,6 +74,8 @@ document.addEventListener('DOMContentLoaded', () => {
     portalIntro.currentTime = 0
     const audioPromise1 = mainTheme.play()
     const audioPromise2 = portalIntro.play()
+
+    newGameBtn.disabled = false
     // start audio
     // audio.currentTime = 0
     // const audioPromise = audio.play()
